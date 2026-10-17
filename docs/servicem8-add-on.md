@@ -49,8 +49,8 @@ by hand.
 
 6. **Connect.** Open [your dashboard](https://www.getturnup.com/dashboard) →
    Setup and settings → **ServiceM8** → **Connect ServiceM8 as an add-on**.
-   ServiceM8 asks you to allow three things (write diary items, send staff
-   notifications, read the account name). Allow, and you land back on the
+   ServiceM8 asks you to allow two things (write diary items, read the
+   account name). Allow, and you land back on the
    dashboard with the panel saying connected.
 
 7. **Check it.** Move any card that follows a ServiceM8 job (your Thimbles job

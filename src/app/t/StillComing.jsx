@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { timeOnly } from '@/lib/when'
 import { TRADE_NAME } from '@/lib/trade'
 import { BellIcon } from '@/components/icons'
 
@@ -14,7 +15,6 @@ import { BellIcon } from '@/components/icons'
  * the time it was given. Nothing on this page invents a time; it only
  * notices that one has passed.
  */
-const hhmm = (d) => new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
 const first = TRADE_NAME.split(' ')[0]
 
 export default function StillComing({ status, onAsked }) {
@@ -22,7 +22,10 @@ export default function StillComing({ status, onAsked }) {
   const [busy, setBusy] = useState(false)
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 30_000); return () => clearInterval(t) }, [])
 
-  const start = status.window?.start || status.scheduledFor
+  // Real hours only: a day with no hours is not a window, and "the window
+  // started at 00:00" is a time nobody gave. publicWindow() already withholds
+  // hours the customer proposed and the trade has not agreed.
+  const start = status.window?.start || null
   if (!start || status.stage === 'DONE') return null
   const end = status.window?.end || null
   const startPassed = now >= new Date(start).getTime()
@@ -61,9 +64,9 @@ export default function StillComing({ status, onAsked }) {
         <div className="min-w-0 flex-1">
           {missed ? (
             <>
-              <p className="text-[16px] font-semibold">Sorry — the window ended at {hhmm(end || start)} and {first} has not arrived</p>
+              <p className="text-[16px] font-semibold">Sorry — the window ended at {timeOnly(end || start)} and {first} has not arrived</p>
               {late && new Date(status.lateAt) > new Date(status.missedAt)
-                ? <p className="mt-0.5 text-[14px] muted">{first} says about {status.lateMinutes} minutes late, said at {hhmm(status.lateAt)}.</p>
+                ? <p className="mt-0.5 text-[14px] muted">{first} says about {status.lateMinutes} minutes late, said at {timeOnly(status.lateAt)}.</p>
                 : <p className="mt-0.5 text-[14px] muted">That is on us, not you. What would suit you? {first}’s phone gets your answer straight away.</p>}
               <div className="mt-3 flex flex-wrap gap-2">
                 {[['WAIT', 'I’ll wait'], ['LATER', 'Later today'], ['REBOOK', 'Another day']].map(([k, label]) => (
@@ -74,21 +77,21 @@ export default function StillComing({ status, onAsked }) {
                   </button>
                 ))}
               </div>
-              {status.missedChoice && <p className="mt-2 text-[13px] muted">Sent at {hhmm(status.missedChoiceAt)}. {status.missedChoice === 'WAIT' ? `${first} knows you are waiting.` : `${first} will offer a new window here.`}</p>}
+              {status.missedChoice && <p className="mt-2 text-[13px] muted">Sent at {timeOnly(status.missedChoiceAt)}. {status.missedChoice === 'WAIT' ? `${first} knows you are waiting.` : `${first} will offer a new window here.`}</p>}
             </>
           ) : late ? (
             <>
               <p className="text-[16px] font-semibold">{first} says: running about {status.lateMinutes} minutes late</p>
-              <p className="mt-0.5 text-[14px] muted">Said at {hhmm(status.lateAt)}. Sorry about that.</p>
+              <p className="mt-0.5 text-[14px] muted">Said at {timeOnly(status.lateAt)}. Sorry about that.</p>
             </>
           ) : open ? (
             <>
-              <p className="text-[16px] font-semibold">You asked at {hhmm(status.askedAt)}</p>
+              <p className="text-[16px] font-semibold">You asked at {timeOnly(status.askedAt)}</p>
               <p className="mt-0.5 text-[14px] muted">{first}’s phone has buzzed. The answer shows here the moment it is given.</p>
             </>
           ) : (
             <>
-              <p className="text-[16px] font-semibold">{status.stage === 'BOOKED' ? `The window started at ${hhmm(start)}` : `The window ended at ${hhmm(end)}`} and nothing has moved yet</p>
+              <p className="text-[16px] font-semibold">{status.stage === 'BOOKED' ? `The window started at ${timeOnly(start)}` : `The window ended at ${timeOnly(end)}`} and nothing has moved yet</p>
               <p className="mt-0.5 text-[14px] muted">Ask, and {first}’s phone buzzes. You get an answer here, not a guess.</p>
             </>
           )}

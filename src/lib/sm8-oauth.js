@@ -18,13 +18,9 @@ import { prisma } from '@/lib/prisma'
  */
 const AUTH_BASE = (process.env.SM8_OAUTH_BASE || 'https://go.servicem8.com').replace(/\/$/, '')
 const API_BASE = (process.env.SM8_API_BASE || 'https://api.servicem8.com').replace(/\/$/, '')
-// Only what is used. `create_notifications` was requested here for two
-// versions and never called once: TurnUp notifies the trade through its own
-// push, not ServiceM8's. ServiceM8's own store requirements make an add-on
-// request only the permissions it needs, and asking a trade to grant one
-// nothing reads is the same defect as a field on publicShape() nothing shows.
-// `vendor` is the account name, which the dashboard prints so the trade can
-// see WHICH ServiceM8 account is connected.
+// Only what is used: diary lines, and the account's name for the panel. The
+// add-on asked for create_notifications too and never sent one; ServiceM8's
+// store asks for the minimum, so it went (v1.60.0).
 export const SCOPES = ['publish_diary_items', 'vendor']
 const ID = 'singleton'
 
