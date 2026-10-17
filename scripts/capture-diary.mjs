@@ -173,6 +173,15 @@ const run = async () => {
     }
     const file = `${OUT}${shot.name}.webp`
     try {
+      // Scroll the whole page first. Pictures below the fold load lazily, and a
+      // full-page shot taken from the top records their frames empty: every
+      // homepage diary until v1.58.0 has blank boxes where the pictures are.
+      if (shot.full) {
+        const h = await page.evaluate(() => document.body.scrollHeight)
+        for (let y = 0; y < h; y += 600) { await page.evaluate((v) => window.scrollTo(0, v), y); await page.waitForTimeout(90) }
+        await page.evaluate(() => window.scrollTo(0, 0))
+        await page.waitForTimeout(700)
+      }
       await toWebp(await page.screenshot({ fullPage: shot.full, type: 'png' }), file)
       done.push(shot.name)
       console.log('  captured', shot.name)

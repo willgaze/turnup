@@ -5,11 +5,11 @@
   },
   "stage-on-my-way": {
     "w": 716,
-    "h": 630
+    "h": 900
   },
   "stage-on-site": {
     "w": 716,
-    "h": 630
+    "h": 900
   },
   "stage-paused": {
     "w": 716,
@@ -41,39 +41,39 @@
   },
   "row-history": {
     "w": 716,
-    "h": 464
+    "h": 466
   },
   "row-terms": {
     "w": 716,
     "h": 500
   },
   "row-notify": {
-    "w": 712,
-    "h": 498
+    "w": 716,
+    "h": 458
   },
   "trade-stage-buttons": {
-    "w": 712,
-    "h": 190
+    "w": 648,
+    "h": 126
   },
   "trade-navigate-note": {
-    "w": 712,
-    "h": 430
+    "w": 704,
+    "h": 344
   },
   "trade-send": {
-    "w": 680,
-    "h": 424
+    "w": 648,
+    "h": 402
   },
   "trade-fields": {
-    "w": 712,
+    "w": 716,
     "h": 760
   },
   "trade-faceid": {
-    "w": 712,
-    "h": 310
+    "w": 728,
+    "h": 296
   },
   "trade-plate": {
-    "w": 712,
-    "h": 420
+    "w": 672,
+    "h": 470
   },
   "sm8-customer-booked": {
     "w": 712,
@@ -114,5 +114,13 @@
   "sm8-lately": {
     "w": 716,
     "h": 504
+  },
+  "house-card": {
+    "w": 732,
+    "h": 1180
+  },
+  "row-after": {
+    "w": 716,
+    "h": 426
   }
 }

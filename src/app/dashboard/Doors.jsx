@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { HouseIcon, CopyIcon, PlusIcon, LinkOffIcon } from '@/components/icons'
+import Shot from '@/components/Shot'
 
 /**
  * Household cards: one door, everything coming to it.
@@ -131,10 +132,9 @@ export default function Doors() {
       </div>
 
       <div className="px-6 pb-5 text-[15px] leading-snug muted">
-        <p>
-          One card per door, with everything coming to it: your visit, the sofa, the parcels.
-          They forward a delivery email to the card&apos;s own address and it turns up on the list.
-        </p>
+        {/* The card itself, cut from a capture of a seeded one. Your visit
+            and the household's own parcels on one list. */}
+        <Shot name="house-card" label="One door, everything coming to it" note="Your visit, the sofa, the parcels. They forward the emails; the card fills itself." fade className="max-w-[360px]" />
 
         {/* The address is the whole promise, so it is not offered until it can
             work. A row that hands out an address nothing is listening on is
@@ -243,11 +243,7 @@ export default function Doors() {
           </ul>
         )}
 
-        <p className="mt-3 text-[12px]">
-          The link only ever shows what someone said was coming. Nothing the household
-          tells you is on it, and the forwarding address is never on it either — so a card
-          passed round a family group chat cannot be used to post onto their door.
-        </p>
+        <p className="mt-3 text-[12px]">The link shows only what someone said was coming. The forwarding address is never on it.</p>
       </div>
     </section>
   )

@@ -35,7 +35,7 @@ export default function AfterJob({ status, reviewUrl, onSaved }) {
         <div className="min-w-0 flex-1">
           <p className="text-[16px] font-semibold">How did it go?</p>
           <p className="mt-0.5 text-[14px] leading-snug muted">
-            {reviewUrl ? `A Google review is the thing that helps ${first} most. And anything you would rather say to ${first} alone, say here.` : `Anything you would like to tell ${first}, say here. It goes to ${first} and nobody else.`}
+            {reviewUrl ? `A review helps ${first} most. A note reaches ${first} alone.` : `A note reaches ${first} alone. Nobody else reads it.`}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             {reviewUrl && (

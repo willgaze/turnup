@@ -38,6 +38,9 @@ export default function Preview({ stage }) {
         vehicleReg: 'SH21 VAN',
       }}
       initialBrand={null}
+      /* An invented Google link, so the DONE page shows both doors of How did
+         it go? Nothing in the fixture is tapped; it is photographed. */
+      initialReviewUrl={at === 'DONE' ? 'https://g.page/r/example/review' : null}
       initialStatus={{
         code: 'K7M4PQRT',
         stage: at,

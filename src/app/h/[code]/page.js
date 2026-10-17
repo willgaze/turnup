@@ -68,6 +68,14 @@ const PERSON_LABEL = {
 const labelFor = (a) =>
   (a.kind === 'SERVICE' || a.source === 'TRADE' ? PERSON_LABEL : LABEL)[a.stage] || a.stage
 
+// The row the empty card shows, so a household sees what forwarding an email
+// does before they have done it. Not a real parcel; nothing links anywhere.
+const example = () => ({
+  kind: 'PARCEL', stage: 'OUT_FOR_DELIVERY', carrier: 'Royal Mail', title: 'Royal Mail parcel',
+  reference: null, trackUrl: null, tradeStatusCode: null, source: 'EMAIL',
+  expectedFor: new Date(), windowSaid: null, windowStart: null, windowEnd: null,
+})
+
 /**
  * When it is expected, always attributed.
  *
@@ -214,9 +222,6 @@ export default async function HouseholdCard({ params }) {
           <h1 className="mt-1 text-[32px] font-bold leading-tight tracking-[-0.02em]">
             {headline(people.length, things.length)}
           </h1>
-          <p className="mt-1.5 text-[16px] leading-snug muted">
-            Who is calling round, and what else is turning up. Forward the emails and they land here.
-          </p>
         </header>
 
         {people.length > 0 && (
@@ -244,9 +249,20 @@ export default async function HouseholdCard({ params }) {
               <ClockIcon size={22} />
             </span>
             <p className="mt-3 text-[17px] font-semibold">Nothing due</p>
-            <p className="mt-1 text-[16px] leading-snug muted">
-              Forward a delivery email or a booking confirmation here and it turns up on this card — the engineer as well as the parcel.
+            <p className="mt-1 text-[16px] leading-snug muted">Forward a delivery email or a booking confirmation and it lands here.</p>
+          </div>
+        )}
+
+        {coming.length === 0 && (
+          /* What a forwarded email becomes, drawn with the same Row the real
+             ones use. Invented parcel; the label says it is an example. */
+          <div className="mt-5">
+            <p className="px-1 text-[13px] font-semibold uppercase tracking-wider" style={{ color: 'var(--label-3)' }}>
+              Like this
             </p>
+            <ul className="mt-2 grid gap-3" aria-label="An example row">
+              <Row a={example()} />
+            </ul>
           </div>
         )}
 

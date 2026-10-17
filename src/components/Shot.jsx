@@ -19,7 +19,8 @@ export default function Shot({ name, label, note, alt, fade = false, className =
   return (
     <figure className={`min-w-0 ${className}`}>
       {/* a row cut short fades out rather than ending on a hard edge */}
-      <div className="overflow-hidden rounded-[18px] shadow-[0_12px_28px_-14px_rgba(0,0,0,.45)] ring-1 ring-black/[.06] dark:ring-white/10"
+      {/* flat, like the app it shows: the one corner radius, a hairline, no cast shadow */}
+      <div className="overflow-hidden rounded-xl ring-1 ring-black/[.08] dark:ring-white/10"
            style={fade ? { maskImage: 'linear-gradient(#000 78%, transparent)', WebkitMaskImage: 'linear-gradient(#000 78%, transparent)' } : undefined}>
         <Image src={`/home/crops/${name}.webp`} alt={alt || label} width={size.w} height={size.h}
                priority={priority} sizes="(min-width: 640px) 320px, 90vw" className="block h-auto w-full" />

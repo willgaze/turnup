@@ -1082,12 +1082,25 @@ BASE=http://localhost:3100 node scripts/capture-home-crops.mjs   # then rebuild
 ```
 
 It photographs the customer's page from `/preview` one element at a time (the
-status card at each stage, each row opened) and cuts the trade's screens from
-the full captures already in `public/home/` — those need a database, so the
-boxes in the script are in those files' pixels. It writes
-`src/lib/home-crops.json` with each file's size, which `Shot.jsx` needs.
+status card at each stage, each row opened), the hero phone
+(`public/home/customer-on-my-way.webp`), the household card it cuts
+`house-card` from, and, since v1.58.0, **the trade's screens live too**:
+signed in against the seeded local database (`scripts/local-db.sh` first, or
+the run says NO SESSION and leaves them), it photographs the sign-in, the stage
+buttons, Navigate with the door note, the send box, the new-job form and the
+plate field by locator. Until then those six were cut by pixel box from full
+captures made at v1.35.0, which is how the homepage showed the glass look for
+a week after the flat one shipped: the rule below was kept for the customer's
+rows and silently broken for the trade's. Build with
+`NEXT_PUBLIC_VAPID_PUBLIC_KEY` set (any string; it is only a photograph) or the
+push row cannot be shot. It writes `src/lib/home-crops.json` with each file's
+size, which `Shot.jsx` needs. The frame round each picture is flat, like the
+app: the one radius and a hairline.
 **When a screen changes, re-run it**: a crop of last month's row is a lie
-about this month's app. Recapture; never retouch. `/with-servicem8` uses the
+about this month's app. Recapture; never retouch. A look change (v1.51.0)
+counts as every screen changing. The poster frames (`public/home/frame-*.webp`,
+`src/lib/posters.js`) still embed older screens at thumbnail size; they have no
+script yet and are the next thing to re-shoot. `/with-servicem8` uses the
 same component and the same folder (`sm8-*`), cut from the captures in
 `public/with-servicem8/` with `ONLY=sm8 node scripts/capture-home-crops.mjs`,
 which needs no browser; ServiceM8's own screens stay drawn (`Sm8Mocks.jsx`), at
@@ -1106,6 +1119,26 @@ page is (glass, wash, `tone-booked`), one line, the box, and under it `Shot`'s
 `/with-servicem8` is `public/with-servicem8/claim.webp` from
 `scripts/capture-with-servicem8.mjs`, which needs a stand-in ServiceM8 on
 `SM8_API_BASE`; re-shoot it when that page changes.
+
+The household card (v1.58.0): no sentence under the heading, the rows say what they
+are; an empty card shows one example row drawn with the real `Row`. The dashboard's
+Household cards panel shows `house-card`, cut from `public/home/household.webp`, a 2x
+phone shot of `/h/HOME24XK` on the seeded database that every full pass re-takes
+(`ONLY=house` re-cuts the existing shot without a browser).
+**If that shot says "That card has expired", the seed skipped the Place table**: run
+`npx prisma generate` and the seed again. Three diaries photographed that dead end.
+
+The review link (v1.58.0): the Google review field under Who to expect sits beneath
+`row-after`, the How-did-it-go row photographed from `/preview?stage=DONE` (the fixture
+carries an invented Google link at DONE so both doors show) with `ONLY=after`. The row
+itself says one line. The two doors stay open to everyone; see *How did it go?* above.
+
+What this could become (v1.58.0, `src/app/dashboard/Roadmap.jsx`): each roadmap item
+shows its screen, from `PICTURE` there: a homepage frame (`public/home/frame-*.webp`,
+the files `src/lib/posters.js` lists) or a crop. A frame for an idea is a drawing, and
+the chip beside it says Not built; never put a real capture beside an idea. The
+sentence and the Needs line open on tap; the live phase is folded behind its count.
+A new roadmap item wants a line in `PICTURE` when a screen for it exists.
 
 The wallet section (`src/components/WalletStory.jsx`) is drawn from
 `PassCard`, the same component the real pass is built from, so it cannot

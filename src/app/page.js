@@ -75,11 +75,15 @@ const CUSTOMER = [
 const TRADE = [
   ['trade-stage-buttons', 'Tap the stage',            'One-handed, next to the van.'],
   ['trade-send',          'Send it in one tap',       'Text, WhatsApp, or copy.'],
-  ['trade-fields',        'A job is five fields',     'Thirty seconds. Their link exists.'],
+  ['trade-fields',        'A job is five fields',     'Thirty seconds. Their link exists.', true],
   ['trade-navigate-note', 'Navigate, and their note', 'Which door, the dog, where to park.'],
   ['trade-faceid',        'Face ID in',               'No password to forget.'],
   ['trade-plate',         'Your van, from the plate', 'Make and colour fill themselves in.'],
 ]
+
+/* Everything live, from the same file the in-app roadmap reads, so this
+   cannot drift from what is actually shipped. */
+const LIVE = PHASES.flatMap((ph) => ph.items).filter((it) => it.state === 'live')
 
 export default function Home() {
   return (
@@ -218,8 +222,8 @@ export default function Home() {
           <H2>What you tap</H2>
           <Lede>Five buttons on a phone, next to the van.</Lede>
           <div className="mt-6 grid gap-6 sm:grid-cols-2">
-            {TRADE.map(([name, label, note]) => (
-              <Shot key={name} name={name} label={label} note={note} />
+            {TRADE.map(([name, label, note, fade]) => (
+              <Shot key={name} name={name} label={label} note={note} fade={fade} />
             ))}
           </div>
         </section>
@@ -237,14 +241,26 @@ export default function Home() {
             </span>
             <span className="shrink-0 text-[15px] font-medium" style={{ color: 'var(--tint)' }}>Read →</span>
           </Link>
-          <ul className="mt-5 flex flex-wrap gap-2">
-            {PHASES.flatMap((ph) => ph.items).filter((it) => it.state === 'live').map((it) => (
-              <li key={it.key} className="glass r-inner flex items-center gap-2 px-3 py-2 text-[14px] font-medium leading-tight">
-                <span className="shrink-0" style={{ color: 'var(--tint)' }}><TickIcon size={15} /></span>
-                {it.name}
-              </li>
-            ))}
-          </ul>
+          {/* Folded: the full list is a screen and a half of chips on a phone,
+              and a visitor wants the count, not the inventory. <details> so it
+              opens without JavaScript. */}
+          <details className="group mt-4">
+            <summary className="glass r-outer flex min-h-[54px] cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 [&::-webkit-details-marker]:hidden">
+              <span className="text-[16px] font-semibold">{LIVE.length} things, live on every job</span>
+              <span className="shrink-0 text-[15px] font-medium" style={{ color: 'var(--tint)' }}>
+                <span className="group-open:hidden">Show the list</span>
+                <span className="hidden group-open:inline">Fold it</span>
+              </span>
+            </summary>
+            <ul className="mt-4 flex flex-wrap gap-2">
+              {LIVE.map((it) => (
+                <li key={it.key} className="glass r-inner flex items-center gap-2 px-3 py-2 text-[14px] font-medium leading-tight">
+                  <span className="shrink-0" style={{ color: 'var(--tint)' }}><TickIcon size={15} /></span>
+                  {it.name}
+                </li>
+              ))}
+            </ul>
+          </details>
         </section>
 
         {/* --- either end ------------------------------------------------------ */}

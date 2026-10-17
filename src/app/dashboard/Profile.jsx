@@ -200,7 +200,9 @@ export default function Profile() {
             <img src={p.brandLogo} alt="Your logo" className="h-10 w-auto max-w-[220px] object-contain" onError={(e) => { e.currentTarget.style.display = 'none' }} />
           )}
 
-          <Field label="Your Google review link" hint="After Job done the customer's page asks how it went, with this link. Google Business Profile → Ask for reviews → copy the link. Google links only."
+          {/* What the link switches on: the row every customer sees after Job done. */}
+          <Shot name="row-after" label="After Job done, every customer sees this" note="Both doors, to everyone. Nobody is sorted into happy and unhappy first." fade className="max-w-[360px]" />
+          <Field label="Your Google review link" hint="Google Business Profile → Ask for reviews → copy the link. Google links only."
                  value={p.reviewUrl || ''} onChange={set('reviewUrl')} placeholder="https://g.page/r/…/review" />
 
           <button type="button" onClick={save} disabled={saving}

@@ -148,7 +148,10 @@ const seedPlace = async () => {
   } catch {
     // The household tables are new, which is the migration case that fails
     // soft. No tables yet means no card, and the jobs above are untouched.
-    console.log('\n  (no Place/Arrival tables yet — run npx prisma db push)')
+    // Loud on purpose. This was a quiet line for three diaries, and each one
+    // photographed a household card that said it had expired.
+    console.log('\n  NO HOUSEHOLD CARD: the Place/Arrival tables are missing or the Prisma client is stale.')
+    console.log('  Run: npx prisma generate && npx prisma db push, then this seed again.')
   }
 }
 

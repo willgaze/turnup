@@ -40,7 +40,8 @@ else
 fi
 
 say "Creating the tables"
-DATABASE_URL="$URL" npx prisma db push --skip-generate >/dev/null
+# No --skip-generate: a stale client silently skips the household card in the seed.
+DATABASE_URL="$URL" npx prisma db push >/dev/null
 echo "    done"
 
 say "Seeding a day's work"

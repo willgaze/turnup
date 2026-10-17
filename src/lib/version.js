@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.57.0'
+export const VERSION = '1.58.0'
 export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 39
+export const THEME_INDEX = 40
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,13 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.58.0', date: '2026-10-17', notes: [
+    'The pictures are of this month\'s app. Every small picture on the homepage, the dashboard\'s setup panels and the roadmap (the status card at each stage, each row of the customer\'s page opened, the stage buttons, the send box, the new-job form, the sign-in, the plate, the household card) and the phone at the top of the homepage were photographed before the flat look, so for a week the site showed a product that no longer existed. All re-shot from this build, in flat frames: the one corner radius and a hairline. The trade\'s screens are now photographed live by the capture script, signed in against the seeded database, instead of cut by pixel box from captures made weeks earlier.',
+    'The household card says less and shows more: no sentence under the heading, and an empty card shows one example row so a household sees what forwarding does before doing it. On the dashboard, Household cards shows the card itself. The local seed now says so loudly when a stale database client skips the card, which is how three diaries photographed one that said it had expired.',
+    'The review link in pictures: under Who to expect the Google review field sits under the row every customer sees after Job done, and How did it go? says one line, a review helps most, a note reaches the trade alone. Both doors stay open to everyone.',
+    'The diary records the pictures too. Its full-page shots were taken from the top of the page, so every picture below the fold was still waiting to load: every homepage diary until now has empty frames where the pictures are. It scrolls the page first.',
+    'What this could become, in pictures: every roadmap item that has a screen shows it; a row is a picture, a name and a chip, and the sentence opens on a tap. The live list is folded behind its count, on the roadmap and on the homepage, where it was a screen and a half of chips on a phone.',
+  ] },
   { version: '1.57.0', date: '2026-10-17', notes: [
     'The words catch up with the app (Standing Rule 24). Five things that work today were still filed as ideas or as waiting on a key: the day-before reminder that answers back, the review ask two hours after Job done, running late in one tap, ServiceM8 following the job, and the card moving itself on a ServiceM8 check-in. All five are live on the roadmap now, under Working now with the window-missed message and customer-not-home, which were live but filed among the big ideas: 38 live in all. The van lookup says what is true: DVSA approved the key on 14 Oct and three settings in Vercel are what is left.',
     'The business plan reads the app as it is, merged from the plan branch and then corrected against the live site: ServiceM8 connected since 9 Oct, nudges every five minutes, the Apple enrolment under review, and the letterbox honest about itself: getturnup.com is on Cloudflare but Email Routing for in.getturnup.com is not on, so nothing arrives yet. The owner\'s taps are the four that are actually left: ring Apple, start the thirty-day count, the DVSA keys, the ServiceM8 developer account. The homepage\'s not-built strip no longer shows the card moving itself, because it is built.',
