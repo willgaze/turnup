@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.61.0'
+export const VERSION = '1.62.0'
 export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 43
+export const THEME_INDEX = 44
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,13 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.62.0', date: '2026-10-17', notes: [
+    'The homepage no longer scrolls sideways on a phone. One section, the wallet drawings, pushed the whole page out to 917 pixels wide on a 375-pixel phone, so every section below it was cut off at the right edge. Every page was measured at three phone widths; the homepage was the only one wider than the screen.',
+    'Getting on the list is now a card that builds itself: /join. Pick trade or home, and each answer files onto a card above as you go, with a tick and an Edit. Your postcode puts a map up and you drag the map until the pin is on your door; a photo shows as a picture, not a file name. Email is step one and that is the sign-up; everything after has a Skip. Only your name, email, trade and the first half of your postcode are sent. The pin, the photos, who else lives there and a work address stay on your own phone.',
+    'Two new pages: /for-trades, one job start to finish as the screens that do it, and /for-homes, the household card, which the homepage did not mention at all. Both are linked from the top of every page.',
+    'Search engines are now told to keep out of household-card links (/h/) and ServiceM8 claim links (/j/) as well as job links. Both pages already said noindex themselves; the second lock was missing. There is also a sitemap of the public pages, so the new pages can be found.',
+    'The privacy page now lists the waiting list, and four services it had missed: Anthropic for the Ask box, DVSA and DVLA for the van lookup, and postcodes.io and OpenStreetMap for the map on /join.',
+  ] },
   { version: '1.61.0', date: '2026-10-17', notes: [
     'The privacy policy is a page, not a draft. getturnup.com/privacy, linked from the homepage footer, which is what a store listing actually takes: a public URL. It is written from what the code does rather than from a template \u2014 what is held, who can read it, and the rule that the page carries what the trade told the customer and never what the customer told the trade \u2014 so if a line in it and the code ever disagree, the line is the bug. One of the three things the listing said it was waiting on.',
     'Read in ServiceM8\u2019s store rules while writing the listing, and worth knowing before move 3 goes further: an add-on may not take a payment between a trade and their customer inside a ServiceM8 interface. Pay-to-book and paid-on-the-page are both parked behind the pilot already, so nothing changes today \u2014 but those two ideas and a store listing pull against each other, and an external payment link is the shape that survives both.',

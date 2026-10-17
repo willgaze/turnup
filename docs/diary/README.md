@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.62.0](./v1.62.0/) | 2026-10-17 | Indigo — the homepage fits a phone; /join builds your card as you sign up; /for-trades and /for-homes |
 | [v1.61.0](./v1.61.0/) | 2026-10-17 | Clay — the privacy policy is a page, not a draft |
 | [v1.60.1](./v1.60.1/) | 2026-10-17 | Slate — the sweep logs a line each run, so the schedule can be seen |
 | [v1.60.0](./v1.60.0/) | 2026-10-17 | Slate — a day is not a time: no midnight nudges; the ServiceM8 add-on listing, ready to paste |

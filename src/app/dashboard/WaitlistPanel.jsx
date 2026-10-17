@@ -58,7 +58,13 @@ export default function WaitlistPanel() {
         <span className="min-w-0 flex-1">
           <span className="block text-[19px] font-semibold">Waiting list</span>
           <span className="block text-[14px] muted">
-            {rows.length} {rows.length === 1 ? 'trade has' : 'trades have'} asked
+            {/* /join asks homes as well as trades; a home is filed with the
+                trade "Household", so count the two apart. */}
+            {(() => {
+              const homes = rows.filter((r) => r.trade === 'Household').length
+              const trades = rows.length - homes
+              return `${trades} ${trades === 1 ? 'trade' : 'trades'}${homes ? `, ${homes} ${homes === 1 ? 'home' : 'homes'}` : ''} asked`
+            })()}
             {waiting > 0 && ` · ${waiting} not contacted`}
           </span>
         </span>

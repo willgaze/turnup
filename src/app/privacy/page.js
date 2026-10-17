@@ -111,6 +111,8 @@ export default function Privacy() {
             ['Push notification subscriptions', 'To send “has set off” to a phone', 'Until the browser discards it or notifications are switched off'],
             ['The trade’s own details: business name, photo, van and plate', 'Shown to the customer from “on my way”, so they know who is at the door', 'Until changed or deleted'],
             ['ServiceM8 bookings, where a trade connects ServiceM8', 'So the card follows the job without anything being retyped', 'With the job'],
+            ['The waiting list (/join): name, email, trade or “a home”, and the first half of a postcode', 'To email you once, when there is a place', 'Until you ask for it to be removed'],
+            ['What else you type into /join: the map pin, photos, who else is home, a work address', 'Builds your card on the page as you go. It is kept in your own browser and never sent to TurnUp', 'Until you tap Start again or clear the browser'],
             ['Emails forwarded to a household card’s inbox address', 'The sender, the subject and the text are read for an arrival and a date; the message itself is not kept', 'The arrival row stays on the card; the email is not stored'],
           ]}
         />
@@ -161,6 +163,9 @@ export default function Privacy() {
             ['ServiceM8', 'Only where a trade connects their own account: the bookings TurnUp reads and the texts and diary lines it writes'],
             ['Apple and Google push services', 'An anonymous subscription and the notification text'],
             ['Cloudflare', 'Where a household card uses email forwarding: the forwarded message, in transit'],
+            ['Anthropic', 'Only when the trade uses the Ask box on their own dashboard: that trade’s job list, with every phone number taken out'],
+            ['DVSA and DVLA', 'Only when a trade looks up their own van: the number plate'],
+            ['postcodes.io and OpenStreetMap', 'On /join: the postcode you type, and the map squares around it. Your browser asks them directly'],
           ]}
         />
         <P>

@@ -1200,6 +1200,45 @@ the push notification (live) and not the Wallet card (not yet): see *Not built
 yet* below, and do not let that section say the card updates itself in Wallet
 until the pass web service exists.
 
+## Getting on the list (`/join`, v1.62.0)
+
+The homepage's three-field form became a sign-up whose **card builds as it is
+filled in**: trade or home first, then one step at a time, each answer filed
+onto a card above (the customer's PassCard for a trade, a household card for a
+home) and folded into a row with a tick and an Edit. It is the product
+explaining itself with the visitor's own details. Rules that must not drift:
+
+- **Step one is the sign-up.** Email and name go to `/api/waitlist` at step
+  one; every later step has a Skip. A form that saves only at the end saves
+  nothing for everyone who stops at step four.
+- **Only the list's own fields leave the phone**: name (stored in `note`, no
+  new column, see v1.9.0), email, trade or `Household`, and the outward
+  postcode. The pin, both photos, who else is home and the work address live in
+  `localStorage` (`turnup-join-v1`) and nowhere else. A waiting list is not a
+  reason to hold a photo of a front door beside an address, and the household's
+  names belong to people who have not agreed to anything. `/privacy` says so.
+- **Nothing offered that does not exist.** Reading Gmail is shown as *not yet*
+  with the reason (Google's restricted-scope audit). The calendar is a feed
+  they would subscribe to. Forwarding says it switches on when their place
+  opens.
+- **The map is OpenStreetMap's tiles in a hand-rolled `TileMap`** (move the
+  map, not the pin) over **postcodes.io** for the postcode centre. Both are
+  free, keyless and asked by the browser directly. OSM's policy allows light
+  use with attribution and can be withdrawn: if `/join` gets real traffic,
+  swap the tile URL in `TileMap.jsx` for a paid provider. **Never put Google
+  Street View imagery on that page**: Google's terms forbid it beside a
+  non-Google map and forbid storing it. "Check the pin on Street View" opens
+  Google's own tab, which is allowed.
+- The throttle on `/api/waitlist` is five posts an hour per IP, and a trade
+  sign-up uses up to three (step one, business, base). Do not add a fourth.
+
+`/for-trades` (one job start to finish, as crops) and `/for-homes` (the
+household card) are the audience pages, both in `SiteShell` with the
+Trades/Homes nav. **Every grid item may shrink** (`.grid > * { min-width: 0 }`
+in `globals.css`): before it, one sideways strip inside a grid made the whole
+homepage 917px wide on a 375px phone. Check a page at 320, 375 and 414 before
+calling it done; nothing scrolls sideways but a strip that means to.
+
 ## Not built yet
 
 **The wallet pass.** This is the premise of the product and it does not exist.

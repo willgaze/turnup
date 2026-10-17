@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { cleanText } from '@/lib/clean-text'
 
 /**
- * A trade asking to be told when this opens up.
+ * A trade, or a household, asking to be told when this opens up (/join).
  *
  * Public and unauthenticated, because it is the one thing on the homepage a
  * stranger is meant to be able to do. Which means it gets the same treatment
@@ -72,7 +72,11 @@ export async function POST(request) {
     email,
     trade: cleanText(body?.trade, 60) || null,
     town: cleanText(body?.town, 80) || null,
-    note: cleanText(body?.note, 500) || null,
+    // The name rides in `note` rather than a new column: columns on an existing
+    // table are the migration that took every link down in v1.9.0, and a name on
+    // a waiting list is read by a person, not queried. /join sends it.
+    note: [cleanText(body?.name, 60) && `Name: ${cleanText(body?.name, 60)}`, cleanText(body?.note, 400)]
+      .filter(Boolean).join(' · ') || null,
   }
 
   try {

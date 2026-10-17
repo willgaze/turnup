@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import Mark from '@/components/Mark'
-import Waitlist from './Waitlist'
 import { STAGE_ORDER, stageOf } from '@/lib/trade-status'
 import { TickIcon, ChevronIcon } from '@/components/icons'
 import Device from '@/components/Device'
@@ -11,6 +10,7 @@ import Shot, { ShotStrip } from '@/components/Shot'
 import { byGroup } from '@/lib/posters'
 import FrameStrip from '@/components/FrameStrip'
 import { PHASES } from '@/lib/roadmap'
+import { SiteNav, SiteFooter } from '@/components/SiteShell'
 
 /**
  * The front door — the only page here a stranger is meant to find.
@@ -28,7 +28,9 @@ import { PHASES } from '@/lib/roadmap'
  * the wallet card — the premise of the product — gets a section of drawings
  * rather than one picture and two sentences.
  *
- * INDEXABLE, and the only page here that is. Every other route carries
+ * INDEXABLE, with the other pages that explain the product (/for-trades,
+ * /for-homes, /join, /with-servicem8, /privacy; see sitemap.js). Every route
+ * that holds anybody's details carries
  * `robots: { index: false }` — a tracking link must never reach a search
  * index, and neither must the dashboard.
  *
@@ -97,10 +99,7 @@ export default function Home() {
             <Mark className="h-8 w-auto" id="top" />
             <span className="text-[21px] font-bold tracking-[-0.02em]">TurnUp</span>
           </span>
-          <Link href="/dashboard" className="inline-flex min-h-[44px] items-center text-[15px] font-medium"
-                style={{ color: 'var(--tint)' }}>
-            Sign in
-          </Link>
+          <SiteNav />
         </header>
 
         {/* --- the promise, in the customer's words ------------------------ */}
@@ -112,7 +111,7 @@ export default function Home() {
             Booked in, on my way, on site, done. On the card they already carry. Sits alongside ServiceM8 and the tools you already use.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
-            <a href="#list" className="btn btn-filled !px-6">Get on the list</a>
+            <Link href="/join" className="btn btn-filled !px-6">Get on the list</Link>
             <Link href="/demo" className="btn btn-grey !px-6">
               See what they see <ChevronIcon size={16} />
             </Link>
@@ -263,6 +262,33 @@ export default function Home() {
           </details>
         </section>
 
+        {/* --- the other half: the household card ----------------------------
+            Built and running at one house, and until v1.62.0 not mentioned on
+            the front page at all. */}
+        <section className="mt-14">
+          <H2>And for the house</H2>
+          <Lede>The plumber, the sofa, four parcels. One card.</Lede>
+          <div className="mt-6 grid items-start gap-6 sm:grid-cols-2">
+            <Shot name="house-card" label="Everything coming to the door" note="Fills itself from forwarded emails." fade />
+            <div className="grid gap-3">
+              <Link href="/for-homes" className="glass r-outer flex items-center justify-between gap-3 px-4 py-4">
+                <span className="min-w-0">
+                  <span className="block text-[17px] font-semibold leading-tight">How the home card works</span>
+                  <span className="mt-0.5 block text-[15px] leading-snug muted">People first. Who said it, always.</span>
+                </span>
+                <span className="shrink-0" style={{ color: 'var(--tint)' }}><ChevronIcon size={18} /></span>
+              </Link>
+              <Link href="/for-trades" className="glass r-outer flex items-center justify-between gap-3 px-4 py-4">
+                <span className="min-w-0">
+                  <span className="block text-[17px] font-semibold leading-tight">One job, start to finish</span>
+                  <span className="mt-0.5 block text-[15px] leading-snug muted">What you tap, what they see.</span>
+                </span>
+                <span className="shrink-0" style={{ color: 'var(--tint)' }}><ChevronIcon size={18} /></span>
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* --- either end ------------------------------------------------------ */}
         <section className="mt-14">
           <H2>Either end, any job</H2>
@@ -299,8 +325,17 @@ export default function Home() {
         </section>
 
         {/* --- the ask ----------------------------------------------------- */}
-        <section id="list" className="mt-12 scroll-mt-6">
-          <Waitlist />
+        {/* Two doors into /join, where the card builds as they sign up. The
+            old three-field form was here; #list still lands on this. */}
+        <section id="list" className="glass r-outer mt-12 scroll-mt-6 p-6">
+          <p className="text-[21px] font-semibold">Want it?</p>
+          <p className="mt-1.5 text-[16px] leading-snug muted">
+            It runs for one plumbing firm while it is made properly. Get on the list and watch your card build as you go.
+          </p>
+          <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+            <Link href="/join?as=trade" className="btn btn-filled">I am a trade</Link>
+            <Link href="/join?as=home" className="btn btn-tinted">It is for my home</Link>
+          </div>
         </section>
 
         {/* --- the page this page replaced --------------------------------- */}
@@ -311,12 +346,7 @@ export default function Home() {
           </p>
         </section>
 
-        <footer className="mt-12 text-center">
-          <Mark className="mx-auto h-6 w-auto opacity-60" id="foot" />
-          <p className="mt-2 text-[13px]" style={{ color: 'var(--label-3)' }}>
-            TurnUp — live job tracking for trades · <Link href="/with-servicem8" className="underline">With ServiceM8</Link> · <Link href="/privacy" className="underline">Privacy</Link>
-          </p>
-        </footer>
+        <SiteFooter id="foot" />
       </main>
     </div>
   )

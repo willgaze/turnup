@@ -47,6 +47,11 @@ const SHOTS = [
   // mistyped your link" card, so it is captured whole.
   { name: 'homepage',       path: () => '/',          scheme: 'light', full: true,  auth: false },
   { name: 'homepage-dark',  path: () => '/',          scheme: 'dark',  full: true,  auth: false },
+  // The pages a visitor reaches from the homepage (v1.62.0): one per audience,
+  // and the sign-up whose card builds as it is filled in.
+  { name: 'for-trades',     path: () => '/for-trades', scheme: 'light', full: true, auth: false },
+  { name: 'for-homes',      path: () => '/for-homes',  scheme: 'light', full: true, auth: false },
+  { name: 'join',           path: () => '/join',       scheme: 'light', full: true, auth: false },
   // The household card: the other half of the product, and the one that has
   // to be looked at as often as the job page, or it will drift the way the
   // dashboard did while nobody could run it.

@@ -365,3 +365,20 @@ body {
   .field::placeholder { color: var(--label-3); }
   .field:focus { outline: none; border-color: var(--tint); }
 }
+
+/* /join: a value landing on the card. Keyed on the value, so each change
+   re-mounts the element and plays once. Nothing loops and nothing counts. */
+@keyframes filed-in {
+  from { opacity: .35; transform: translateY(3px) scale(.98); }
+  to   { opacity: 1;   transform: none; }
+}
+.filed-in { animation: filed-in .32s ease-out; }
+@media (prefers-reduced-motion: reduce) { .filed-in { animation: none; } }
+.skel { display: inline-block; border-radius: 999px; background: color-mix(in srgb, currentColor 12%, transparent); }
+
+/* A grid item is min-width:auto by default, so one long word, a code line or a
+   sideways-scrolling strip inside it stretches its whole column past the
+   screen. That happened three times on phones (the homepage's wallet strip and
+   Now/With TurnUp panels, the steps on /with-servicem8; found 17 Oct, v1.62.0).
+   Every grid item may shrink; what is too wide wraps or scrolls inside it. */
+.grid > * { min-width: 0; }
