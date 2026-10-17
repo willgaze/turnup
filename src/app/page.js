@@ -314,7 +314,7 @@ export default function Home() {
         <footer className="mt-12 text-center">
           <Mark className="mx-auto h-6 w-auto opacity-60" id="foot" />
           <p className="mt-2 text-[13px]" style={{ color: 'var(--label-3)' }}>
-            TurnUp — live job tracking for trades · <Link href="/with-servicem8" className="underline">With ServiceM8</Link>
+            TurnUp — live job tracking for trades · <Link href="/with-servicem8" className="underline">With ServiceM8</Link> · <Link href="/privacy" className="underline">Privacy</Link>
           </p>
         </footer>
       </main>

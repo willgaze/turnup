@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.59.0'
+export const VERSION = '1.60.0'
 export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 41
+export const THEME_INDEX = 42
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.60.0', date: '2026-10-17', notes: [
+    'The ServiceM8 store listing, written from their rules rather than from memory. docs/servicem8-store-listing.md has the name, both descriptions and the three screenshots ready to paste, the 90/10 revenue split, and the ten steps in the order they happen \u2014 every requirement read off ServiceM8\u2019s own Add-on Store and Store Requirements pages on 17 Oct. Two of their numbers are not published (the image sizes and the description limits), so the file says to read those off the form instead of guessing them.',
+    'TurnUp asks ServiceM8 for one permission fewer. It requested create_notifications for two versions and never called it once: the trade is notified by TurnUp\u2019s own push, not ServiceM8\u2019s. Their checklist says an add-on must ask for only what it needs, and a permission nothing reads is the same defect as a field on the public shape nothing shows. Now publish_diary_items and vendor, which are the two it uses.',
+    'A privacy policy, at getturnup.com/privacy and linked from the homepage. The store cannot take a listing without one. It is written from what the code does rather than from a template \u2014 what is held, who can read it, the rule that the page carries what the trade told the customer and never what the customer told the trade \u2014 so if a line in it and the code ever disagree, the line is the bug.',
+    'Found while writing it, and worth knowing before move 3 goes further: a ServiceM8 add-on may not take a payment between a trade and their customer inside a ServiceM8 interface. Pay-to-book and paid-on-the-page are both already parked behind the pilot, so nothing changes today, but the two ideas and the store listing pull against each other.',
+  ] },
   { version: '1.59.0', date: '2026-10-17', notes: [
     'Your job on your lock screen, written and waiting on Apple, now on main rather than on its own branch. native/ holds the iOS app: the dashboard in a native window, and the job you are on as a Live Activity, with the stage, the time it was tapped, the note, and On site, Paused, Back on site and Job done buttons on the lock screen and in the Dynamic Island. A button is a real tap: the same record, the same buzz to the customer, the same line in ServiceM8. Written 15 Oct; merged 17 Oct on the owner\'s go.',
     'In a browser nothing changes: the dashboard\'s half is a no-op outside the app. The lock-screen buttons sign in with a token the app fetches from the dashboard, so the operator check accepts that token as well as the cookie: the same secret, the same thirty days. It compiles on a Mac runner the day the Apple Developer membership is active; until then the iOS build job does not run.',

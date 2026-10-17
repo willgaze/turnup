@@ -48,8 +48,10 @@ dragged onto the calendar.
   key derived from `JWT_SECRET`), `publishDiary()` and `diaryFor()`. Hooked in:
   trade-made stage changes, running late, terms agreed, no one home and the
   customer's reply, the window missed and the customer's choice, the day-before
-  ask and its reply. Scopes requested: `publish_diary_items create_notifications
-  vendor`. Routes: `/api/servicem8/oauth/start` and `/callback`, operator only
+  ask and its reply. Scopes requested: `publish_diary_items vendor` — only
+  what is called. `create_notifications` was in that list for two versions
+  and never used; ServiceM8's store requirements make an add-on ask for only
+  what it needs. Routes: `/api/servicem8/oauth/start` and `/callback`, operator only
   with a signed state. Steps for the owner: `docs/servicem8-add-on.md`.
 
 ## What shipped first (v1.33.0)
