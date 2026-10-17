@@ -833,18 +833,24 @@ writes `lateMinutes`/`lateAt`, a note with the time, and pushes the customer.
 Unasked nudges go to the trade at window start (`nudgeLevel` 1) and window
 end (2); an unanswered ask repeats every ten minutes. `nudgeIfDue` runs on
 the customer's 30-second poll, after every ServiceM8 sync, and from
-`GET /api/cron/nudge`, which **`.github/workflows/nudge.yml` pings every five
-minutes**. Before that nothing called it, so a window could pass unnoticed
+`GET /api/cron/nudge`, which **Vercel Cron calls every five minutes**
+(`vercel.json`), with `.github/workflows/nudge.yml` as a half-hourly backup.
+Before any schedule nothing called it, so a window could pass unnoticed
 whenever no customer happened to have their page open — which is the case a
 trade cannot rely on.
 
-Why GitHub Actions and not Vercel Cron: Vercel's free plan caps cron at once a
-day, and whether a more frequent schedule is rejected at deploy time or quietly
-run daily could not be confirmed from their docs. A rejected cron breaks the
-deploy of a live product, so the schedule runs where the cost is known. **It is
-free only because the repo is public** — GitHub bills a minimum of one minute
-per job, so every five minutes is ~8,640 minutes a month against a 2,000-minute
-allowance. Making the repo private turns this into a bill.
+**It ran on GitHub Actions until v1.56.0, and GitHub ran it every four hours.**
+The workflow asked for every five minutes; GitHub's scheduler is best effort
+and dropped almost every run (37 runs in total; on 17 Oct at 00:57, 05:29,
+09:37, 13:12 and 16:29). So the missed-window notice, the 4pm day-before ask,
+the review ask and Follow every booking all fired hours late, and nothing went
+red, because a run that never starts cannot fail. It was there because Vercel's
+free plan caps cron at once a day, and **a sub-daily cron on that plan fails
+the deploy**; the team is on **Pro** (Vercel's 9 Oct email, paid receipts), so
+Vercel runs it. If the team ever drops to Hobby, take the cron out of
+`vercel.json` first or every deploy fails. **Check a schedule by its log, never
+by its config**: Vercel → turnup → Logs, filter `/api/cron/nudge`, a line every
+five minutes. The GitHub backup is free only because the repo is public.
 
 The route is **open, and that is a choice**: every nudge level fires once and a
 repeat is paced to ten minutes inside `nudgeAll()`, whoever calls it, so

@@ -8,8 +8,9 @@ export const dynamic = 'force-dynamic'
 /**
  * Sweep every live job and send whatever nudge is due.
  *
- * A scheduled ping lives in .github/workflows/nudge.yml and runs every five
- * minutes. Without one the same check still runs on the customer's 30-second
+ * Vercel Cron calls this every five minutes (vercel.json); a slower GitHub
+ * Actions ping in .github/workflows/nudge.yml is the backup. GitHub alone ran
+ * it about every four hours, which is why it moved (v1.56.0). Without one the same check still runs on the customer's 30-second
  * poll and after every ServiceM8 sync — but only while somebody has the page
  * open, which is exactly the case a trade cannot rely on. A window passing
  * unnoticed because nobody happened to be looking is the failure this closes.

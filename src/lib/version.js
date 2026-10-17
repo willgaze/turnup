@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.55.0'
-export const BUILD_DATE = '2026-10-14'
+export const VERSION = '1.56.0'
+export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 37
+export const THEME_INDEX = 38
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.56.0', date: '2026-10-17', notes: [
+    'Nudges on time. The sweep that notices a window has passed, asks the day-before question at 4pm, asks how it went and follows every ServiceM8 booking was meant to run every five minutes. GitHub ran it about every four hours, so all four fired hours late. It now runs on Vercel\'s own scheduler every five minutes, with the GitHub job kept as a half-hourly backup. Two callers cannot send anything twice: every nudge is sent once and paced inside the sweep.',
+  ] },
   { version: '1.55.0', date: '2026-10-14', notes: [
     'Turn on forwarding says where it has got to, and checks itself every twenty seconds. Switched on here, the domain is on Cloudflare, mail points at Cloudflare, something has arrived \u2014 each one asked of the internet rather than assumed, so setting this up stops being four things done blind in four different websites.',
     'Asked of two DNS-over-HTTPS resolvers, not the server\u2019s own, which in the container this was written in answered ENODATA for records that plainly exist. A step somebody HAS done must never be drawn with a cross because a lookup failed, so unknown is its own state and draws the same empty circle as not-yet.',

@@ -1,35 +1,29 @@
-# Ping the nudge sweep so a window passing is noticed even when nobody has a
-# page open.
+# The BACKUP ping for the nudge sweep. Vercel Cron is the real schedule since
+# v1.56.0 (vercel.json, every five minutes); this is here so a sweep still
+# happens if that ever stops.
 #
-# WHY HERE AND NOT VERCEL CRON. Vercel's free plan caps cron at once a day, and
-# whether it rejects a more frequent schedule at deploy time or quietly runs it
-# daily could not be confirmed from the docs. A rejected cron would break the
-# deploy of a live product, so this runs where the cost is known: GitHub
-# Actions, free on any plan, independent of whatever Vercel plan is in force.
+# WHY IT MOVED. This workflow asked for every five minutes and GitHub ran it
+# about every four hours: 37 runs in its whole life, and on 17 Oct at 00:57,
+# 05:29, 09:37, 13:12 and 16:29. GitHub's scheduler is best effort and drops
+# scheduled runs under load, so the missed-window notice, the 4pm day-before
+# ask, the review ask and Follow every booking were all firing hours late. The
+# reason it lived here at all was Vercel's free plan, which caps cron at once a
+# day; the team is on Pro (Vercel's 9 Oct email), which runs five-minute cron.
 #
-# GitHub's scheduler is best effort and often runs late — five minutes asked
-# for can arrive in fifteen under load. That is fine here. A nudge a few
-# minutes late still beats one that never comes, and nothing in this product
-# promises a time.
+# Two callers cannot double a notification: every nudge level fires once and a
+# repeat is paced inside nudgeAll(), whoever calls it, and a sweep within
+# twenty seconds of the last one answers "too soon".
 #
-# COST: nil, because willgaze/turnup is public and Actions minutes are
-# free and unlimited on public repositories. This matters more than it looks:
-# GitHub bills a MINIMUM OF ONE MINUTE per job, so every five minutes is about
-# 8,640 minutes a month against a 2,000-minute free allowance. **If this repo
-# is ever made private, this workflow starts costing real money** — drop the
-# frequency or move it to Vercel Cron on a paid plan.
+# COST: nil while willgaze/turnup is public. GitHub bills a minimum of one
+# minute per job, so on a private repo this backup costs money: drop it then.
 #
-# GitHub also disables scheduled workflows on a repository with no commits for
-# 60 days. The nightly build commits most days, so it will not idle out, but
-# that is the thing to check first if nudges quietly stop.
-#
-# If this job ever goes red, nudges have stopped. That is the point of failing
-# on a bad response rather than ignoring it.
+# GitHub disables scheduled workflows on a repository with no commits for 60
+# days. If this job goes red, the sweep answered badly: look at Vercel too.
 name: Nudge sweep
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '*/30 * * * *'
   # So it can be run by hand from the Actions tab to check it still works.
   workflow_dispatch:
 
