@@ -2,7 +2,7 @@
 import { ChevronIcon, TickIcon, WalletIcon } from '@/components/icons'
 
 import { VERSION } from '@/lib/version'
-import { BEFORE_AFTER, FLOW, MOATS, PLAN_META, PROBLEM_STATS, PRODUCT, ROADMAP_COUNTS, STAGES, STATUS, WAITING_ON_OWNER, WALLET } from '@/lib/plan'
+import { BEFORE_AFTER, FLOW, MOATS, PLAN_META, PROBLEM_STATS, PRODUCT, RECENT_RELEASES, ROADMAP_COUNTS, STAGES, STATUS, WAITING_ON_OWNER, WALLET } from '@/lib/plan'
 import { Eyebrow, Hero, Light, Section, Steps, Sub, Table, Tag } from './ui'
 
 /* The first five sections: what it is, where it stands, the problem, the
@@ -44,10 +44,11 @@ export function WhereWeAre({ readOnly }) {
   const greens = STATUS.filter((s) => s.state === 'green').length
   return (
     <Section kicker="Where we are" title={`Version ${VERSION}, live since ${PLAN_META.liveSince}`}>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Hero value={ROADMAP_COUNTS.live} label="features live" sub="counted from the roadmap" kind="fact" />
         <Hero value={ROADMAP_COUNTS.ready} label="built, waiting on a key" sub="Apple, DVSA, ServiceM8" kind="fact" />
         <Hero value={ROADMAP_COUNTS.idea} label="ideas, not built" sub="and said so" kind="fact" />
+        <Hero value={RECENT_RELEASES} label="releases this week" sub="from the changelog, each with a diary" kind="fact" />
       </div>
       <div className="mt-4 flex items-center gap-3">
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-black/[.08] dark:bg-white/[.1]">
@@ -61,10 +62,10 @@ export function WhereWeAre({ readOnly }) {
       </div>
       {!readOnly && (
         <>
-          <Sub>Three taps only the owner can make</Sub>
-          <ol className="mt-3 grid gap-3 sm:grid-cols-3">
+          <Sub>Taps only the owner can make, in order</Sub>
+          <ol className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {WAITING_ON_OWNER.map((w, i) => (
-              <li key={w.label} className="glass r-inner p-4 tone-onway">
+              <li key={w.label} className={`glass r-inner p-4 ${i === 0 ? 'tone-onway' : ''}`}>
                 <Eyebrow tint>Tap {i + 1}</Eyebrow>
                 <a href={w.href} target="_blank" rel="noreferrer" className="text-[17px] font-bold underline">{w.label}</a>
                 <div className="mt-1 text-[13px] muted">{w.step}</div>
@@ -123,7 +124,7 @@ function FlowDiagram() {
           {FLOW.outputs.map((o) => <div key={o} className={`${node} tone-done`} style={{ borderColor: 'color-mix(in srgb, var(--tint) 35%, transparent)' }}>{o}</div>)}
         </div>
       </div>
-      <div className="mt-3 text-[12px] muted">One change in, three ways out. The same row in the database feeds all three.</div>
+      <div className="mt-3 text-[12px] muted">{FLOW.inputs.length} ways in, {FLOW.outputs.length} ways out. The same row in the database feeds every one.</div>
     </div>
   )
 }
