@@ -97,6 +97,9 @@ export const PHASES = [
     title: 'Built, waiting on someone else',
     blurb: 'The code is done. These need an account or a certificate that only you can get.',
     items: [
+      { key: 'native-app', name: 'Your job on your lock screen', state: 'ready',
+        what: 'The iOS app: the dashboard in a native window, and the job you are on as a Live Activity — stage, time, note, and On site / Paused / Job done buttons on the lock screen and in the Dynamic Island. Written in native/; builds and lands on TestFlight the day Apple says yes.',
+        needs: 'Apple Developer Program, £79/yr' },
       { key: 'wallet-pass', name: 'The card in Apple Wallet', state: 'ready',
         what: 'Updates itself on the lock screen when you tap a stage.',
         needs: 'Apple Developer Program, £79/yr' },

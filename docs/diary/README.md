@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.59.0](./v1.59.0/) | 2026-10-17 | Moss — your job on your lock screen: the iOS app merged, waiting on Apple |
 | [v1.58.0](./v1.58.0/) | 2026-10-17 | Harbour — every picture re-shot from the current build, the trade's live; the household card, the review link and the roadmap in pictures |
 | [v1.57.0](./v1.57.0/) | 2026-10-17 | Ochre — the words catch up: five live features filed live, the plan read against the live site |
 | [v1.56.0](./v1.56.0/) | 2026-10-17 | Plum — nudges on time: the sweep on Vercel Cron every five minutes, GitHub as the backup |

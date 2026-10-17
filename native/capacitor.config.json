@@ -1,0 +1,13 @@
+{
+  "appId": "com.getturnup.app",
+  "appName": "TurnUp",
+  "webDir": "www",
+  "server": {
+    "url": "https://www.getturnup.com/dashboard",
+    "allowNavigation": ["www.getturnup.com", "getturnup.com"]
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "scheme": "TurnUp"
+  }
+}

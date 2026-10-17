@@ -31,6 +31,7 @@ import DropPin from '@/components/DropPin'
 import FindWords from '@/components/FindWords'
 import { windowSummary, windowHours, windowRevisionLine } from '@/lib/window'
 import { PAUSE_BACK, pauseBackLine } from '@/lib/pause-words'
+import { syncActivity, primeNativeToken } from '@/lib/native'
 import { TickIcon } from '@/components/icons'
 import { DB_REASONS } from '@/lib/db-errors'
 import { StageIcon, PresenceIcon, CopyIcon, EyeIcon, MessageIcon, LinkOffIcon, CompassIcon, KeyIcon, PinIcon, PlusIcon, ChevronIcon } from '@/components/icons'
@@ -95,7 +96,9 @@ export default function Console({ assistant = false }) {
     try {
       const r = await fetch('/api/dashboard/trackers', { cache: 'no-store' })
       if (!r.ok) return setError(await failure(r, 'Could not load jobs'))
-      setTrackers((await r.json()).trackers || [])
+      const rows = (await r.json()).trackers || []
+      setTrackers(rows)
+      syncActivity(rows) // the lock screen, inside the iOS app; a no-op in a browser
       setError(null)
     } catch {
       setError({ title: 'Could not reach the server', fix: 'Check your connection and try again.' })
@@ -194,7 +197,7 @@ export default function Console({ assistant = false }) {
 
   // Read after mount: window does not exist during the server render.
   const [origin, setOrigin] = useState('')
-  useEffect(() => setOrigin(window.location.origin), [])
+  useEffect(() => { setOrigin(window.location.origin); primeNativeToken() }, [])
 
   // "Mrs Hale".split(' ')[0] is "Mrs", and "Hi Mrs —" is worse than no name at
   // all. If the first word is a title, keep the whole thing.

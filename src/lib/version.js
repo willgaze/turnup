@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.58.0'
+export const VERSION = '1.59.0'
 export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 40
+export const THEME_INDEX = 41
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.59.0', date: '2026-10-17', notes: [
+    'Your job on your lock screen, written and waiting on Apple, now on main rather than on its own branch. native/ holds the iOS app: the dashboard in a native window, and the job you are on as a Live Activity, with the stage, the time it was tapped, the note, and On site, Paused, Back on site and Job done buttons on the lock screen and in the Dynamic Island. A button is a real tap: the same record, the same buzz to the customer, the same line in ServiceM8. Written 15 Oct; merged 17 Oct on the owner\'s go.',
+    'In a browser nothing changes: the dashboard\'s half is a no-op outside the app. The lock-screen buttons sign in with a token the app fetches from the dashboard, so the operator check accepts that token as well as the cookie: the same secret, the same thirty days. It compiles on a Mac runner the day the Apple Developer membership is active; until then the iOS build job does not run.',
+  ] },
   { version: '1.58.0', date: '2026-10-17', notes: [
     'The pictures are of this month\'s app. Every small picture on the homepage, the dashboard\'s setup panels and the roadmap (the status card at each stage, each row of the customer\'s page opened, the stage buttons, the send box, the new-job form, the sign-in, the plate, the household card) and the phone at the top of the homepage were photographed before the flat look, so for a week the site showed a product that no longer existed. All re-shot from this build, in flat frames: the one corner radius and a hairline. The trade\'s screens are now photographed live by the capture script, signed in against the seeded database, instead of cut by pixel box from captures made weeks earlier.',
     'The household card says less and shows more: no sentence under the heading, and an empty card shows one example row so a household sees what forwarding does before doing it. On the dashboard, Household cards shows the card itself. The local seed now says so loudly when a stale database client skips the card, which is how three diaries photographed one that said it had expired.',

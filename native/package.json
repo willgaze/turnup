@@ -1,0 +1,17 @@
+{
+  "name": "turnup-native",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The thin iOS shell around www.getturnup.com: the dashboard in a native window, with a Live Activity on the lock screen for the current job.",
+  "scripts": {
+    "sync": "cap sync ios",
+    "open": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.0",
+    "@capacitor/ios": "^7.4.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.0"
+  }
+}

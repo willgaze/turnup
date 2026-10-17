@@ -966,6 +966,28 @@ runs from the cron two hours after the last DONE event, pushes once per job
 note (`feedbackText`/`feedbackAt`); the note goes to the trade's phone, the
 card and the diary, and `publicShape` carries only the two times.
 
+## The native shell (`native/`): the job on the trade's own lock screen
+
+iOS shows buttons and a live card on the lock screen only through a **Live
+Activity**, and only a native app can start one. `native/` is a Capacitor
+shell whose one screen is the live dashboard (`server.url` in
+`capacitor.config.json`, so a Vercel deploy is an app update), plus a
+WidgetKit extension (`ios/App/TurnUpWidget`) drawing the job you are on with
+On site / Paused / Back on site / Job done buttons. `SetStageIntent.swift`
+PATCHes the tracker route like any dashboard tap, carrying a bearer token from
+`POST /api/dashboard/native-token`; `requireOperator()` accepts
+`Authorization: Bearer` when there is no cookie, same JWT, same secret, same
+30 days. `src/lib/native.js` is the dashboard's half and is a no-op outside
+the app; `Console.jsx` calls `syncActivity(rows)` on every load.
+
+**Nothing in `native/` is compiled here**: no Xcode in the container. The
+Xcode project Capacitor generates has no widget target, so `add-widget.rb`
+(the `xcodeproj` gem) adds it, idempotently, and `.github/workflows/ios.yml`
+runs it on a macOS runner and uploads to TestFlight once the repository
+variable `IOS_SIGNING_READY` and the secrets in `native/README.md` exist. The
+lock screen rule for pushes does not apply here: it is the trade's own phone
+and their own job.
+
 ## Paused, and when you are back (`src/lib/pause.js`)
 
 Paused already carried the reason (the stage note). The return is the trade's

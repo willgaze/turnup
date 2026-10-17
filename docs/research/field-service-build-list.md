@@ -32,6 +32,7 @@ capability we do not have) · No.
 | Revised promise shown as revised, original kept | Copy | Done 1.52.0 — first hours and first day kept on the row; the page says Revised hh:mm, they first said…; withdrawal and a customer's agreed counter worded as such; a line in the record for every change |
 | Customer buttons before arrival: I'm running late / someone else will let you in / rebook | Copy | Done 1.40.0 — Running late yourself? (15/30/60, I'm there now) joins someone else and move it |
 | Paused visible to the customer with reason and expected return | Improve | Done 1.54.0 — Paused + note, plus the trade's own return estimate in seven fixed words with the time it was said; overdue stated as a fact |
+| The trade's own job on the lock screen: stage, time, note, stage buttons (Live Activity) | Build | Written 1.55.0 in native/ (Capacitor shell + WidgetKit extension + bearer-token intent); compiles and ships via the macOS workflow once the Apple membership exists |
 | Name and photo of who is coming, on the page and in the On-my-way message | Copy | Done (Who to expect, van, name; photo taken on the phone, on the card and in the On-my-way notification, 1.50.0) |
 
 ## Tier 2 — the log becomes a booking and evidence system (web, now)
