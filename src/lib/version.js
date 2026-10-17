@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.60.0'
+export const VERSION = '1.60.1'
 export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.60.1', date: '2026-10-17', notes: [
+    'The five-minute sweep now writes one line to the log each time it runs, saying who called it and how many jobs it checked. Without it a sweep that ran quietly left no trace, so nobody could see whether the schedule was keeping time. Counts only; no names.',
+  ] },
   { version: '1.60.0', date: '2026-10-17', notes: [
     'A day is not a time. A job booked for a day with no hours was treated as if its window began at midnight: your phone buzzed in the small hours, the customer\'s page said the window started at 00:00, and at ten past two the customer was told their window had been missed. With the sweep now every five minutes that would have happened every night. Only hours you actually set or agreed count as a window now; ServiceM8 bookings, which always carry their times, are unchanged. The customer\'s times on that row also go through the one date formatter, so phone and server agree.',
     'The ServiceM8 add-on listing, ready to paste: the short and long description written to ServiceM8\'s store rules, four real screenshots with an invented trade and customer, the icon, and a manifest checked against ServiceM8\'s own schema, served at /servicem8/manifest.json. The add-on now asks ServiceM8 for two permissions instead of three; it never used the third. A privacy policy is drafted from what the database actually holds, for the owner to agree. A public listing waits on three things the listing says plainly: an account per trade, that privacy page, and a support mailbox.',

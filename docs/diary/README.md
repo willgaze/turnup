@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.60.1](./v1.60.1/) | 2026-10-17 | Slate — the sweep logs a line each run, so the schedule can be seen |
 | [v1.60.0](./v1.60.0/) | 2026-10-17 | Slate — a day is not a time: no midnight nudges; the ServiceM8 add-on listing, ready to paste |
 | [v1.59.0](./v1.59.0/) | 2026-10-17 | Moss — your job on your lock screen: the iOS app merged, waiting on Apple |
 | [v1.58.0](./v1.58.0/) | 2026-10-17 | Harbour — every picture re-shot from the current build, the trade's live; the household card, the review link and the roadmap in pictures |
