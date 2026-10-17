@@ -5,7 +5,7 @@
  * /preview/posters (a client component) both read it, and a named export from
  * a 'use client' file arrives on the server as a reference, not an array.
  *
- * group    customer | trade | either | next
+ * group    customer | trade | either | next | shipped (live, drawn, on no strip)
  * state    live   — a real capture of the real screen (public/home/*.webp)
  *          ready  — built, waiting on something outside the code (a certificate)
  *          next   — not built; drawn as a mock and badged so nobody is misled
@@ -86,7 +86,10 @@ export const FRAMES = [
     { mock: 'household', alt: 'A household with three people who can answer the door' }),
 
   // ---- where it is going -----------------------------------------------------------
-  f('n-sm8', 'next', 'next', NAVY,
+  // Live since 9 Oct (ServiceM8 connected), so it is no longer a promise and
+  // leaves the "Where it is going" strip. It stays a drawing, not a capture,
+  // so it does not join the live frames either; the roadmap still pictures it.
+  f('n-sm8', 'shipped', 'live', NAVY,
     'The card moves\nitself.', 'Check in on ServiceM8 and the customer sees On site. Nobody taps anything.',
     { mock: 'sm8', alt: 'ServiceM8 check-in becoming On site automatically' }),
   f('n-live', 'next', 'next', INDIGO,

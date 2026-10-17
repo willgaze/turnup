@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.56.0'
+export const VERSION = '1.57.0'
 export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 38
+export const THEME_INDEX = 39
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.57.0', date: '2026-10-17', notes: [
+    'The words catch up with the app (Standing Rule 24). Five things that work today were still filed as ideas or as waiting on a key: the day-before reminder that answers back, the review ask two hours after Job done, running late in one tap, ServiceM8 following the job, and the card moving itself on a ServiceM8 check-in. All five are live on the roadmap now, under Working now with the window-missed message and customer-not-home, which were live but filed among the big ideas: 38 live in all. The van lookup says what is true: DVSA approved the key on 14 Oct and three settings in Vercel are what is left.',
+    'The business plan reads the app as it is, merged from the plan branch and then corrected against the live site: ServiceM8 connected since 9 Oct, nudges every five minutes, the Apple enrolment under review, and the letterbox honest about itself: getturnup.com is on Cloudflare but Email Routing for in.getturnup.com is not on, so nothing arrives yet. The owner\'s taps are the four that are actually left: ring Apple, start the thirty-day count, the DVSA keys, the ServiceM8 developer account. The homepage\'s not-built strip no longer shows the card moving itself, because it is built.',
+  ] },
   { version: '1.56.0', date: '2026-10-17', notes: [
     'Nudges on time. The sweep that notices a window has passed, asks the day-before question at 4pm, asks how it went and follows every ServiceM8 booking was meant to run every five minutes. GitHub ran it about every four hours, so all four fired hours late. It now runs on Vercel\'s own scheduler every five minutes, with the GitHub job kept as a half-hourly backup. Two callers cannot send anything twice: every nudge is sent once and paced inside the sweep.',
   ] },

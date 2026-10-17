@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.57.0](./v1.57.0/) | 2026-10-17 | Ochre — the words catch up: five live features filed live, the plan read against the live site |
 | [v1.56.0](./v1.56.0/) | 2026-10-17 | Plum — nudges on time: the sweep on Vercel Cron every five minutes, GitHub as the backup |
 | [v1.55.0](./v1.55.0/) | 2026-10-14 | Turn on forwarding says where it has got to, and checks itself |
 | [v1.54.0](./v1.54.0/) | 2026-10-13 | Indigo — Paused says when you expect to be back, in your words with the time you said them |
