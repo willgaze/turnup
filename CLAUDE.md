@@ -878,8 +878,10 @@ free plan caps cron at once a day, and **a sub-daily cron on that plan fails
 the deploy**; the team is on **Pro** (Vercel's 9 Oct email, paid receipts), so
 Vercel runs it. If the team ever drops to Hobby, take the cron out of
 `vercel.json` first or every deploy fails. **Check a schedule by its log, never
-by its config**: Vercel → turnup → Logs, filter `/api/cron/nudge`, a line every
-five minutes. The GitHub backup is free only because the repo is public.
+by its config**: Vercel → turnup → Logs, filter `/api/cron/nudge`: one
+`sweep by=vercel-cron checked=… nudged=…` line every five minutes (the route
+logs it on purpose since v1.60.1; before that a warm sweep logged nothing and
+the schedule could not be seen). The GitHub backup is free only because the repo is public.
 
 The route is **open, and that is a choice**: every nudge level fires once and a
 repeat is paced to ten minutes inside `nudgeAll()`, whoever calls it, so

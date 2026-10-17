@@ -51,6 +51,11 @@ export async function GET(request) {
     const follow = await autoFollow().catch((e) => ({ on: true, error: e.message }))
     // Two hours after Job done: how did it go? Once per job.
     const reviews = await reviewAsks().catch((e) => ({ on: true, error: e.message }))
+    // One line per sweep, so the schedule can be checked in Vercel's logs: a
+    // warm function otherwise logs nothing, and a schedule with no evidence is
+    // a schedule nobody can tell has stopped. Counts only, no names.
+    const who = /vercel-cron/i.test(request.headers.get('user-agent') || '') ? 'vercel-cron' : 'other'
+    console.log(`sweep by=${who} checked=${r.checked ?? 0} nudged=${(r.nudged || []).length}`)
     return NextResponse.json({ ok: true, at: new Date().toISOString(), ...r, follow, reviews })
   } catch (error) {
     console.error('cron nudge failed:', error)
