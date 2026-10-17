@@ -105,7 +105,7 @@ export const PHASES = [
         needs: 'Apple Developer Program, £79/yr' },
       { key: 'dvla', name: 'Van details from the number plate', state: 'ready',
         what: 'Type the plate and the make, model and colour fill themselves in, from the DVSA MOT history record. DVLA is the fallback and has no model.',
-        needs: 'Three settings in Vercel. DVSA approved the key on 14 Oct 2026' },
+        needs: 'Three settings in Vercel, approved by DVSA on 14 Oct 2026: MOT_CLIENT_ID, MOT_CLIENT_SECRET and MOT_API_KEY' },
       { key: 'google-wallet', name: 'The same card on Android', state: 'idea',
         what: 'Google Wallet pass alongside the Apple one.',
         needs: 'Google Wallet issuer account, free' },
