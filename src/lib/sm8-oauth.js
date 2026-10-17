@@ -18,7 +18,10 @@ import { prisma } from '@/lib/prisma'
  */
 const AUTH_BASE = (process.env.SM8_OAUTH_BASE || 'https://go.servicem8.com').replace(/\/$/, '')
 const API_BASE = (process.env.SM8_API_BASE || 'https://api.servicem8.com').replace(/\/$/, '')
-export const SCOPES = ['publish_diary_items', 'create_notifications', 'vendor']
+// Only what is used: diary lines, and the account's name for the panel. The
+// add-on asked for create_notifications too and never sent one; ServiceM8's
+// store asks for the minimum, so it went (v1.60.0).
+export const SCOPES = ['publish_diary_items', 'vendor']
 const ID = 'singleton'
 
 export const oauthConfigured = () => Boolean(process.env.SM8_APP_ID && process.env.SM8_APP_SECRET && process.env.JWT_SECRET)

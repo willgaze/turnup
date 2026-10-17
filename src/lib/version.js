@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.59.0'
+export const VERSION = '1.60.0'
 export const BUILD_DATE = '2026-10-17'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 41
+export const THEME_INDEX = 42
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.60.0', date: '2026-10-17', notes: [
+    'A day is not a time. A job booked for a day with no hours was treated as if its window began at midnight: your phone buzzed in the small hours, the customer\'s page said the window started at 00:00, and at ten past two the customer was told their window had been missed. With the sweep now every five minutes that would have happened every night. Only hours you actually set or agreed count as a window now; ServiceM8 bookings, which always carry their times, are unchanged. The customer\'s times on that row also go through the one date formatter, so phone and server agree.',
+    'The ServiceM8 add-on listing, ready to paste: the short and long description written to ServiceM8\'s store rules, four real screenshots with an invented trade and customer, the icon, and a manifest checked against ServiceM8\'s own schema, served at /servicem8/manifest.json. The add-on now asks ServiceM8 for two permissions instead of three; it never used the third. A privacy policy is drafted from what the database actually holds, for the owner to agree. A public listing waits on three things the listing says plainly: an account per trade, that privacy page, and a support mailbox.',
+  ] },
   { version: '1.59.0', date: '2026-10-17', notes: [
     'Your job on your lock screen, written and waiting on Apple, now on main rather than on its own branch. native/ holds the iOS app: the dashboard in a native window, and the job you are on as a Live Activity, with the stage, the time it was tapped, the note, and On site, Paused, Back on site and Job done buttons on the lock screen and in the Dynamic Island. A button is a real tap: the same record, the same buzz to the customer, the same line in ServiceM8. Written 15 Oct; merged 17 Oct on the owner\'s go.',
     'In a browser nothing changes: the dashboard\'s half is a no-op outside the app. The lock-screen buttons sign in with a token the app fetches from the dashboard, so the operator check accepts that token as well as the cookie: the same secret, the same thirty days. It compiles on a Mac runner the day the Apple Developer membership is active; until then the iOS build job does not run.',

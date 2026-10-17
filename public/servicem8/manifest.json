@@ -1,0 +1,34 @@
+{
+  "$schema": "https://api.servicem8.com/api_1.0/addonsdk/manifest-schema/v1.json",
+  "name": "TurnUp",
+  "version": "1.0",
+  "iconURL": "https://www.getturnup.com/icon-512.png",
+  "supportURL": "https://www.getturnup.com/with-servicem8",
+  "supportEmail": null,
+  "addonTargetAudience": "Trades and home-service businesses in the United Kingdom (plumbing, heating, electrical, building and similar), from one person with a van to about ten staff, whose customers wait in for a visit.",
+  "oauth": {
+    "scope": "publish_diary_items vendor"
+  },
+  "supportFAQ": [
+    {
+      "question": "What does TurnUp add to a job?",
+      "answer": "A line in the job diary for each thing that happened on the customer's TurnUp page: set off, on site, paused with the reason, done, booking terms agreed, no one home, running late, and each reply the customer gave. The diary keeps the record; nothing is copied by hand."
+    },
+    {
+      "question": "Does TurnUp change my jobs, quotes or invoices?",
+      "answer": "No. It writes diary lines and reads the account name, and asks for nothing else. Quotes, invoices, scheduling and staff stay in ServiceM8."
+    },
+    {
+      "question": "Does it send texts from my account?",
+      "answer": "Not through the add-on. Texts that carry the customer's link go out through your normal ServiceM8 SMS allowance, only when you switch Follow every booking on in TurnUp."
+    },
+    {
+      "question": "Does it ever tell the customer an arrival time?",
+      "answer": "Never. It shows the stage, when you set off, and hours only when you and the customer have both agreed them. It never works out or counts down to an arrival."
+    },
+    {
+      "question": "How do I disconnect it?",
+      "answer": "In TurnUp, Setup and settings, ServiceM8, Disconnect. The stored tokens are deleted at once. Revoking it in ServiceM8 stops it too."
+    }
+  ]
+}

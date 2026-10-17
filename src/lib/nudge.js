@@ -43,15 +43,22 @@ const hhmm = (d) => new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', m
 
 export function nudgeDue(t, now = new Date()) {
   if (!t.isActive || t.stage === 'DONE') return null
-  const start = t.windowStart || t.scheduledFor
-  if (!start) return null
-  const end = t.windowEnd || new Date(new Date(start).getTime() + 60 * 60_000)
   const since = (d) => now - new Date(d)
 
   // an unanswered question outranks everything, every ten minutes
   if (t.askedAt && !t.askAnsweredAt && (!t.nudgedAt || new Date(t.nudgedAt) < new Date(t.askedAt) || since(t.nudgedAt) >= REPEAT_MS)) {
     return { kind: 'ask', title: `${first(t)} is asking`, body: `"Are you still coming?" — asked at ${hhmm(t.askedAt)}, no answer yet. Tap to reply from the card.` }
   }
+
+  // Only real hours make a window. A job booked for a day with no hours
+  // carries scheduledFor at midnight, and this used to fall back to it: the
+  // trade was buzzed at one in the morning, told the window had ended at two,
+  // and at ten past two the CUSTOMER was told their window was missed. A day
+  // is not a time anybody gave (v1.60.0). ServiceM8 bookings always set
+  // windowStart, so they are untouched.
+  const start = t.windowStart
+  if (!start) return null
+  const end = t.windowEnd || new Date(new Date(start).getTime() + 60 * 60_000)
   if (t.nudgeLevel < 1 && now >= new Date(start) && t.stage === 'BOOKED') {
     return { kind: 'start', level: 1, title: `${first(t)}'s window has started`, body: `From ${hhmm(start)}, and the card still says Booked in. Set off, or say you are running late.` }
   }

@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.60.0](./v1.60.0/) | 2026-10-17 | Slate — a day is not a time: no midnight nudges; the ServiceM8 add-on listing, ready to paste |
 | [v1.59.0](./v1.59.0/) | 2026-10-17 | Moss — your job on your lock screen: the iOS app merged, waiting on Apple |
 | [v1.58.0](./v1.58.0/) | 2026-10-17 | Harbour — every picture re-shot from the current build, the trade's live; the household card, the review link and the roadmap in pictures |
 | [v1.57.0](./v1.57.0/) | 2026-10-17 | Ochre — the words catch up: five live features filed live, the plan read against the live site |

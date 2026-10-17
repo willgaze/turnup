@@ -512,6 +512,15 @@ Each of these was live. Do not reintroduce them.
   the job you have just tapped Done on jumps above the one you are driving to
   next. The order a list is read in is part of what it says; `inRunOrder()` in
   `src/app/api/dashboard/trackers/route.js` is the only place it is decided.
+- **A day was treated as a time.** A job booked for a day with no hours
+  stores `scheduledFor` at midnight, and the nudge sweep and the customer's
+  "Are you still coming?" row both fell back to it as the start of a window:
+  the trade was buzzed at one in the morning, the customer's page said *the
+  window started at 00:00*, and at ten past two the customer was told their
+  window was missed. Found in a listing screenshot on 17 Oct (v1.60.0), the
+  day the sweep went from every four hours to every five minutes, which would
+  have made it nightly. **Only real hours make a window**: `windowStart`, never
+  `scheduledFor`. ServiceM8 bookings always set both.
 - **The card said the stage and not the day.** A customer opening a job that
   was only booked got "Booked in", a rail they could already read, and the
   actual answer — Thursday 1 October — two taps down inside "The job",
@@ -615,6 +624,17 @@ tokens in `Sm8OAuth`, `publishDiary()`, `diaryFor()`), steps for the owner in
 `docs/servicem8-add-on.md`. `diaryFor()` is fire-and-forget wherever it is
 called and a no-op until the add-on is authorised. Texts go through
 `src/lib/sm8-words.js` and stay plain ASCII.
+
+**The store listing (`docs/servicem8-listing.md`, `public/servicem8/manifest.json`,
+v1.60.0)** is written to ServiceM8's own requirements and the manifest is
+validated against their v1 schema. Three things block a *public* listing and
+none is code you can finish in an evening: TurnUp serves **one trade** (a
+second business pressing Activate lands on this dashboard's sign-in), there is
+**no privacy policy page** (`docs/privacy-draft.md` waits on three owner
+decisions), and **no monitored support mailbox**. The add-on asks for the
+minimum, `publish_diary_items vendor`; it asked for `create_notifications` and
+never used it. Keep the listing's words true to what the add-on does, and never
+compare it with ServiceM8's own features in the listing: their rules forbid it.
 
 **Follow every booking (`src/lib/sm8-auto.js`, v1.35.0).** When
 `TradeProfile.autoFollow` is on, the cron sweep calls `autoFollow()`: every
