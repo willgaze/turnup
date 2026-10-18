@@ -20,6 +20,11 @@ const first = TRADE_NAME.split(' ')[0]
 export default function StillComing({ status, onAsked }) {
   const [now, setNow] = useState(() => Date.now())
   const [busy, setBusy] = useState(false)
+  // Every hook above the first `return null`. This one sat below them until
+  // v1.66.0, so the render that crossed the window's start called one hook
+  // more than the render before it, React threw #310, and the customer's
+  // page went to "Application error" at the one moment it exists for.
+  const [choosing, setChoosing] = useState(false)
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 30_000); return () => clearInterval(t) }, [])
 
   // Real hours only: a day with no hours is not a window, and "the window
@@ -38,7 +43,6 @@ export default function StillComing({ status, onAsked }) {
 
   const askAgainOk = !open && (!status.askedAt || now - new Date(status.askedAt).getTime() > 10 * 60_000)
 
-  const [choosing, setChoosing] = useState(false)
   const choose = async (choice) => {
     setChoosing(true)
     try {

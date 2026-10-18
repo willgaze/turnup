@@ -116,6 +116,9 @@ export const PHASES = [
     title: 'Next, if they are worth it',
     blurb: 'Tell me which of these you would actually use. That is what gets built.',
     items: [
+      { key: 'connect-gmail', name: 'Connect Gmail, so parcels reach the household card on their own', state: 'idea',
+        what: 'Today a household forwards delivery emails to its card, and most will never set up the filter. Linking the inbox once would do it for them. It starts on our own mailbox, and nobody else can use it until Google has reviewed it and an approved lab has assessed it, a check repeated every year, so it has no date. Plan and sources: docs/research/inbox-connect.md.',
+        needs: 'Google restricted-scope verification and a yearly CASA assessment (roughly $540 to $1,800 a year)' },
       { key: 'photos', name: 'Photos when the job is done', state: 'idea',
         what: 'They see the finished work. Also your evidence if anyone queries it.' },
       { key: 'whatsapp-auto', name: 'Automatic WhatsApp updates', state: 'idea',

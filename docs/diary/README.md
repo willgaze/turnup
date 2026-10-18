@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.66.0](./v1.66.0/) | 2026-10-19 | Harbour — Are you still coming? no longer crashes the page at the window; the email reader proven in every client; audit and the inbox-connect plan |
 | [v1.65.3](./v1.65.3/) | 2026-10-18 | Ochre — card titles say the thing ("Screwfix order"); Fwd: leftovers hidden |
 | [v1.65.2](./v1.65.2/) | 2026-10-18 | Ochre — a link opens the dashboard at the right panel (?open=doors) |
 | [v1.65.1](./v1.65.1/) | 2026-10-18 | Ochre — an iPhone forward lands right: the shop, On the way, its date, the Royal Mail number |
