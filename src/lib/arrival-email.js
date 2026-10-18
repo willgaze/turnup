@@ -407,11 +407,19 @@ const STAGE_LABEL = /^\s*(?:dispatched|despatched|shipped|delivered|out for deli
 // An order number names nothing a person would recognise on a card.
 const REF_TOKEN = /\b(?=[A-Z0-9-]*\d)[A-Z0-9][A-Z0-9-]{5,}\b/g
 
+// Sentences a shop tacks on that are about the email, not the thing.
+const SUBJECT_CHAFF = /[.\-–:]?\s*(please find (your |the )?(invoice|receipt)[^.]*attached|(your )?(invoice|receipt) (is )?attached|thank you for (your order|shopping)[^.]*|(has|have) (now )?(been )?(marked as )?(dispatched|despatched|shipped)\b|(with|from) [a-z0-9-]+\.(?:co\.uk|com|uk|net|org)\b)\.?/gi
+// A subject that, with its reference gone, names nothing: "Your order: A28...".
+const NAMES_NOTHING = /^(your|my)?(new)?(order|parcel|delivery|purchase|item|items|package)s?(number|no|ref|reference)?$/i
+
 function titleFrom(subject, who, isCarrier) {
   const raw = (subject || '').trim()
-  const subj = raw.replace(STAGE_LABEL, '').trim()
+  const subj = raw.replace(STAGE_LABEL, '').replace(SUBJECT_CHAFF, '').trim().replace(/[\s:.\-–]+$/, '')
   const left = subj.replace(REF_TOKEN, ' ').replace(PLUMBING, ' ').replace(/[^A-Za-z]+/g, '')
-  if (subj && left.length > 2) return subj.charAt(0).toUpperCase() + subj.slice(1)
+  // "Confirmation of your order: A28609474611. Please find your invoice
+  // attached." (Screwfix, 18 Oct 2026) names nothing once the reference and
+  // the chaff are gone, so it becomes "Screwfix order".
+  if (subj && left.length > 2 && !NAMES_NOTHING.test(left)) return subj.charAt(0).toUpperCase() + subj.slice(1)
   if (isCarrier) return `${who} parcel`
   return /\border\b/i.test(raw) ? `${who} order` : `Delivery from ${who}`
 }

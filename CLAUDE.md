@@ -723,6 +723,12 @@ and delivery move one row forwards. Only digital orders are dropped
 household's forwarding rule catches whatever it catches and a row for a thing
 that never comes to the door is the card lying.
 
+**Chaff comes off a title too (v1.65.3).** "Please find your invoice
+attached", "has been marked as dispatched" and "with shop.com" are about the
+email, and a subject that names nothing once the reference is gone ("Your
+order: A28609474611") becomes `<shop> order`. Rows whose title still starts
+"Fwd:" were filed before v1.64.0 read forwards, and `cardShape()` hides them.
+
 **Titles name the thing, not the stage.** A stage label at the front of a
 subject ("Dispatched:", "Delivered:", "Confirmation of") comes off, because
 the card shows the stage above the title. A row keeps its first title, except

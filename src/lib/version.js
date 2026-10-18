@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.65.2'
+export const VERSION = '1.65.3'
 export const BUILD_DATE = '2026-10-18'
 
 export const THEMES = [
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.65.3', date: '2026-10-18', notes: [
+    'Card titles say what the thing is. "Confirmation of your order: A28609474611. Please find your invoice attached." is now "Screwfix order", and "Your Order with divapor.com has been marked as dispatched" is "Di Vapor order": the stage already shows above the title, and an order number and an invoice line name nothing.',
+    'Rows left over from before forwarded emails were read properly, with "Fwd:" at the front of the title and the household as the sender, no longer show on the card.',
+  ] },
   { version: '1.65.2', date: '2026-10-18', notes: [
     'A link that opens the dashboard at the right panel: getturnup.com/dashboard?open=doors goes straight to Household cards, ?open=servicem8 to ServiceM8, ?open=profile to Who to expect, and so on. Instructions can now be one tap instead of scroll, open Setup and settings, find the panel.',
   ] },

@@ -102,7 +102,10 @@ else bad('no invented dates', 'a date appeared from nowhere', noDate)
 const TITLES = [
   ['a subject that is only a stage', { from: 'noreply@evri.com', subject: 'Your parcel is out for delivery', text: 'Your parcel H00AP1234567890 is out for delivery today.' }, 'Evri parcel'],
   ['a sender with no carrier', { from: 'deliveries@loaf.com', subject: 'Your delivery is booked', text: 'We will deliver your sofa on Friday.' }, 'Delivery from Loaf'],
-  ['a subject that names something', { from: 'noreply@dpd.co.uk', subject: 'Your Screwfix order has been dispatched', text: 'Order 15502938475610 has been dispatched.' }, 'Your Screwfix order has been dispatched'],
+  ['a subject that names something', { from: 'noreply@dpd.co.uk', subject: 'Your Screwfix order has been dispatched', text: 'Order 15502938475610 has been dispatched.' }, 'Your Screwfix order'],
+  // 18 Oct 2026, live: an order number and an invoice line name nothing.
+  ['an order number and an invoice line', { from: 'confirmation@screwfix.com', subject: 'Confirmation of your order: A28609474611. Please find your invoice attached.', text: 'Thank you for shopping with us. Order number: A28609474611. Click & Collect.' }, 'Screwfix order'],
+  ['"Your Order with <shop>.com has been marked as dispatched"', { from: 'help@partsshop.example', subject: 'Your Order with partsshop.com has been marked as dispatched', text: 'Your item(s) have now been marked as dispatched.' }, 'Partsshop order'],
 ]
 for (const [name, email, want] of TITLES) {
   const got = readArrivalEmail(email, NOW)

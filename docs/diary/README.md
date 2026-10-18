@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.65.3](./v1.65.3/) | 2026-10-18 | Ochre — card titles say the thing ("Screwfix order"); Fwd: leftovers hidden |
 | [v1.65.2](./v1.65.2/) | 2026-10-18 | Ochre — a link opens the dashboard at the right panel (?open=doors) |
 | [v1.65.1](./v1.65.1/) | 2026-10-18 | Ochre — an iPhone forward lands right: the shop, On the way, its date, the Royal Mail number |
 | [v1.65.0](./v1.65.0/) | 2026-10-18 | Ochre — no notifications, an email instead: set off, window missed and the day-before ask through ServiceM8; the missed notice no longer waits on a trade phone |
