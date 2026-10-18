@@ -683,9 +683,14 @@ that splits trades from parcels makes them do the merging in their head.
 Getting thirteen delivery firms to integrate is not a thing a sole trader can
 do. Getting one household to add a forwarding rule is. `src/lib/arrival-email.js`
 reads a forwarded email and returns an arrival or **null**; it is pure, has no
-database, and `node scripts/check-arrival-email.mjs` is its test: 31 cases, five
-of them raw forwarded emails in `scripts/fixtures/forwards/` run through
-`readRawEmail()` first, which is the real path.
+database, and `node scripts/check-arrival-email.mjs` is its test: 50 cases. Six
+are raw forwarded emails in `scripts/fixtures/forwards/` and twelve more are in
+`scripts/fixtures/forwards/matrix/`: Gmail, Outlook and Apple Mail forwards,
+each at all four stages (ordered, on its way, out for delivery, delivered), from
+one invented shop. Every one runs through `readRawEmail()` first, which is the
+real path. **Fixtures use invented people and addresses** (`example.*`
+domains, the Oakleys, Harbour Home). Since 19 Oct 2026 none of them names a
+real household or a mailbox somebody could own.
 
 **Every card email is a forward, so the forward is unwrapped first**
 (`unwrapForward()`, v1.64.0). Until then nothing did: a live test on 18 Oct 2026

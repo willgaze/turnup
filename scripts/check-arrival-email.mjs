@@ -136,7 +136,7 @@ if (invoice === null) { pass++; console.log('  ok    an invoice is not an arriva
 else bad('an invoice', 'filed something', invoice)
 
 // FORWARDS, AS A CARD ACTUALLY RECEIVES THEM. Every card email is a forward.
-// A live test on 18 Oct 2026 (the Thimbles card) found three bugs at once:
+// A live test on 18 Oct 2026 (the owner's own card) found three bugs at once:
 // the sender read as "Me" and the title as "Fwd: ...", a Samsung "Dispatched"
 // email filed as arrived, and "Confirmation of your order" dropped. These are
 // raw RFC 822 files, run through the same two functions the inbound route
@@ -179,6 +179,31 @@ for (const [name, file, want] of FORWARDS) {
   else { pass++; console.log(`  ok    ${name} -> ${got.carrier} / ${got.stage} / "${got.title}"`) }
 }
 
+// EVERY FORWARD FORMAT AT EVERY STAGE. The three ways a household forwards
+// (Gmail's "Forwarded message", Outlook's line of underscores, Apple Mail's
+// "Begin forwarded message:") crossed with the four stage words, from one
+// invented shop. The ON_THE_WAY emails all say the order "should be
+// delivered" or "may be left in your safe place", so a pass is proof that
+// dispatched never files as arrived, in any client. All names are invented.
+const MATRIX = new URL('./fixtures/forwards/matrix/', import.meta.url)
+const STAGE_OF = { ordered: 'ORDERED', 'on-the-way': 'ON_THE_WAY', 'out-for-delivery': 'OUT_FOR_DELIVERY', delivered: 'DONE' }
+for (const fmt of ['gmail', 'outlook', 'apple']) {
+  for (const [file, wantStage] of Object.entries(STAGE_OF)) {
+    const name = `${fmt} forward, ${file}`
+    const read = readRawEmail(readFileSync(new URL(`${fmt}-${file}.eml`, MATRIX), 'utf8'))
+    const got = read && readArrivalEmail({ ...read, receivedAt: NOW })
+    if (!got) { bad(name, 'expected an arrival, got nothing', read); continue }
+    const problems = []
+    if (got.carrier !== 'Harbour Home') problems.push(`sender ${got.carrier} != Harbour Home`)
+    if (got.stage !== wantStage) problems.push(`stage ${got.stage} != ${wantStage}`)
+    if (/^\s*(fwd?|fw)\s*:/i.test(got.title)) problems.push(`title still says Fwd: "${got.title}"`)
+    if (/^\s*(dispatched|delivered|shipped|out for delivery|order confirmation)\b/i.test(got.title)) problems.push(`title opens with its stage: "${got.title}"`)
+    if (got.reference !== 'HH4821377') problems.push(`reference ${got.reference} != HH4821377`)
+    if (problems.length) bad(name, problems.join('; '), got)
+    else { pass++; console.log(`  ok    ${name} -> ${got.stage} / "${got.title}"`) }
+  }
+}
+
 // One order, one row. A shop's three emails all carry its order number, and
 // the card matches rows on sender and reference, so the order confirmation,
 // the dispatch and the delivery move ONE row forwards rather than adding
@@ -194,6 +219,13 @@ const TRAPS = [
     { from: 'shop@example.com', subject: 'Thanks for your order', text: 'We will email you when it has been dispatched.' }, 'ORDERED'],
   ['"it may be left in your safe place" is not arrived',
     { from: 'shop@example.com', subject: 'Dispatched: your order', text: 'If you are out it may be left in your safe place.' }, 'ON_THE_WAY'],
+  ['"Ordered: ..." (an Amazon-style subject) is an order',
+    { from: 'shop@example.com', subject: 'Ordered: "Bath sheet, sea blue"', text: 'Thanks, Jo. Order number HH4821377.' }, 'ORDERED'],
+  ['"you ordered" is an order', { from: 'shop@example.com', subject: 'Hello Jo', text: 'You ordered 2 items. Order number HH4821377.' }, 'ORDERED'],
+  ['"the item you ordered has been delivered" is arrived, not an order',
+    { from: 'shop@example.com', subject: 'An update on your parcel', text: 'The item you ordered has been delivered.' }, 'DONE'],
+  ['"the item you ordered has been dispatched" is on its way, not an order',
+    { from: 'shop@example.com', subject: 'An update on your parcel', text: 'The item you ordered has been dispatched.' }, 'ON_THE_WAY'],
   ['"left with your neighbour" is arrived',
     { from: 'noreply@evri.com', subject: 'Your parcel update', text: 'We left your parcel with your neighbour at number 6.' }, 'DONE'],
 ]

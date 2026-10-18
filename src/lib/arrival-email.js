@@ -138,7 +138,11 @@ const STAGE_PHRASES = [
     /\byour order (has been |is )?(confirmed|placed|received)\b/i,
     /\bthank(s| you) for (your|placing your) order\b/i, /\bthank(s| you) for shopping with\b/i,
     /\bthanks? for your order\b/i,
-    /\bwe('| ha)ve received your order\b/i, /\byour order( is)? (is )?being (prepared|picked|processed)\b/i]],
+    /\bwe('| ha)ve received your order\b/i, /\byour order( is)? (is )?being (prepared|picked|processed)\b/i,
+    // "Ordered: Bath sheet" is how Amazon titles a confirmation; "you ordered"
+    // is how many shops open one. Last in the list, so "the item you ordered
+    // has been delivered" is still read as delivered (19 Oct 2026).
+    /^\s*ordered\s*:/i, /\byou ordered\b/i]],
 ]
 
 // Said anywhere near "delivered", these mean it has not happened yet.
