@@ -126,9 +126,30 @@ Add, after the Glympse row:
   updated: '<the build date>',
 ```
 
-## If the DVSA keys have gone into Vercel
+## Van lookup: live, owner confirmed 19 Oct 2026
 
-Only then: the STATUS van row and WAITING_ON_OWNER's DVSA entry go, the
-roadmap's `dvla` moves to `live`, and PRODUCT.does' "Van make, model, colour"
-note drops "pending key". The review could not see Vercel's settings, so this
-is conditional.
+STATUS, old:
+```
+  { item: 'Van lookup (DVSA MOT API)', state: 'amber', note: 'DVSA approved 14 Oct; three settings in Vercel to go' },
+```
+New:
+```
+  { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live since 18 Oct 2026: type the plate, make, model and colour fill themselves in' },
+```
+
+WAITING_ON_OWNER: delete the `DVSA keys into Vercel` entry. Three taps remain.
+
+PRODUCT.does, old:
+```
+    { label: 'Van make, model, colour', note: 'DVSA lookup, pending key' },
+```
+New:
+```
+    { label: 'Van make, model, colour', note: 'from the plate, DVSA MOT history; live 18 Oct 2026' },
+```
+
+Outside `plan.js`, same build:
+
+- `src/lib/roadmap.js`: `dvla` moves from `ready` to `live`, under Working now; its `needs` line goes.
+- `src/app/plan/sections-now.jsx`: the hero sub-line `"Apple, DVSA, ServiceM8"` becomes `"Apple"`.
+- `src/app/dashboard/Profile.jsx`: the paragraph telling the owner to register with DVSA and put three settings in Vercel is now for a second trade, not this one; read it before leaving it.
