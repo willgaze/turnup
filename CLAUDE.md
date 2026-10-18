@@ -938,10 +938,18 @@ MX on the subdomain) and `/join` shows the forwarding address only when it is
 true: an address nothing is listening on is the push row that opened onto an
 empty drawer.
 
-Still to do: a way to connect a source other than forwarding (Gmail's
-`gmail.readonly` is a restricted scope — Google verification plus a CASA
-assessment renewed yearly, weeks of lead time and a four-figure annual cost,
-which is why forwarding came first).
+Still to do: a way to connect a source other than forwarding, because a
+household will not set up a filter. **The plan is `docs/research/inbox-connect.md`
+(19 Oct 2026), every claim with its URL.** In short: `gmail.readonly` and
+`gmail.metadata` are both restricted, and no Gmail scope can be narrowed to
+matching messages or one label. An Internal app on the owner's own Workspace
+needs no Google review, so that is stage 1. Testing mode allows 100 named
+users with seven-day tokens (stage 2). Public needs restricted-scope
+verification plus a CASA assessment by an authorised lab every year (stage 3).
+The best public figure for that is roughly $540 to $1,800 a year, not the
+"four-figure" sum this paragraph used to say. A tracking-number aggregator
+keeps a card moving from one email. **No OAuth app is created by a session**;
+the Google Cloud project and the consent screen are the owner's to make.
 
 ## When the window arrives and nothing has moved (`src/lib/nudge.js`)
 
@@ -1082,6 +1090,18 @@ reached no phone of theirs, they get an email instead.
 The day-before nudge to the trade says when the ask went by email. Running late
 and Job done are not emailed yet: the first is a figure the trade typed, which
 the page shows with when it was said; the second is not urgent.
+
+## No hook after an early return (`node scripts/check-hook-order.mjs`)
+
+There is no ESLint config in this repo, so React's rules-of-hooks never runs.
+Until v1.66.0 `src/app/t/StillComing.jsx` called `useState` below two
+`return null`s: the render that crossed the window's start called one hook
+more than the one before, React threw #310, and the customer's page showed
+"Application error" at the exact moment it exists for. Reproduced in a browser
+on 19 Oct 2026 (a Booked-in card, agreed window starting 40 seconds after the
+page opened) and gone after the fix. The check reads every component's
+top-level lines and fails a `useX(` that follows a top-level return; it
+carries a self-test with the original bug. Run it before every push.
 
 ## A tap with no signal still counts (`src/app/dashboard/offline-queue.js`)
 
