@@ -21,6 +21,7 @@ the one thing this exists for.
 | Version | Date | Theme |
 |---|---|---|
 | [v1.65.0](./v1.65.0/) | 2026-10-18 | Ochre — no notifications, an email instead: set off, window missed and the day-before ask through ServiceM8; the missed notice no longer waits on a trade phone |
+| [v1.64.1](./v1.64.1/) | 2026-10-18 | Plum — Gmail's confirm-forwarding code shows on the card instead of being dropped |
 | [v1.64.0](./v1.64.0/) | 2026-10-18 | Plum — the household card reads the email inside the forward; dispatched is on its way; an order goes on as Ordered |
 | [v1.63.0](./v1.63.0/) | 2026-10-18 | Teal — a home makes its own card; the letterbox steps fixed (one rule, not a catch-all); posters re-shot |
 | [v1.62.0](./v1.62.0/) | 2026-10-17 | Indigo — the homepage fits a phone; /join builds your card as you sign up; /for-trades and /for-homes |

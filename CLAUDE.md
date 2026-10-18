@@ -805,6 +805,14 @@ Settings page, and Cloudflare then writes that subdomain's own MX/SPF records â€
 which leaves `will@getturnup.com` available for ever. A catch-all on the apex
 would have spent that for nothing.
 
+**Gmail's confirmation is the one non-arrival that is kept (v1.64.1).** Before
+Gmail auto-forwards it sends a code to the new address, which is the card's
+letterbox; dropped as "not an arrival", the household waits on a code nobody
+can see. `readForwardingConfirm()` in `src/lib/gmail-confirm.js` (sender domain
+google.com, Gmail's own link hosts only; `node scripts/check-gmail-confirm.mjs`)
+files it as a `NOTICE` row the card shows first and never counts as coming. The
+next real arrival deletes it; `cardShape()` drops it after a week.
+
 **One rule, not a catch-all (v1.63.0).** Cloudflare's catch-all works on the
 apex only; a subdomain takes literal rules. So every card's address is
 `cards+<key>@in.getturnup.com` (`INBOUND_LOCAL` in `src/lib/inbox-address.js`),

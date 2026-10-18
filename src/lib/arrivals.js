@@ -5,6 +5,7 @@ import { cleanText } from './clean-text'
 import { atLocalTime } from './when'
 import { cardShape } from './arrival-card'
 import { INBOUND_HOST, inboxAddress } from './inbox-address'
+import { readForwardingConfirm, CONFIRM_KEY } from './gmail-confirm'
 import { arrivalFromTracker, trackerDedupeKey } from './arrival-sync'
 
 /**
@@ -91,10 +92,32 @@ export async function fileEmail({ inboxKey, from, subject, text, receivedAt }) {
   } catch { return { ok: false, why: 'unavailable' } }
   if (!place?.isActive) return { ok: false, why: 'no_such_inbox' }
 
+  // Gmail asking the household to confirm forwarding. Not an arrival, but the
+  // one email they must see, or nothing else ever arrives. See gmail-confirm.js.
+  const confirm = readForwardingConfirm({ from, subject, text })
+  if (confirm) {
+    try {
+      const data = {
+        kind: 'NOTICE', source: 'EMAIL', stage: 'BOOKED', carrier: 'Gmail',
+        title: 'Gmail is asking you to confirm forwarding',
+        reference: confirm.code, trackUrl: confirm.url,
+      }
+      await prisma.arrival.upsert({
+        where: { placeId_dedupeKey: { placeId: place.id, dedupeKey: CONFIRM_KEY } },
+        create: { placeId: place.id, dedupeKey: CONFIRM_KEY, ...data },
+        update: data,
+      })
+      return { ok: true, filed: true, stage: 'GMAIL_CONFIRM' }
+    } catch { return { ok: false, why: 'unavailable' } }
+  }
+
   const parsed = readArrivalEmail({ from, subject, text, receivedAt })
   // Not an arrival. A receipt, a newsletter, a password reset. Dropping it is
   // the correct outcome and is not an error worth reporting as one.
   if (!parsed) return { ok: true, filed: false, why: 'not_an_arrival' }
+
+  // Mail is flowing, so Gmail's ask has been answered: take the notice off.
+  prisma.arrival.deleteMany({ where: { placeId: place.id, dedupeKey: CONFIRM_KEY } }).catch(() => {})
 
   const dedupeKey = dedupeKeyFor(parsed)
   const data = {

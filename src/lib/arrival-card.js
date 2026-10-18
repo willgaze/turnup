@@ -23,6 +23,9 @@ export function cardShape(place, now = new Date()) {
   const cutoff = new Date(now.getTime() - KEEP_FINISHED_DAYS * 24 * 3600 * 1000)
   const arrivals = (place.arrivals || [])
     .filter((a) => !(['DONE', 'MISSED'].includes(a.stage) && new Date(a.updatedAt) < cutoff))
+    // Gmail's forwarding confirmation (gmail-confirm.js) is a notice, not an
+    // arrival; a week on, Gmail's link has long expired and it only clutters.
+    .filter((a) => !(a.kind === 'NOTICE' && new Date(a.updatedAt) < new Date(now.getTime() - 7 * 24 * 3600 * 1000)))
     .map((a) => ({
       kind: a.kind,
       source: a.source,

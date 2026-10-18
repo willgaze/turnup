@@ -54,6 +54,9 @@ export const CHANGELOG = [
     'The missed-window notice now reaches the customer even when no trade phone is registered for nudges. Before, the window-started nudge waited for ever for a phone to take it and blocked the missed notice behind it.',
     'The day-before nudge to your phone now says when the ask went by email, so you only need to text the link if you want to be sure.',
   ] },
+  { version: '1.64.1', date: '2026-10-18', notes: [
+    'Gmail\u2019s confirm-forwarding email now shows on the card. Before Gmail will forward to a new address it sends a code to that address, which is the card\u2019s letterbox: it was not a delivery, so it was dropped, and Gmail waited for a confirmation nobody could see. Now the card shows One step left, the code, and a Confirm in Gmail button, and the notice goes once a delivery email arrives. The /join card screen also says how to set up Gmail, starting with one email forwarded by hand.',
+  ] },
   { version: '1.64.0', date: '2026-10-18', notes: [
     'The household card reads the email inside the forward. Every card email is a forward, and until now the card read the wrapper: a live test on a household card showed Me as the sender and Fwd: Dispatched as the title. Gmail, Apple Mail and Outlook forwards are unwrapped first, a forward of a forward included, so the card shows Samsung UK and the subject they wrote.',
     'Dispatched is on its way, never arrived. A Samsung Dispatched email said the order should be delivered to your address, and the card filed it as arrived. The subject is now read before the body, since the headline names the stage the email is about, and arrived means only what is said after the event: delivered, left with someone, in your safe place.',

@@ -109,16 +109,18 @@ recommends.
    checked 17 Oct). The store will delist an add-on whose support address goes
    unanswered.
 
-   Same place you turned on forwarding, one level up — the apex instead of
-   `in.getturnup.com`:
+   It is the same place you turned on forwarding, one level up — the apex
+   instead of `in.getturnup.com` — and it is **written out as a Cowork paste
+   in `docs/cowork-mailboxes.md`**, not as a step list here. Standing rule 3:
+   a console is a Cowork job, because the step list is the form that does not
+   get done.
 
-   1. [dash.cloudflare.com](https://dash.cloudflare.com) → **getturnup.com**
-      → **Email** → **Email Routing**.
-   2. **Routing rules** → **Create address**.
-   3. Custom address `support` → Action **Send to an email** → your own inbox.
-   4. Again for `privacy`, which the privacy page gives out.
-   5. Cloudflare emails that inbox to verify it. Click the link or nothing
-      arrives.
+   Two things that paste covers and a step list would not: a destination
+   address has to be verified from the inbox or nothing is ever delivered,
+   and enabling Email Routing on the apex writes MX records onto
+   `getturnup.com` itself. That is what makes an apex address work, and it is
+   also what a hosted mailbox provider would later have to replace —
+   forwarding and a real mailbox cannot both own the apex.
 
 **A rule that pulls against the roadmap.** ServiceM8's requirements say an
 add-on may not "accept, request, manage, or process payments between ServiceM8

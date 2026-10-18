@@ -606,6 +606,20 @@ function GoLive({ d, set, onRestart }) {
               {copied === 'inbox' ? 'Copied' : 'Copy the address'}
             </button>
             <p className="mt-2 text-[14px] leading-snug muted">Keep it to yourself. It is the one way onto your card. The card link is the one to share.</p>
+            {/* The quick proof is one email forwarded by hand. Doing it
+                automatically, Gmail first sends a code to this address, and
+                the card shows it (src/lib/gmail-confirm.js). */}
+            <details className="group mt-3">
+              <summary className="cursor-pointer list-none text-[15px] font-semibold [&::-webkit-details-marker]:hidden" style={{ color: 'var(--tint)' }}>
+                Make Gmail send them on its own
+              </summary>
+              <ol className="mt-2 grid list-decimal gap-1.5 pl-5 text-[14px] leading-snug">
+                <li>Try one first: forward any delivery email to the address above. It shows on your card.</li>
+                <li>On a computer, Gmail → Settings → See all settings → Forwarding and POP/IMAP → Add a forwarding address. Paste the address.</li>
+                <li>Gmail sends a code to your card. Open your card and tap Confirm in Gmail.</li>
+                <li>Then Filters → Create a filter, From: the delivery firms you use, and choose Forward it to this address.</li>
+              </ol>
+            </details>
           </>
         ) : (
           <p className="mt-1 text-[15px] leading-snug muted">

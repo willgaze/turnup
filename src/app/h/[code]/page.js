@@ -192,7 +192,9 @@ export default async function HouseholdCard({ params }) {
   }
 
   const card = cardShape(place)
-  const coming = card.arrivals.filter((a) => a.stage !== 'DONE')
+  // Gmail asking to confirm forwarding: shown first, never counted as coming.
+  const notices = card.arrivals.filter((a) => a.kind === 'NOTICE')
+  const coming = card.arrivals.filter((a) => a.stage !== 'DONE' && a.kind !== 'NOTICE')
   const settled = card.arrivals.filter((a) => a.stage === 'DONE')
 
   /*
@@ -223,6 +225,18 @@ export default async function HouseholdCard({ params }) {
             {headline(people.length, things.length)}
           </h1>
         </header>
+
+        {notices.map((n) => (
+          <div key="gmail-confirm" className="tone-paused glass r-outer mt-6 p-4">
+            <p className="text-[13px] font-semibold uppercase tracking-wide" style={{ color: 'var(--tint)' }}>One step left</p>
+            <p className="mt-0.5 text-[17px] font-semibold leading-snug">{n.title}</p>
+            <p className="mt-1 text-[15px] leading-snug muted">Nothing is forwarded until you do. Tap Confirm, or type the code into Gmail’s forwarding settings.</p>
+            {n.reference && <p className="mt-2 font-mono text-[20px] font-bold tracking-wider">{n.reference}</p>}
+            {n.trackUrl && (
+              <a href={n.trackUrl} target="_blank" rel="noreferrer" className="btn btn-filled mt-3 !min-h-[44px] !px-5 !text-[15px]">Confirm in Gmail</a>
+            )}
+          </div>
+        ))}
 
         {people.length > 0 && (
           <>
