@@ -107,6 +107,8 @@ const STAGE_PHRASES = [
 
   ['ON_THE_WAY', [/^\s*(dispatched|despatched|shipped)\b/i, /\b(has|have) (been )?(dispatched|despatched|shipped)\b/i,
     /\b(order|parcel|item|package)s? (is |are |was |were )?(now )?(dispatched|despatched|shipped)\b/i, /\bon its way\b/i,
+    // "has been marked as dispatched" (Di Vapor, and many small shop systems).
+    /\bmarked as (dispatched|despatched|shipped)\b/i, /^\s*(dispatch|despatch|shipping) confirmation\b/i,
     /\byour (parcel|order) is on the way\b/i, /\bleft (our|the) (warehouse|depot)\b/i,
     /\bin transit\b/i, /\bwe('| ha)ve got your (parcel|item)\b/i]],
 
@@ -199,7 +201,15 @@ function unwrapOnce(text) {
     if (!m) return null
     start = m.index
   }
-  const lines = t.slice(start).split(/\r?\n/)
+  // iPhone Mail quotes the whole forward, every line "> ", and the line after
+  // "Begin forwarded message:" is a bare ">". Read as text that ">" ended the
+  // headers at once and the forward was never unwrapped: a live test on 18 Oct
+  // 2026 filed a Royal Mail dispatch as from the household, Ordered, on the
+  // forward's own date. One level of quoting comes off when the mark itself
+  // was quoted.
+  const markLine = t.slice(mark ? mark.index : start, start)
+  const quoted = /^\s*>/.test(markLine.replace(/^\n/, ''))
+  const lines = t.slice(start).split(/\r?\n/).map((l) => (quoted ? l.replace(/^[ \t]*> ?/, '') : l))
   const head = {}
   let i = 0
   while (i < lines.length && !lines[i].trim()) i++
@@ -321,6 +331,9 @@ export function statedWindow(text) {
 const domainOf = (from) => (String(from || '').match(/@([^\s>]+)/) || [])[1]?.toLowerCase() || ''
 
 /** The name a person would use for who it is from, when no carrier matched. */
+/** The name an email's own From line gives, as the card would show it. */
+export const nameOfSender = (from) => senderName(from, domainOf(from))
+
 function senderName(from, domain) {
   const named = String(from || '').match(/^\s*"?([^"<@]+?)"?\s*</)
   const label = named?.[1]?.trim()
@@ -441,13 +454,24 @@ export function readArrivalEmail({ from: outerFrom, subject: outerSubject, text:
   // its way: they do not email about parcels that are not moving.
   if (!stage) stage = 'ON_THE_WAY'
 
+  // A shop that posts with a carrier links to that carrier's own tracking
+  // page ("RM Tracking Link: https://www.royalmail.com/track-your-item..."). The
+  // shop is still who said it, and stays the sender; the carrier is only where
+  // the reference and the tracking link come from. Matched on the link's
+  // domain AND the carrier's own reference shape, never on its name in text.
+  const linkHosts = [...body.matchAll(/https?:\/\/([a-z0-9.-]+)/gi)].map((m) => m[1].toLowerCase())
+  const via = carrier || CARRIERS.find((c) =>
+    linkHosts.some((h) => c.domains.some((d) => d.test(h))) && c.ref.some((re) => re.test(hay))) || null
+
   let reference = null
-  for (const re of carrier?.ref || []) {
+  for (const re of via?.ref || []) {
     const m = hay.match(re)
     if (m) { reference = m[1]; break }
   }
   if (!reference) {
-    const generic = hay.match(/\b(?:tracking|consignment|parcel|order)\s*(?:number|no\.?|#|reference|ref)?\s*[:#]?\s*([A-Z0-9][A-Z0-9-]{5,24})\b/i)
+    // A reference has a digit in it: "Order Receipt Number: 1638376" once
+    // came back as "Receipt" (18 Oct 2026).
+    const generic = hay.match(/\b(?:tracking|consignment|parcel|order)\s*(?:receipt\s*)?(?:number|no\.?|#|reference|ref)?\s*[:#]?\s*((?=[A-Z0-9-]*\d)[A-Z0-9][A-Z0-9-]{5,24})\b/i)
     if (generic) reference = generic[1]
   }
 
@@ -456,7 +480,7 @@ export function readArrivalEmail({ from: outerFrom, subject: outerSubject, text:
   const who = carrier?.name || senderName(from, domain)
 
   return {
-    kind: kindOf(hay, carrier, reference),
+    kind: kindOf(hay, via, reference),
     source: 'EMAIL',
     carrier: who,
     carrierId: carrier?.id || null,
@@ -467,6 +491,6 @@ export function readArrivalEmail({ from: outerFrom, subject: outerSubject, text:
     expectedFor: when?.at || null,
     expectedSaid: when?.said || null,
     window: window ? { start: window.start, end: window.end, said: window.said } : null,
-    trackUrl: reference && carrier?.track ? carrier.track(reference) : null,
+    trackUrl: reference && via?.track && via.ref.some((re) => re.test(reference)) ? via.track(reference) : null,
   }
 }

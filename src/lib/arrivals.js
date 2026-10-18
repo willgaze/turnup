@@ -6,6 +6,7 @@ import { atLocalTime } from './when'
 import { cardShape } from './arrival-card'
 import { INBOUND_HOST, inboxAddress } from './inbox-address'
 import { readForwardingConfirm, CONFIRM_KEY } from './gmail-confirm'
+import { nameOfSender } from './arrival-email'
 import { arrivalFromTracker, trackerDedupeKey } from './arrival-sync'
 
 /**
@@ -177,6 +178,16 @@ export async function fileEmail({ inboxKey, from, subject, text, receivedAt }) {
       return { ok: true, filed: true, updated: true, stage: nextStage(existing.stage, parsed.stage) }
     }
     await prisma.arrival.create({ data: { ...data, placeId: place.id, dedupeKey, stage: parsed.stage } })
+    // The same email, filed before a forward could be read (v1.64.2): a row
+    // under the household's own name with this exact title is this thing,
+    // filed wrongly. Narrow on purpose: same card, same title, and the sender
+    // being whoever forwarded it, never a carrier or a shop.
+    const forwarder = nameOfSender(from)
+    if (forwarder && forwarder !== data.carrier) {
+      prisma.arrival.deleteMany({
+        where: { placeId: place.id, source: 'EMAIL', title: data.title, carrier: forwarder, NOT: { dedupeKey } },
+      }).catch(() => {})
+    }
     return { ok: true, filed: true, updated: false, stage: parsed.stage }
   } catch (error) {
     console.error('arrival file failed:', error?.code || error?.message)

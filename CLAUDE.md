@@ -688,6 +688,17 @@ behind it. The protection instead is that only the household holds the inbox
 key, and anyone holding it could post anything anyway. Without that trade no
 forwarded email could ever match a carrier.
 
+**iPhone Mail quotes the whole forward (v1.65.1).** Every line starts "> " and
+the line after "Begin forwarded message:" is a bare ">", which ended the header
+read at once: a live test filed a Royal Mail dispatch from the household, as
+Ordered, on the forward's date, reference "Receipt". When the mark itself is
+quoted, one level of quoting comes off first. Two more from the same email: a
+reference must contain a digit, and a shop that links to a carrier's own
+tracking page (matched on the link's domain AND the carrier's reference shape)
+lends that carrier's number and tracking link, while the shop stays who said
+it. `scripts/fixtures/forwards/iphone-quoted-royalmail-via-shop.eml` is that
+email with the names and numbers changed.
+
 **The subject is read before the body.** The sender's headline names the stage
 it is about ("Dispatched:", "Delivered:", "Confirmation of your order"); the
 body mentions every other stage in passing ("we'll email you when it has been

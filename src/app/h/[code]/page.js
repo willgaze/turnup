@@ -140,7 +140,9 @@ function Row({ a }) {
             {a.trackUrl && (
               <a href={a.trackUrl} target="_blank" rel="noreferrer"
                  className="btn btn-grey !min-h-[40px] !px-4 !text-[14px]">
-                Track with {a.carrier}
+                {/* A shop posting by Royal Mail links to Royal Mail's page,
+                    so the button names the page it opens, not the shop. */}
+                {(() => { try { const h = new URL(a.trackUrl).hostname; return /royalmail/.test(h) ? 'Track with Royal Mail' : /evri|hermes/.test(h) ? 'Track with Evri' : /dpd/.test(h) ? 'Track with DPD' : /parcelforce/.test(h) ? 'Track with Parcelforce' : /inpost|yodel/.test(h) ? 'Track with InPost' : /dhl/.test(h) ? 'Track with DHL' : /ups\./.test(h) ? 'Track with UPS' : `Track with ${a.carrier}` } catch { return `Track with ${a.carrier}` } })()}
               </a>
             )}
           </div>

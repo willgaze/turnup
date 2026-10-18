@@ -86,6 +86,7 @@ for (const { name, email, want } of CASES) {
   if (want.hasTrack && !got.trackUrl) problems.push('expected a tracking link')
   if (want.hasDate && !got.expectedFor) problems.push('expected a stated date')
   if (want.hasWindow && !got.window) problems.push('expected a stated window')
+  if (want.trackUrl && !got.trackUrl) problems.push('expected a tracking link')
   if (problems.length) bad(name, problems.join('; '), got)
   else { pass++; console.log(`  ok    ${name}${got.expectedSaid ? `  (said "${got.expectedSaid}")` : ''}`) }
 }
@@ -149,6 +150,12 @@ const FORWARDS = [
     { carrier: 'DPD', stage: 'OUT_FOR_DELIVERY', hasWindow: true }],
   ['A forward of a forward: Evri on its way', 'nested-evri-on-its-way.eml',
     { carrier: 'Evri', stage: 'ON_THE_WAY', hasDate: true }],
+  // A live test, 18 Oct 2026 (names and numbers changed): iPhone Mail quotes
+  // every line "> ", a bare ">" follows the mark, the shop's subject says
+  // "marked as dispatched", and the Royal Mail number is only in the shop's
+  // tracking link. It had come back from the household, Ordered, "Receipt".
+  ['iPhone forward, quoted: a shop posting by Royal Mail', 'iphone-quoted-royalmail-via-shop.eml',
+    { carrier: 'Parts Shop', stage: 'ON_THE_WAY', hasDate: true, reference: 'AB123456789GB', trackUrl: true }],
 ]
 for (const [name, file, want] of FORWARDS) {
   const raw = readFileSync(new URL(file, FIXTURES), 'utf8')
