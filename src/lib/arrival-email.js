@@ -83,9 +83,19 @@ const STAGE_PHRASES = [
   // the worst mistake this file can make — it drops a thing off the card at
   // the moment the customer most wants it there. Every pattern here is
   // explicitly past tense, and the future-tense guard below is belt and braces.
-  ['DONE', [/\b(has|have|was|were) been delivered\b/i, /\b(was|were) delivered\b/i,
-    /\bwe delivered\b/i, /\bdelivered (to|at|on|in|your|it)\b/i,
-    /\bdelivery (is )?complete(d)?\b/i, /\byour (parcel|order|item) is here\b/i]],
+  //
+  // "delivered to" ALONE IS THE SAME TRAP (18 Oct 2026). A Samsung "Dispatched"
+  // email said its order "should be delivered to your address", and a bare
+  // /delivered to/ filed it as arrived while the parcel was still at a depot.
+  // DONE is now only what a carrier writes AFTER the event: it has been
+  // delivered, it was left with someone, it is in your safe place.
+  ['DONE', [/^\s*delivered\b/i, /\b(has|have) been delivered\b/i, /\b(was|were) delivered\b/i,
+    /\bwe('ve| have)? delivered\b/i,
+    /\bdelivered to (your |a |the )?(safe place|neighbou?r|porch|front door|door|reception|locker|parcel locker|letterbox|mailbox|chosen)/i,
+    /\b(left|handed) (it |them |your (parcel|order|item|package)s? )?with\b/i,
+    /\b(left|placed|put) (it |them |your (parcel|order|item|package)s? )?in your safe ?place\b/i,
+    /\bin your safe ?place\b.{0,40}\b(at|on)\b/i,
+    /\bdelivery (is |was )?complete(d)?\b/i, /\byour (parcel|order|item|package)s? (is here|has arrived|arrived)\b/i]],
 
   ['MISSED', [/\bsorry we missed you\b/i, /\bwe missed you\b/i, /\bunable to deliver\b/i,
     /\bdelivery attempt(ed)? (was )?unsuccessful\b/i, /\bnobody (was )?(in|home)\b/i,
@@ -95,7 +105,8 @@ const STAGE_PHRASES = [
     /\bwith (your|the) (driver|courier)\b/i, /\barriving today\b/i,
     /\b(is|are|being) (being )?delivered today\b/i, /\bwill be delivered .{0,30}today\b/i]],
 
-  ['ON_THE_WAY', [/\b(has|have) (been )?(dispatched|despatched|shipped)\b/i, /\bon its way\b/i,
+  ['ON_THE_WAY', [/^\s*(dispatched|despatched|shipped)\b/i, /\b(has|have) (been )?(dispatched|despatched|shipped)\b/i,
+    /\b(order|parcel|item|package)s? (is |are |was |were )?(now )?(dispatched|despatched|shipped)\b/i, /\bon its way\b/i,
     /\byour (parcel|order) is on the way\b/i, /\bleft (our|the) (warehouse|depot)\b/i,
     /\bin transit\b/i, /\bwe('| ha)ve got your (parcel|item)\b/i]],
 
@@ -116,12 +127,117 @@ const STAGE_PHRASES = [
     /\bwill (attend|call (round|out)|come (out|round)|be (attending|visiting|calling))\b/i,
     /\b(visit|appointment|survey|service|installation|fitting)\b.{0,30}\b(on|booked|confirmed|arranged|scheduled)\b/i]],
 
-  ['ORDERED', [/\border (confirmation|confirmed|received)\b/i, /\bthanks? for your order\b/i,
+  // ORDERED IS FILED, NOT DROPPED (18 Oct 2026). "Confirmation of your order"
+  // was read as not_an_arrival, but an order is the first thing a household
+  // knows about something that is coming, and the card ranks ORDERED below
+  // every later stage, so the dispatch email simply moves the same row on.
+  // Only digital orders are dropped: see DIGITAL_ONLY below.
+  ['ORDERED', [/\border (confirmation|confirmed|received|placed)\b/i, /\bconfirmation of your order\b/i,
+    /\byour order (has been |is )?(confirmed|placed|received)\b/i,
+    /\bthank(s| you) for (your|placing your) order\b/i, /\bthank(s| you) for shopping with\b/i,
+    /\bthanks? for your order\b/i,
     /\bwe('| ha)ve received your order\b/i, /\byour order( is)? (is )?being (prepared|picked|processed)\b/i]],
 ]
 
 // Said anywhere near "delivered", these mean it has not happened yet.
-const FUTURE_TENSE = /\b(will be|to be|due to be|being|scheduled to be|expected to be)\s+deliver/i
+const FUTURE_TENSE = /\b(will be|to be|due to be|being|scheduled to be|expected to be|should be|could be|may be|might be|can be|would be)\s+(deliver|left)/i
+
+// "We'll email you when it has been dispatched" is an order, not a dispatch.
+const NOT_YET_DISPATCHED = /\b(when|once|as soon as|after)\s+(it|they|your \w+)\s+(has|have|is|are)\s+(been\s+)?(dispatched|despatched|shipped)/i
+
+/**
+ * An order for something nobody carries to a door. A forwarding rule is set
+ * by the household and catches whatever it catches; an e-ticket or a gift card
+ * on the card would be a row for a thing that never arrives.
+ */
+const DIGITAL_ONLY = /\b(e-?tickets?|digital (code|download|delivery|product|gift)|download (link|now|your)|gift ?card|e-?gift|e-?voucher|subscription|licen[cs]e key|e-?book|activation code|redeem (your )?code)\b/i
+const PHYSICAL = /\b(dispatch|despatch|ship|deliver|courier|parcel|tracking|postage|delivery address|collect(ion)? from store|click (&|and) collect)/i
+
+/**
+ * Unwrap a forward, so the parser reads the email the sender wrote rather
+ * than the one the household's mail client wrapped round it.
+ *
+ * EVERY CARD EMAIL IS A FORWARD, which is the whole design, and until 18 Oct
+ * 2026 nothing unwrapped them: a live test on a household card showed "Me" as
+ * the sender and "Fwd: Dispatched: ..." as the title. The outer email is the
+ * household writing to its own card; the facts are all inside.
+ *
+ * Gmail ("---------- Forwarded message ---------"), Apple Mail ("Begin
+ * forwarded message:") and Outlook ("-----Original Message-----", or a bare
+ * From / Sent / To / Subject block) all put the original headers as text lines
+ * above the original body. A forward of a forward is unwrapped to the bottom.
+ *
+ * WHAT THIS DOES TO THE DOMAIN RULE. Carriers are matched on the sending
+ * domain because a domain has to pass SPF. Inside a forward, the original
+ * From line is text the household's own mail client wrote, so it carries no
+ * SPF of its own. What protects the card instead is that only the household
+ * holds its inbox key; anyone who can write to the card could write anything
+ * there anyway. That trade is accepted: without it, no forwarded email could
+ * ever match a carrier.
+ */
+const FORWARD_MARK = /(?:^|\n)[ \t>*]*(?:-{2,}\s*Forwarded message\s*-{2,}|Begin forwarded message:|-{2,}\s*Original Message\s*-{2,}|_{8,})[ \t]*\r?\n/i
+const HEADER_LINE = /^[ \t>*]*(From|Date|Sent|Subject|To|Cc|Reply-To)\s*\*{0,2}\s*:\s*\*{0,2}\s*(.*)$/i
+const FWD_PREFIX = /^\s*((fwd?|fw|tr|wg|re)\s*:\s*)+/i
+
+function asFromHeader(line) {
+  const s = String(line || '').replace(/\[mailto:[^\]]*\]/i, (m) => ` <${m.slice(8, -1)}>`).trim()
+  const addr = (s.match(/[\w.+'-]+@[\w-]+(?:\.[\w-]+)+/) || [])[0]
+  if (!addr) return s
+  const name = s.replace(/<?[\w.+'-]+@[\w-]+(?:\.[\w-]+)+>?/, '').replace(/["<>]/g, '').trim()
+  return name ? `${name} <${addr}>` : `<${addr}>`
+}
+
+/** One level of a forward, or null when the text is not one. */
+function unwrapOnce(text) {
+  const t = String(text || '')
+  let start = -1
+  const mark = t.match(FORWARD_MARK)
+  if (mark) start = mark.index + mark[0].length
+  else {
+    // Outlook with no marker: a From line followed within a few lines by Subject.
+    const m = t.match(/(?:^|\n)[ \t>*]*From\s*\*{0,2}:[^\n]*\n(?:[ \t>*]*(?:Sent|Date|To|Cc)\s*\*{0,2}:[^\n]*\n){1,4}[ \t>*]*Subject\s*\*{0,2}:/i)
+    if (!m) return null
+    start = m.index
+  }
+  const lines = t.slice(start).split(/\r?\n/)
+  const head = {}
+  let i = 0
+  while (i < lines.length && !lines[i].trim()) i++
+  for (; i < lines.length; i++) {
+    const h = lines[i].match(HEADER_LINE)
+    if (!h) break
+    head[h[1].toLowerCase()] = h[2].trim()
+  }
+  if (!head.from) return null
+  const body = lines.slice(i).join('\n').replace(/^\s+/, '')
+  return { from: asFromHeader(head.from), subject: head.subject || '', text: body }
+}
+
+export function unwrapForward({ from, subject, text } = {}) {
+  let cur = { from, subject: String(subject || '').replace(FWD_PREFIX, ''), text: String(text || '') }
+  let forwarded = false
+  for (let depth = 0; depth < 4; depth++) {
+    const inner = unwrapOnce(cur.text)
+    if (!inner) break
+    forwarded = true
+    cur = { from: inner.from, subject: (inner.subject || cur.subject).replace(FWD_PREFIX, ''), text: inner.text }
+  }
+  return { ...cur, forwarded }
+}
+
+/** The first stage a piece of text states, guards applied. */
+function stageIn(text) {
+  if (!text) return null
+  for (const [name, patterns] of STAGE_PHRASES) {
+    // Never read a future delivery as a past one, however the sentence is
+    // built. This guard costs one regex and prevents the one unrecoverable
+    // error: a parcel marked arrived while the customer is still waiting in.
+    if (name === 'DONE' && FUTURE_TENSE.test(text)) continue
+    if (name === 'ON_THE_WAY' && NOT_YET_DISPATCHED.test(text)) continue
+    if (patterns.some((p) => p.test(text))) return name
+  }
+  return null
+}
 
 /** Dates a carrier actually wrote. Never a date this code worked out. */
 const MONTHS = {
@@ -271,12 +387,25 @@ function kindOf(hay, carrier, reference) {
  */
 const PLUMBING = /\b(your|our|the|a|an|is|are|was|were|has|have|had|will|be|been|being|out|for|on|in|its|it|way|to|you|today|tomorrow|now|soon|update|re|fw|fwd|delivery|deliveries|delivered|deliver|delivering|parcel|parcels|package|order|items?|shipment|consignment|dispatch|dispatched|despatched|shipped|booked|confirmed|confirmation|scheduled|arriving|arrived|arrival|coming|missed|attempted|sorry|we|us|track|tracking|number|notification|notice)\b/gi
 
+// A shop's subject often opens with the stage as a label ("Dispatched: Your
+// Samsung order ...", "Delivered: ..."). The card shows the stage above the
+// title already, so the label comes off and what is left names the thing.
+const STAGE_LABEL = /^\s*(?:dispatched|despatched|shipped|delivered|out for delivery|order confirmation|confirmation of|order confirmed|order received)\b\s*[:\-–]?\s*/i
+// An order number names nothing a person would recognise on a card.
+const REF_TOKEN = /\b(?=[A-Z0-9-]*\d)[A-Z0-9][A-Z0-9-]{5,}\b/g
+
 function titleFrom(subject, who, isCarrier) {
-  const subj = (subject || '').trim()
-  const left = subj.replace(PLUMBING, ' ').replace(/[^A-Za-z]+/g, '')
-  if (subj && left.length > 2) return subj
-  return isCarrier ? `${who} parcel` : `Delivery from ${who}`
+  const raw = (subject || '').trim()
+  const subj = raw.replace(STAGE_LABEL, '').trim()
+  const left = subj.replace(REF_TOKEN, ' ').replace(PLUMBING, ' ').replace(/[^A-Za-z]+/g, '')
+  if (subj && left.length > 2) return subj.charAt(0).toUpperCase() + subj.slice(1)
+  if (isCarrier) return `${who} parcel`
+  return /\border\b/i.test(raw) ? `${who} order` : `Delivery from ${who}`
 }
+
+/** True for the titles this file makes up when a subject named nothing. */
+export const isGenericTitle = (title, who) =>
+  [`${who} parcel`, `${who} order`, `Delivery from ${who}`].includes(String(title || ''))
 
 /**
  * Read one forwarded email.
@@ -285,8 +414,10 @@ function titleFrom(subject, who, isCarrier) {
  * newsletter, a password reset. Returning null is the common case and is not a
  * failure: the card would rather miss a parcel than invent one.
  */
-export function readArrivalEmail({ from, subject, text, receivedAt } = {}) {
+export function readArrivalEmail({ from: outerFrom, subject: outerSubject, text: outerText, receivedAt } = {}) {
   const now = receivedAt instanceof Date ? receivedAt : new Date(receivedAt || Date.now())
+  // Before anything else: the original email inside the forward.
+  const { from, subject, text } = unwrapForward({ from: outerFrom, subject: outerSubject, text: outerText })
   const subj = cleanText(subject, 300) || ''
   const body = String(text || '').slice(0, 20000)
   const hay = `${subj}\n${body}`
@@ -294,14 +425,15 @@ export function readArrivalEmail({ from, subject, text, receivedAt } = {}) {
 
   const carrier = CARRIERS.find((c) => c.domains.some((d) => d.test(domain))) || null
 
-  let stage = null
-  for (const [name, patterns] of STAGE_PHRASES) {
-    // Never read a future delivery as a past one, however the sentence is
-    // built. This guard costs one regex and prevents the one unrecoverable
-    // error: a parcel marked arrived while the customer is still waiting in.
-    if (name === 'DONE' && FUTURE_TENSE.test(hay)) continue
-    if (patterns.some((p) => p.test(hay))) { stage = name; break }
-  }
+  // THE SUBJECT FIRST. The sender's headline names the stage they are telling
+  // you about ("Dispatched:", "Delivered:", "Confirmation of your order"); the
+  // body then mentions every other stage in passing ("we'll email you when it
+  // has been dispatched", "should be delivered to your address"). Reading the
+  // body first is how an order confirmation became a dispatch and a dispatch
+  // became an arrival.
+  let stage = stageIn(subj) || stageIn(body)
+  // An order for something nobody carries to a door is not an arrival.
+  if (stage === 'ORDERED' && DIGITAL_ONLY.test(hay) && !PHYSICAL.test(hay)) return null
 
   // Nothing says a thing is coming, and no known carrier sent it. Leave it.
   if (!stage && !carrier) return null

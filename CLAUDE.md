@@ -674,7 +674,42 @@ that splits trades from parcels makes them do the merging in their head.
 Getting thirteen delivery firms to integrate is not a thing a sole trader can
 do. Getting one household to add a forwarding rule is. `src/lib/arrival-email.js`
 reads a forwarded email and returns an arrival or **null**; it is pure, has no
-database, and `node scripts/check-arrival-email.mjs` is its 10-case test.
+database, and `node scripts/check-arrival-email.mjs` is its test: 31 cases, five
+of them raw forwarded emails in `scripts/fixtures/forwards/` run through
+`readRawEmail()` first, which is the real path.
+
+**Every card email is a forward, so the forward is unwrapped first**
+(`unwrapForward()`, v1.64.0). Until then nothing did: a live test on 18 Oct 2026
+showed the household ("Me") as the sender and "Fwd: Dispatched: ..." as the
+title. Gmail, Apple Mail and Outlook forwards are read, nested ones to the
+bottom. **The cost, written down:** inside a forward the carrier's domain is a
+line of text the household's own mail client wrote, so it no longer has SPF
+behind it. The protection instead is that only the household holds the inbox
+key, and anyone holding it could post anything anyway. Without that trade no
+forwarded email could ever match a carrier.
+
+**The subject is read before the body.** The sender's headline names the stage
+it is about ("Dispatched:", "Delivered:", "Confirmation of your order"); the
+body mentions every other stage in passing ("we'll email you when it has been
+dispatched", "should be delivered to your address"). Reading the body first is
+how, in the same live test, an order confirmation would have become a dispatch
+and a dispatch became an arrival.
+
+**An order confirmation is filed as `ORDERED`, not dropped.** It is the first
+news of something coming, `RANK` puts it below every later stage, and a shop's
+order number is the reference all three of its emails share, so order, dispatch
+and delivery move one row forwards. Only digital orders are dropped
+(`DIGITAL_ONLY`: e-tickets, gift cards, downloads, subscriptions), because a
+household's forwarding rule catches whatever it catches and a row for a thing
+that never comes to the door is the card lying.
+
+**Titles name the thing, not the stage.** A stage label at the front of a
+subject ("Dispatched:", "Delivered:", "Confirmation of") comes off, because
+the card shows the stage above the title. A row keeps its first title, except
+that a title this code made up (`isGenericTitle()`: "Samsung UK order", "Evri
+parcel", "Delivery from Loaf") gives way to the first later email that names
+the thing. Without that, filing the order confirmation first would have pinned
+"Confirmation of your order" to the row for good.
 
 Three rules in that parser, each of which cost a bug:
 
@@ -682,7 +717,11 @@ Three rules in that parser, each of which cost a bug:
   subject line can claim to be Royal Mail; a domain has to pass SPF.
 - **`FUTURE_TENSE` guards DONE.** A bare `/delivered/` matched "will be
   delivered between 1 and 2 today" and took a parcel off the card while the
-  customer was waiting in for it. Every DONE pattern is explicitly past tense.
+  customer was waiting in for it. Every DONE pattern is explicitly past tense:
+  it has been delivered, it was left with someone, it is in your safe place.
+  A bare `/delivered to/` went the same way on 18 Oct 2026 ("should be
+  delivered to your address" in a dispatch email) and is gone; the guard now
+  covers should, may, could and left as well.
 - **`BOOKED` is the row Shop drops.** Shop's own documentation says forwarding
   works for *"English emails with a tracking number"*. A sofa with two men and
   a Tuesday window has no tracking number anywhere, and nor does a boiler

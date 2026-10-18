@@ -1,6 +1,6 @@
 import { prisma } from './prisma'
 import { generateCode } from './trade-status'
-import { readArrivalEmail } from './arrival-email'
+import { readArrivalEmail, isGenericTitle } from './arrival-email'
 import { cleanText } from './clean-text'
 import { atLocalTime } from './when'
 import { cardShape } from './arrival-card'
@@ -142,7 +142,11 @@ export async function fileEmail({ inboxKey, from, subject, text, receivedAt }) {
           // first filed as "Your Screwfix order" must not become "Your parcel
           // is on its way" an hour later — the stage already moved, and the
           // one line naming the thing is the line worth keeping.
-          title: existing.title || data.title,
+          //
+          // One exception: a title this code made up because the first email
+          // named nothing ("Samsung UK order", from "Confirmation of your
+          // order") gives way to the first later email that does name it.
+          title: existing.title && !isGenericTitle(existing.title, existing.carrier) ? existing.title : (data.title || existing.title),
           expectedFor: data.expectedFor || existing.expectedFor,
           expectedSaid: data.expectedFor ? data.expectedSaid : existing.expectedSaid,
         },

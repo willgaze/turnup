@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.63.0'
+export const VERSION = '1.64.0'
 export const BUILD_DATE = '2026-10-18'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 45
+export const THEME_INDEX = 46
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.64.0', date: '2026-10-18', notes: [
+    'The household card reads the email inside the forward. Every card email is a forward, and until now the card read the wrapper: a live test on a household card showed Me as the sender and Fwd: Dispatched as the title. Gmail, Apple Mail and Outlook forwards are unwrapped first, a forward of a forward included, so the card shows Samsung UK and the subject they wrote.',
+    'Dispatched is on its way, never arrived. A Samsung Dispatched email said the order should be delivered to your address, and the card filed it as arrived. The subject is now read before the body, since the headline names the stage the email is about, and arrived means only what is said after the event: delivered, left with someone, in your safe place.',
+    'An order confirmation goes on the card as Ordered instead of being dropped. The shop\'s order number ties its three emails together, so order, dispatched and delivered move one row forward. An order for an e-ticket, a gift card or a download stays off: nothing comes to the door.',
+    'Titles name the thing, not the stage: Dispatched: and Delivered: come off the front, since the card already says the stage above the title. A title made up because the first email named nothing (Samsung UK order) gives way to the first later email that does.',
+  ] },
   { version: '1.63.0', date: '2026-10-18', notes: [
     'A household can make its own card. At the end of the home path on /join, pick a name for it and tap Make my card live: it becomes a real link for everyone who lives there, to open and share. Only the name goes on the card. Its forwarding address comes back once, is kept on that phone, and is shown only when the letterbox is actually receiving.',
     'The letterbox steps were wrong, and are fixed. They said to turn on a catch-all on in.getturnup.com; Cloudflare only allows a catch-all on the main domain, so it could never have worked. Every card now gets cards+<its key>@in.getturnup.com, and one Cloudflare rule for cards@ with plus-addressing switched on takes them all. The dashboard\u2019s steps say so, and the whole job is one Cowork paste.',
