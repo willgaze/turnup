@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.65.1'
+export const VERSION = '1.65.2'
 export const BUILD_DATE = '2026-10-18'
 
 export const THEMES = [
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.65.2', date: '2026-10-18', notes: [
+    'A link that opens the dashboard at the right panel: getturnup.com/dashboard?open=doors goes straight to Household cards, ?open=servicem8 to ServiceM8, ?open=profile to Who to expect, and so on. Instructions can now be one tap instead of scroll, open Setup and settings, find the panel.',
+  ] },
   { version: '1.65.1', date: '2026-10-18', notes: [
     'An email forwarded from an iPhone now lands on the card properly. iPhone Mail starts every line of a forward with a > mark, and the card stopped reading at the first one, so a live test filed a Royal Mail dispatch as coming from the person who forwarded it, as Ordered, on the forward\u2019s own date, with the word Receipt as its reference. Now it reads the shop as the sender, On the way, the day the shop gave, and the Royal Mail tracking number with a link to Royal Mail\u2019s own page.',
     '"Marked as dispatched" reads as on its way. A reference always has a number in it. Where a shop posts by Royal Mail and links to Royal Mail\u2019s tracking page, that number and that link are used, and the button says Track with Royal Mail; the shop is still who said it. The wrong row from the first try is replaced the next time the same email is forwarded.',

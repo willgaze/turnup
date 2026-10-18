@@ -20,6 +20,15 @@ are written down:
    for him; it hands over the prompt.
 
 
+4. **Link to the panel, not the page.** `/dashboard?open=<panel>` opens Setup
+   and settings at that panel (v1.65.2): `doors` (Household cards), `servicem8`,
+   `profile` (Who to expect), `inbound` (Turn on forwarding), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
+   `waitlist`, `roadmap`. A household's own card link is private and lives in
+   two places only: the phone that made it on `/join`, and
+   `/dashboard?open=doors`, where each card shows its link and its forwarding
+   address.
+
+
 ## This is not Rosebourne Plumbing
 
 **Read this first, because the mistake has been made twice.**

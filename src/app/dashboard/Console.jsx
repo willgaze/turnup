@@ -120,10 +120,26 @@ export default function Console({ assistant = false }) {
     setSetupOpen(true)
     setFocusPanel(panel)
   }
+  // A link straight to a panel: /dashboard?open=doors opens Setup and settings
+  // at Household cards. Every ask of the owner comes with a tappable link
+  // (CLAUDE.md, Talking to Will), and "scroll down, open Setup, find the
+  // panel" is three steps where one link will do. Panel ids only.
+  useEffect(() => {
+    try {
+      const want = new URLSearchParams(window.location.search).get('open')
+      if (want && /^[a-z0-9]{2,20}$/.test(want)) openPanel(want)
+    } catch { /* no URL, no panel */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   useEffect(() => {
     if (!setupOpen || !focusPanel) return
-    const el = document.getElementById(`panel-${focusPanel}`)
-    el?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+    const go = () => document.getElementById(`panel-${focusPanel}`)?.scrollIntoView?.({ behavior: 'smooth', block: 'start' })
+    go()
+    // The jobs above it are still loading when a ?open= link lands, and they
+    // push the panel down the page; go again once they have settled.
+    // Not cleared on re-run: clearing focusPanel below re-runs this effect
+    // at once, and a cleanup would cancel them before they fire.
+    setTimeout(go, 700); setTimeout(go, 1600)
     setFocusPanel(null)
   }, [setupOpen, focusPanel])
 
