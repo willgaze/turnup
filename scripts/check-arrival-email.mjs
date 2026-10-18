@@ -7,7 +7,9 @@
  *
  *   node scripts/check-arrival-email.mjs
  */
-import { readArrivalEmail, statedWindow, statedDate } from '../src/lib/arrival-email.js'
+import { readFileSync } from 'node:fs'
+import { readArrivalEmail, unwrapForward, statedWindow, statedDate } from '../src/lib/arrival-email.js'
+import { readRawEmail } from '../src/lib/mime.js'
 
 // A fixed "now" so a weekday or "tomorrow" means the same thing every run.
 const NOW = new Date('2026-10-12T09:00:00Z') // a Monday
@@ -128,6 +130,78 @@ for (const [name, email, wantKind, wantStage] of KINDS) {
 const invoice = readArrivalEmail({ from: 'billing@someco.com', subject: 'Your invoice', text: 'Please find attached your invoice for last month.' }, NOW)
 if (invoice === null) { pass++; console.log('  ok    an invoice is not an arrival') }
 else bad('an invoice', 'filed something', invoice)
+
+// FORWARDS, AS A CARD ACTUALLY RECEIVES THEM. Every card email is a forward.
+// A live test on 18 Oct 2026 (the Thimbles card) found three bugs at once:
+// the sender read as "Me" and the title as "Fwd: ...", a Samsung "Dispatched"
+// email filed as arrived, and "Confirmation of your order" dropped. These are
+// raw RFC 822 files, run through the same two functions the inbound route
+// uses, so a pass here is a pass for the real path.
+const FIXTURES = new URL('./fixtures/forwards/', import.meta.url)
+const FORWARDS = [
+  ['Gmail forward: Samsung order confirmation', 'gmail-samsung-order-confirmation.eml',
+    { carrier: 'Samsung UK', stage: 'ORDERED', titleIs: 'Samsung UK order', reference: 'UK260018734512' }],
+  ['Gmail forward: Samsung dispatched', 'gmail-samsung-dispatched.eml',
+    { carrier: 'Samsung UK', stage: 'ON_THE_WAY', titleIs: 'Your Samsung order UK260018734512', hasDate: true, reference: 'UK260018734512' }],
+  ['Gmail forward: Samsung delivered', 'gmail-samsung-delivered.eml',
+    { carrier: 'Samsung UK', stage: 'DONE', titleIs: 'Your Samsung order UK260018734512', reference: 'UK260018734512' }],
+  ['Outlook forward: DPD out for delivery', 'outlook-dpd-out-for-delivery.eml',
+    { carrier: 'DPD', stage: 'OUT_FOR_DELIVERY', hasWindow: true }],
+  ['A forward of a forward: Evri on its way', 'nested-evri-on-its-way.eml',
+    { carrier: 'Evri', stage: 'ON_THE_WAY', hasDate: true }],
+]
+for (const [name, file, want] of FORWARDS) {
+  const raw = readFileSync(new URL(file, FIXTURES), 'utf8')
+  const read = readRawEmail(raw)
+  const got = read && readArrivalEmail({ ...read, receivedAt: NOW })
+  if (!got) { bad(name, 'expected an arrival, got nothing', read); continue }
+  const problems = []
+  if (got.carrier !== want.carrier) problems.push(`sender ${got.carrier} != ${want.carrier}`)
+  if (/^me$/i.test(got.carrier)) problems.push('read the household as the sender')
+  if (got.stage !== want.stage) problems.push(`stage ${got.stage} != ${want.stage}`)
+  if (/^\s*(fwd?|fw)\s*:/i.test(got.title)) problems.push(`title still says Fwd: "${got.title}"`)
+  if (want.titleIs && got.title !== want.titleIs) problems.push(`title "${got.title}" != "${want.titleIs}"`)
+  if (/^\s*(dispatched|delivered|shipped|confirmation of)\b/i.test(got.title)) problems.push(`title still opens with its stage: "${got.title}"`)
+  if (want.reference && got.reference !== want.reference) problems.push(`reference ${got.reference} != ${want.reference}`)
+  if (want.hasDate && !got.expectedFor) problems.push('expected a stated date')
+  if (want.hasWindow && !got.window) problems.push('expected a stated window')
+  if (problems.length) bad(name, problems.join('; '), got)
+  else { pass++; console.log(`  ok    ${name} -> ${got.carrier} / ${got.stage} / "${got.title}"`) }
+}
+
+// One order, one row. A shop's three emails all carry its order number, and
+// the card matches rows on sender and reference, so the order confirmation,
+// the dispatch and the delivery move ONE row forwards rather than adding
+// three. (The shop's email names the courier's tracking number as well; the
+// shop's own number is the one all three share.) Asserted above per fixture:
+// every Samsung case expects reference UK260018734512.
+
+// The traps on their own, without the forward round them.
+const TRAPS = [
+  ['"should be delivered to your address" is not arrived',
+    { from: 'shop@example.com', subject: 'Order update', text: 'Your order has been dispatched and should be delivered to your address on Monday.' }, 'ON_THE_WAY'],
+  ['"we will email you when it has been dispatched" is an order, not a dispatch',
+    { from: 'shop@example.com', subject: 'Thanks for your order', text: 'We will email you when it has been dispatched.' }, 'ORDERED'],
+  ['"it may be left in your safe place" is not arrived',
+    { from: 'shop@example.com', subject: 'Dispatched: your order', text: 'If you are out it may be left in your safe place.' }, 'ON_THE_WAY'],
+  ['"left with your neighbour" is arrived',
+    { from: 'noreply@evri.com', subject: 'Your parcel update', text: 'We left your parcel with your neighbour at number 6.' }, 'DONE'],
+]
+for (const [name, email, wantStage] of TRAPS) {
+  const got = readArrivalEmail({ ...email, receivedAt: NOW })
+  if (got?.stage === wantStage) { pass++; console.log(`  ok    ${name}`) }
+  else bad(name, `stage ${got?.stage} != ${wantStage}`, got)
+}
+
+// An order for something nobody carries to a door stays off the card.
+const eticket = readArrivalEmail({ from: 'tickets@venue.example', subject: 'Confirmation of your order', text: 'Thank you for your order. Your e-tickets are attached.' }, NOW)
+if (eticket === null) { pass++; console.log('  ok    an e-ticket order is not an arrival') }
+else bad('an e-ticket order', 'filed something', eticket)
+
+// Unwrapping leaves an email that is not a forward alone.
+const plain = unwrapForward({ from: 'DPD <noreply@dpd.co.uk>', subject: 'Out for delivery', text: 'Your parcel is out for delivery today.' })
+if (!plain.forwarded && plain.from === 'DPD <noreply@dpd.co.uk>') { pass++; console.log('  ok    an email that is not a forward is read as it is') }
+else bad('not a forward', 'was changed', plain)
 
 console.log(`\n${fail ? 'FAILED' : 'PASSED'} — ${pass} passed, ${fail} failed`)
 process.exit(fail ? 1 : 0)
