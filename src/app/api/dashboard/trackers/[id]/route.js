@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, after } from 'next/server'
 import { runningLate, answeredByStage } from '@/lib/nudge'
 import { pausedBack, pauseStampFor } from '@/lib/pause'
 import { diaryFor } from '@/lib/sm8-oauth'
@@ -191,10 +191,15 @@ export async function PATCH(request, { params }) {
     // service — nor fail because that service is having a bad afternoon.
     // notifyStage() never throws, but the catch is here anyway, because the
     // thing that must survive is the stage change.
+    //
+    // after() rather than a bare promise: since v1.65.0 a set-off with no push
+    // that lands goes on to fetch the customer's email from ServiceM8 and send
+    // one, which is two more round trips than a serverless function is
+    // promised once its response has gone. after() keeps it alive for them.
     if (data.stage) {
-      notifyStage(tracker, data.stage).catch((error) =>
+      after(() => notifyStage(tracker, data.stage).catch((error) =>
         console.error('push: notify failed after stage change:', error?.message),
-      )
+      ))
     }
 
     // Any household card carrying this job moves with it. Un-awaited and

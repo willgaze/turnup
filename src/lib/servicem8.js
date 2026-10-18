@@ -483,3 +483,27 @@ export async function sendSms({ to, message, jobUuid }) {
   weekCache.at = 0 // the week's verdicts just changed
   return { sent: true, messageID: r.messageID || null, to }
 }
+
+/**
+ * An email through ServiceM8, with the account API key. The same Messaging
+ * API as sendSms (`POST /platform_service_email`, developer.servicem8.com
+ * reference "Send an Email"). Checked 18 Oct 2026: the key is accepted (a bad
+ * address comes back 400 "Email To address is not valid", not 401). The From
+ * address is ServiceM8's to choose, which is the business's own; with
+ * regardingJobUUID the email lands in the job diary. Plain text only.
+ */
+export async function sendEmail({ to, subject, text, jobUuid }) {
+  if (!sm8Configured()) throw new Error('sm8_not_configured')
+  const body = { to: String(to || '').trim(), subject: String(subject).slice(0, 200), textBody: String(text).slice(0, 8000) }
+  if (jobUuid && UUID.test(jobUuid)) body.regardingJobUUID = jobUuid
+  let r
+  try {
+    r = await api(`${BASE}/platform_service_email`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+  } catch (e) {
+    await log({ event: 'email.send', jobUuid: jobUuid || null, outcome: `error:${String(e.message).slice(0, 80)}` })
+    throw e
+  }
+  await log({ event: 'email.send', jobUuid: jobUuid || null, outcome: r?.errorCode === 0 ? `sent:${r.messageID || ''}` : `error:${r?.message || 'unknown'}` })
+  if (r?.errorCode !== 0) throw new Error(`sm8_email: ${r?.message || 'failed'}`)
+  return { sent: true, messageID: r.messageID || null }
+}

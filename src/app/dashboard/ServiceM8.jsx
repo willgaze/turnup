@@ -17,6 +17,8 @@ export default function ServiceM8({ onChanged }) {
   const [s, setS] = useState(null)
   const [busy, setBusy] = useState(null)
   const [note, setNote] = useState(null)
+  const [testTo, setTestTo] = useState('')
+  const [emailNote, setEmailNote] = useState(null)
 
   const load = useCallback(async () => {
     const r = await fetch('/api/dashboard/servicem8')
@@ -112,6 +114,41 @@ export default function ServiceM8({ onChanged }) {
                         className={`btn mt-2.5 !min-h-[42px] !px-4 !text-[14px] ${s.autoFollow ? 'btn-grey' : 'accent-fill'}`}>
                   {busy === 'follow' ? '…' : s.autoFollow ? 'Switch off' : 'Switch on'}
                 </button>
+              </div>
+
+              {/* The non-push fallback: an email through ServiceM8 when no
+                  notification reached the customer (src/lib/customer-email.js). */}
+              <div className="r-inner mt-4 px-4 py-3.5 text-[14px]" style={{ background: s.emailFallback ? 'color-mix(in srgb, var(--stage-done) 12%, transparent)' : 'rgb(var(--glass-line) / 0.07)' }}>
+                <p className="font-semibold">Email when notifications are off {s.emailFallback ? '· on' : '· off'}</p>
+                <p className="mt-1 muted">A customer without notifications switched on gets an email instead, from your ServiceM8 address, to the email on the ServiceM8 job: when you set off, if a window is missed, and the day-before ask. Once each per job, never a time, and it shows in the job diary. Not SMS, so no credits.</p>
+                <button type="button" disabled={busy} onClick={async () => { setBusy('email'); try { await fetch('/api/dashboard/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emailFallback: !s.emailFallback }) }); await load() } finally { setBusy(null) } }}
+                        className={`btn mt-2.5 !min-h-[42px] !px-4 !text-[14px] ${s.emailFallback ? 'btn-grey' : 'accent-fill'}`}>
+                  {busy === 'email' ? '…' : s.emailFallback ? 'Switch off' : 'Switch on'}
+                </button>
+                <form className="mt-3 flex flex-wrap gap-2" onSubmit={async (ev) => {
+                  ev.preventDefault(); setBusy('email_test'); setEmailNote(null)
+                  try {
+                    const r = await fetch('/api/dashboard/servicem8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'email_test', to: testTo }) })
+                    const j = await r.json().catch(() => ({}))
+                    setEmailNote(r.ok ? `Sent to ${j.to}. It is the set-off email, as a customer would get it. Nothing in your inbox in a few minutes? Check spam, then ServiceM8’s email settings.` : j.error === 'bad_email' ? 'That does not look like an email address.' : `Did not send: ${j.error || r.status}`)
+                  } finally { setBusy(null) }
+                }}>
+                  <input type="email" inputMode="email" autoComplete="email" required value={testTo} onChange={(e) => setTestTo(e.target.value)} placeholder="your@email.co.uk"
+                         className="min-h-[42px] flex-1 min-w-[180px] rounded-xl px-3 text-[14px]" style={{ background: 'rgb(var(--glass-line) / 0.10)' }} aria-label="Send a test email to" />
+                  <button type="submit" disabled={busy} className="btn btn-grey !min-h-[42px] !px-4 !text-[14px]">{busy === 'email_test' ? '…' : 'Send me a test'}</button>
+                </form>
+                {emailNote && <p className="mt-2 text-[13px]">{emailNote}</p>}
+                {s.customerEmails?.length > 0 && (
+                  <ul className="mt-2.5 grid gap-1 text-[13px]">
+                    {s.customerEmails.map((e, i) => (
+                      <li key={i} className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="muted tabular-nums whitespace-nowrap">{new Date(e.createdAt).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                        <span className="whitespace-nowrap">{{ ON_MY_WAY: 'Set off', MISSED: 'Window missed', DAY_BEFORE: 'Day before' }[e.kind] || e.kind}</span>
+                        <span className={e.outcome === 'sent' ? 'font-semibold' : 'muted'}>{e.outcome === 'sent' ? 'emailed' : e.outcome === 'no_email' ? 'no email on the job' : e.outcome}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {/* The add-on half: the diary. The key cannot write there; an

@@ -46,6 +46,7 @@ export async function PUT(request) {
       // The terms: hours between 1 and 336 (a fortnight), a fee in whole
       // pounds or nothing. Nothing else about a charge is stored anywhere.
       ...('autoFollow' in b ? { autoFollow: Boolean(b.autoFollow) } : {}),
+      ...('emailFallback' in b ? { emailFallback: Boolean(b.emailFallback) } : {}),
       // Only Google's own review surfaces. Anything else is dropped, not stored.
       ...('reviewUrl' in b ? { reviewUrl: cleanReviewUrl(b.reviewUrl) } : {}),
       ...('noticeHours' in b ? { noticeHours: Math.min(336, Math.max(1, Math.round(Number(b.noticeHours)) || 24)) } : {}),

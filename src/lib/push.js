@@ -73,6 +73,22 @@ const LINES = {
  * @returns {Promise<{sent: number, dropped: number}>}
  */
 export async function notifyStage(tracker, stage) {
+  let r = { sent: 0, dropped: 0 }
+  try { r = await pushStage(tracker, stage) } catch (error) { console.error('push: stage push failed:', error?.message) }
+  // Setting off is the moment the customer most needs to hear about, so if
+  // no phone of theirs took the push, it goes by email (src/lib/customer-email.js,
+  // switched on under ServiceM8 on the dashboard). Imported here rather than
+  // at the top because customer-email needs servicem8, which needs this file.
+  if (stage === 'ON_MY_WAY') {
+    try {
+      const { emailIfUnreached } = await import('@/lib/customer-email')
+      await emailIfUnreached(tracker, 'ON_MY_WAY', r)
+    } catch (error) { console.error('customer email after set-off failed:', error?.message) }
+  }
+  return r
+}
+
+async function pushStage(tracker, stage) {
   const line = LINES[stage]
   if (!line || !configure()) return { sent: 0, dropped: 0 }
 

@@ -945,6 +945,12 @@ than what it costs the customer. Setting `CRON_SECRET` makes it require
 `Authorization: Bearer <secret>` — the header Vercel Cron sends — and it must
 then be set in **both** Vercel and the repository secrets, or the schedule
 locks itself out.
+**The missed check comes before the start and end nudges (v1.65.0).** Those
+two only count as sent when a trade phone takes them (`r.devices === 0` leaves
+them due). With no phone registered, the start nudge stayed due for ever,
+`nudgeDue()` returned it every sweep, and the missed notice behind it never
+fired, so the customer was never told. Found on 18 Oct 2026, end to end, by
+the email fallback test. Once a window is missed, "it has started" is stale.
 Rules that must not drift: the product never estimates a time; a late figure
 is only ever one the trade typed, shown with when they said it.
 
@@ -992,6 +998,51 @@ counted by a person and the panel says so; "Are you still coming?" taps are
 shown beside it as the nearest thing the product sees, never as calls. Decided
 11 Oct 2026: nothing moves on housing or pricing until thirty days of these
 are in.
+
+## When no notification lands: email (`src/lib/customer-email.js`)
+
+Rule 1 of `docs/design/when-things-go-wrong.md`: every state change the
+customer cares about has a non-push fallback, because a customer who opened the
+link once in Safari will never get a push. Since v1.65.0 three moments have
+one: **set off** (`notifyStage` in `push.js`), **window missed** (`tellMissed`
+in `nudge.js`) and **the day-before ask** (`askPresenceIfDue`). When the push
+reached no phone of theirs, they get an email instead.
+
+- **Through ServiceM8, with the key.** `sendEmail()` in `servicem8.js` posts to
+  `/platform_service_email`, the same Messaging API as `sendSms()`. The docs say
+  public apps only; the key was checked on 18 Oct 2026 by sending it a bad
+  address, which came back 400 "Email To address is not valid", not 401. That
+  means no new mail provider, the From address is the business's own, the
+  customer's address is read from the ServiceM8 job at send time and never
+  copied into TurnUp, and with `regardingJobUUID` the email lands in the job
+  diary. So it only covers cards linked to a ServiceM8 job. A hand-made card
+  has no address, and its page is still the page.
+- **A fallback, never a second copy.** If the push landed on any of their
+  phones, nothing is emailed (`emailDecision()`).
+- **Once per kind per job.** A `CustomerEmail` row is the claim, created before
+  the contact is fetched, and the unique `(tradeStatusId, kind)` pair is what
+  stops the cron, the customer's poll and a stage tap all sending it. A job with
+  no email on it is recorded as `no_email` and not tried again.
+- **Off by default.** `TradeProfile.emailFallback`, switched on the ServiceM8
+  panel: **Email when notifications are off**. It writes to customers from the
+  business's address, so the trade chooses it. **Send me a test** sends the
+  set-off email to an address they type, because a switch should end with an
+  email arriving, not a sentence. The panel lists the last few sends.
+- **What it may say is the lock-screen rule**, because a mail app shows the
+  subject and the first line on the lock screen: the trade's name, the van and
+  plate from Who to expect, the stage and the link. Never the customer's name or
+  address, never the job reference, never a note, never a time. The words are in
+  `src/lib/customer-email-words.js`, and `node scripts/check-customer-email.mjs`
+  checks them (24 cases). The how-to for switching on notifications is only in
+  the email when the push keys exist, since without them the button it names is
+  not on the page.
+- **Never throws.** The stage tap runs `notifyStage` inside `after()` (the
+  email is two more round trips than a serverless function promises once its
+  response has gone). The sweep awaits it.
+
+The day-before nudge to the trade says when the ask went by email. Running late
+and Job done are not emailed yet: the first is a figure the trade typed, which
+the page shows with when it was said; the second is not urgent.
 
 ## A tap with no signal still counts (`src/app/dashboard/offline-queue.js`)
 

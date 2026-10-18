@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireOperator } from '@/lib/operator-auth'
-import { sm8Configured, webhookToken, callbackUrl, listSubscriptions, subscribe, unsubscribe, syncTracker, fetchJob, EVENTS } from '@/lib/servicem8'
+import { sm8Configured, webhookToken, callbackUrl, listSubscriptions, subscribe, unsubscribe, syncTracker, fetchJob, sendEmail, EVENTS } from '@/lib/servicem8'
+import { recentCustomerEmails } from '@/lib/customer-email'
+import { emailFor, validEmail } from '@/lib/customer-email-words'
+import { pushConfigured } from '@/lib/push'
+import { TRADE_NAME, CANONICAL_HOST } from '@/lib/trade'
 import { oauthState, disconnect, redirectUri } from '@/lib/sm8-oauth'
 
 export const dynamic = 'force-dynamic'
@@ -29,7 +33,12 @@ export async function GET(request) {
   // The add-on half: configured means SM8_APP_ID and SM8_APP_SECRET are set;
   // connected means the operator has authorised it and tokens are held.
   state.oauth = { ...(await oauthState()), redirectUri: redirectUri(origin(request)) }
-  try { state.autoFollow = Boolean((await prisma.tradeProfile.findUnique({ where: { id: 'singleton' } }))?.autoFollow) } catch { state.autoFollow = false }
+  try {
+    const p = await prisma.tradeProfile.findUnique({ where: { id: 'singleton' } })
+    state.autoFollow = Boolean(p?.autoFollow)
+    state.emailFallback = Boolean(p?.emailFallback)
+  } catch { state.autoFollow = false; state.emailFallback = false }
+  state.customerEmails = await recentCustomerEmails()
   try {
     state.recent = await prisma.sm8Event.findMany({ orderBy: { receivedAt: 'desc' }, take: 12 })
     state.linked = await prisma.sm8Link.count()
@@ -52,6 +61,18 @@ export async function POST(request) {
     }
     if (body.action === 'unsubscribe') return NextResponse.json({ removed: await unsubscribe() })
     if (body.action === 'oauth_disconnect') { await disconnect(); return NextResponse.json({ ok: true }) }
+    // The switch ends with an email arriving, not a sentence: the set-off
+    // email as a customer would get it, to an address the trade types, with
+    // a demo link. Not linked to any job, so it lands in no diary.
+    if (body.action === 'email_test') {
+      const to = String(body.to || '').trim()
+      if (!validEmail(to)) return NextResponse.json({ error: 'bad_email' }, { status: 400 })
+      const p = await prisma.tradeProfile.findUnique({ where: { id: 'singleton' } }).catch(() => null)
+      const vehicle = [p?.vehicleColour, p?.vehicleMake, p?.vehicleModel].filter(Boolean).join(' ')
+      const mail = emailFor({ kind: 'ON_MY_WAY', tradeName: TRADE_NAME, host: CANONICAL_HOST, code: 'K7M4PQRT', who: { name: p?.engineerName?.split(' ')[0] || null, vehicle: vehicle || null, reg: p?.vehicleReg || null }, pushOn: pushConfigured() })
+      await sendEmail({ to, subject: `Test: ${mail.subject}`, text: mail.text })
+      return NextResponse.json({ ok: true, to })
+    }
     if (body.action === 'sync') {
       const linked = await prisma.tradeStatus.findMany({ where: { isActive: true, externalId: { not: null } } })
       const results = []

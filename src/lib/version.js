@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.64.0'
+export const VERSION = '1.65.0'
 export const BUILD_DATE = '2026-10-18'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 46
+export const THEME_INDEX = 47
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.65.0', date: '2026-10-18', notes: [
+    'A customer with no notifications still hears about the moments that matter. If no push reached them, they get an email instead when you set off, if the window is missed, and with the day-before ask. It goes through ServiceM8, from your own address, to the email on the ServiceM8 job, and it shows in the job diary. Once each per job, and it never mentions a time.',
+    'Off until you switch it on: Setup and settings, ServiceM8, Email when notifications are off. Send me a test sends the set-off email to an address you type, so you can see exactly what a customer gets. Below it, the last few sends, including any job with no email on it.',
+    'The missed-window notice now reaches the customer even when no trade phone is registered for nudges. Before, the window-started nudge waited for ever for a phone to take it and blocked the missed notice behind it.',
+    'The day-before nudge to your phone now says when the ask went by email, so you only need to text the link if you want to be sure.',
+  ] },
   { version: '1.64.0', date: '2026-10-18', notes: [
     'The household card reads the email inside the forward. Every card email is a forward, and until now the card read the wrapper: a live test on a household card showed Me as the sender and Fwd: Dispatched as the title. Gmail, Apple Mail and Outlook forwards are unwrapped first, a forward of a forward included, so the card shows Samsung UK and the subject they wrote.',
     'Dispatched is on its way, never arrived. A Samsung Dispatched email said the order should be delivered to your address, and the card filed it as arrived. The subject is now read before the body, since the headline names the stage the email is about, and arrived means only what is said after the event: delivered, left with someone, in your safe place.',

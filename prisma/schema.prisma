@@ -263,6 +263,11 @@ model TradeProfile {
   // on. Nothing here decides who gets asked; everyone does.
   reviewUrl String?
 
+  // Email the customer through ServiceM8 when no notification reached them:
+  // set off, window missed, the day-before ask (src/lib/customer-email.js).
+  // Off by default: it writes to customers from the business's address.
+  emailFallback Boolean @default(false)
+
   updatedAt DateTime @updatedAt
 }
 
@@ -366,6 +371,22 @@ model Sm8OAuth {
 }
 
 // Every delivery and every sync, so "did it fire?" has an answer.
+/// One email to a customer whose phone no notification reached
+/// (src/lib/customer-email.js). The row is the claim: it is created before
+/// anything is sent, and the unique pair is what makes each kind once per
+/// job, whichever of the cron, the customer's poll or a stage tap gets there
+/// first. The address itself is never copied here; it stays in ServiceM8.
+model CustomerEmail {
+  id            String   @id @default(cuid())
+  tradeStatusId String
+  kind          String // ON_MY_WAY | MISSED | DAY_BEFORE
+  outcome       String   @default("claimed") // sent | no_email | error:...
+  messageId     String?
+  createdAt     DateTime @default(now())
+
+  @@unique([tradeStatusId, kind])
+}
+
 model Sm8Event {
   id            String   @id @default(cuid())
   event         String // job.checked_in, sync.pull, ...
