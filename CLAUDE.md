@@ -700,7 +700,7 @@ said it, via `TRADE_NAME`.
 | | Half | Goes to | On the card? |
 |---|---|---|---|
 | `code` | read | the customer, as `/h/<code>` | yes, it is the URL |
-| `inboxKey` | write | a mail rule, as `<key>@in.getturnup.com` | **never** |
+| `inboxKey` | write | a mail rule, as `cards+<key>@in.getturnup.com` | **never** |
 
 Collapsing those two would mean a card forwarded into a family group chat is a
 way to post rows onto a stranger's door. `cardShape()` lives in
@@ -765,6 +765,14 @@ than assumed: Email Routing is zone-level, a subdomain is added from the apex's
 Settings page, and Cloudflare then writes that subdomain's own MX/SPF records —
 which leaves `will@getturnup.com` available for ever. A catch-all on the apex
 would have spent that for nothing.
+
+**One rule, not a catch-all (v1.63.0).** Cloudflare's catch-all works on the
+apex only; a subdomain takes literal rules. So every card's address is
+`cards+<key>@in.getturnup.com` (`INBOUND_LOCAL` in `src/lib/inbox-address.js`),
+one rule for `cards@` takes them all with Cloudflare's subaddressing switched
+on, and the key rides in the plus part. Until then the steps said "catch-all on
+the subdomain", which could never have worked. The owner's half is a Cowork
+paste: `docs/cowork-letterbox.md`.
 
 **The Worker does almost nothing, and that is the design.** Cloudflare hands it
 a raw RFC 822 message in an environment that cannot be run locally and whose
@@ -844,8 +852,15 @@ fixes, which all look like silence otherwise. `noteInboundSeen()` is
 fire-and-forget from the inbound route for the usual reason: a mail provider
 is waiting on that response and retries a slow one.
 
-Still to do: let a household make a card themselves rather than being given
-one, and a way to connect a source other than forwarding (Gmail's
+**A household can make its own card** (v1.63.0): the end of the home path on
+`/join` posts a name to `POST /api/places` (public, three an hour per IP) and
+gets back the code and the inbox address, once, kept on that phone. Only the
+name goes on the card. `GET /api/places` answers `{receiving}` (configured and
+MX on the subdomain) and `/join` shows the forwarding address only when it is
+true: an address nothing is listening on is the push row that opened onto an
+empty drawer.
+
+Still to do: a way to connect a source other than forwarding (Gmail's
 `gmail.readonly` is a restricted scope — Google verification plus a CASA
 assessment renewed yearly, weeks of lead time and a four-figure annual cost,
 which is why forwarding came first).
@@ -1152,8 +1167,13 @@ app: the one radius and a hairline.
 **When a screen changes, re-run it**: a crop of last month's row is a lie
 about this month's app. Recapture; never retouch. A look change (v1.51.0)
 counts as every screen changing. The poster frames (`public/home/frame-*.webp`,
-`src/lib/posters.js`) still embed older screens at thumbnail size; they have no
-script yet and are the next thing to re-shoot. `/with-servicem8` uses the
+`src/lib/posters.js`) and the phone screens inside them come from
+`scripts/capture-posters.mjs` (v1.63.0): screens first, then
+`rm -rf .next/cache/images` and a restart, then `ONLY=frames`, because the
+image optimiser caches by URL and a running server shows a re-shot screen's old
+self inside the frames. Both capture scripts write the live origin over the
+local one before a shot (`asLive`): from v1.58.0 the homepage's "Send it in one
+tap" picture showed `http://127.0.0.1:3100/t/...`. `/with-servicem8` uses the
 same component and the same folder (`sm8-*`), cut from the captures in
 `public/with-servicem8/` with `ONLY=sm8 node scripts/capture-home-crops.mjs`,
 which needs no browser; ServiceM8's own screens stay drawn (`Sm8Mocks.jsx`), at

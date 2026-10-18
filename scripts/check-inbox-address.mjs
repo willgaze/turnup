@@ -13,7 +13,11 @@ import { inboxKeyFrom, inboxAddress } from '../src/lib/inbox-address.js'
 
 const KEY = 'q7rmt4ndkw82jp'
 const CASES = [
-  // Our own subdomain, the plain case.
+  // What is handed out since v1.63.0: one Cloudflare rule for cards@, with
+  // subaddressing on, and the key in the plus part.
+  [`cards+${KEY}@in.getturnup.com`, KEY],
+  [`"Our home" <cards+${KEY}@in.getturnup.com>`, KEY],
+  // Our own subdomain, the bare form handed out before v1.63.0.
   [`${KEY}@in.getturnup.com`, KEY],
   // Mail clients put a display name in front of it.
   [`"14 Church Lane" <${KEY}@in.getturnup.com>`, KEY],
@@ -44,6 +48,8 @@ for (const [to, want] of CASES) {
 // the kind of pairing that drifts when one side is edited.
 const round = inboxKeyFrom(inboxAddress(KEY))
 if (round !== KEY) { failed += 1; console.log(`  FAIL  round trip: ${round}`) }
+// And it must be the shape the Cloudflare rule matches: cards+<key>@host.
+if (!/^cards\+[a-z0-9]+@in\.getturnup\.com$/.test(inboxAddress(KEY))) { failed += 1; console.log(`  FAIL  shape: ${inboxAddress(KEY)}`) }
 
-console.log(failed ? `\nFAILED — ${failed}` : `\nPASSED — ${CASES.length + 1} checks`)
+console.log(failed ? `\nFAILED — ${failed}` : `\nPASSED — ${CASES.length + 2} checks`)
 process.exit(failed ? 1 : 0)

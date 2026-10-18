@@ -211,9 +211,9 @@ export default function InboundSetup() {
                   2 — The letterbox and the Worker
                 </p>
                 <p className="mt-1">
-                  In Cloudflare on <b>{bare}</b>: <b>Email</b> → <b>Email Routing</b> → <b>Get started</b>.
-                  Then <b>Settings</b> → add the subdomain <b>{sub}</b>. That keeps your own email at
-                  {' '}<span className="font-mono">{bare}</span> untouched, now and later.
+                  In Cloudflare on <b>{bare}</b>: <b>Compute</b> → <b>Email Service</b> → <b>Email Routing</b>.
+                  Then <b>Settings</b>: add the subdomain <b>{sub}</b>, and switch on <b>Subaddressing</b>.
+                  That keeps your own email at <span className="font-mono">{bare}</span> untouched, now and later.
                 </p>
                 <p className="mt-2">
                   Next, <b>Workers &amp; Pages</b> → <b>Create</b> → <b>Start with Hello World</b> →
@@ -223,12 +223,16 @@ export default function InboundSetup() {
                 <div className="mt-2 flex flex-wrap gap-2">
                   <Copy value={info.worker} label="Copy the Worker" wide />
                 </div>
+                {/* Not a catch-all: Cloudflare's catch-all works on the apex
+                    only. One rule for cards@ on the subdomain, with
+                    subaddressing on, takes every cards+<key>@ (v1.63.0). */}
                 <p className="mt-2.5">
-                  Last, back in <b>Email Routing</b> on <b>{info.host}</b>: <b>Routes</b> → turn on
-                  {' '}<b>Catch-all address</b> → Action <b>Send to a Worker</b> → <b>turnup-inbound</b>.
+                  Last, back in <b>Email Routing</b>: <b>Routing Rules</b> → <b>Create routing rule</b> →
+                  Email pattern <b>cards</b> @ <b>{info.host}</b> → Action <b>Send to a Worker</b> →
+                  <b> turnup-inbound</b> → <b>Save</b>.
                 </p>
                 <p className="mt-1.5 text-[13px]">
-                  <b>You will see:</b> Catch-all showing as <b>Active</b>.
+                  <b>You will see:</b> the rule for <span className="font-mono">cards@{info.host}</span> showing as <b>Active</b>.
                 </p>
               </li>
             </ol>

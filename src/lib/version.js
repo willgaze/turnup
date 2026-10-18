@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.62.0'
-export const BUILD_DATE = '2026-10-17'
+export const VERSION = '1.63.0'
+export const BUILD_DATE = '2026-10-18'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 44
+export const THEME_INDEX = 45
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,11 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.63.0', date: '2026-10-18', notes: [
+    'A household can make its own card. At the end of the home path on /join, pick a name for it and tap Make my card live: it becomes a real link for everyone who lives there, to open and share. Only the name goes on the card. Its forwarding address comes back once, is kept on that phone, and is shown only when the letterbox is actually receiving.',
+    'The letterbox steps were wrong, and are fixed. They said to turn on a catch-all on in.getturnup.com; Cloudflare only allows a catch-all on the main domain, so it could never have worked. Every card now gets cards+<its key>@in.getturnup.com, and one Cloudflare rule for cards@ with plus-addressing switched on takes them all. The dashboard\u2019s steps say so, and the whole job is one Cowork paste.',
+    'The poster pictures are re-shot from today\u2019s app: 13 phone screens and all 29 frames, from a new script, so they can be redone whenever a screen changes. The homepage\u2019s Send it in one tap picture had shown a test address (127.0.0.1) since v1.58.0; it now shows getturnup.com, and both capture scripts put the real address in before every shot.',
+  ] },
   { version: '1.62.0', date: '2026-10-17', notes: [
     'The homepage no longer scrolls sideways on a phone. One section, the wallet drawings, pushed the whole page out to 917 pixels wide on a 375-pixel phone, so every section below it was cut off at the right edge. Every page was measured at three phone widths; the homepage was the only one wider than the screen.',
     'Getting on the list is now a card that builds itself: /join. Pick trade or home, and each answer files onto a card above as you go, with a tick and an Edit. Your postcode puts a map up and you drag the map until the pin is on your door; a photo shows as a picture, not a file name. Email is step one and that is the sign-up; everything after has a Skip. Only your name, email, trade and the first half of your postcode are sent. The pin, the photos, who else lives there and a work address stay on your own phone.',

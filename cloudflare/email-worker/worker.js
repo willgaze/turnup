@@ -1,7 +1,9 @@
 /**
  * Cloudflare Email Worker: the letterbox.
  *
- * Mail addressed to anything @in.getturnup.com lands here and is posted to
+ * Mail addressed to cards+<key>@in.getturnup.com lands here (one Cloudflare
+ * routing rule for cards@, subaddressing on: a catch-all works on the apex
+ * only, so a subdomain needs a literal rule) and is posted to
  * TurnUp's inbound route, which decides whether it is an arrival and which
  * household card it belongs to.
  *

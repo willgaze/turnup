@@ -126,6 +126,17 @@ const clipAround = async (page, locators, pad = 14) => {
   return page.screenshot({ type: 'png', clip: { x, y, width: r - x, height: d - y }, fullPage: true })
 }
 
+// The dashboard prints its own origin into the link it hands out, so a capture
+// against a local server shows http://127.0.0.1:3100/t/... where a trade sees
+// https://www.getturnup.com/t/.... That address was on the homepage's
+// "Send it in one tap" picture from v1.58.0 to v1.63.0. Put the real one back
+// before the shot: it is the environment, not the design, being corrected.
+const LIVE_ORIGIN = 'https://www.getturnup.com'
+const asLive = (page) => page.evaluate(([from, to]) => {
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+  for (let n = w.nextNode(); n; n = w.nextNode()) if (n.nodeValue.includes(from)) n.nodeValue = n.nodeValue.split(from).join(to)
+}, [new URL(BASE).origin, LIVE_ORIGIN])
+
 // The trade's screens, live. Each shot is its own try/catch: one locator that
 // has moved must cost one crop, not the run (the diary learned that the hard way).
 const shootTrade = async (browser) => {
@@ -182,6 +193,7 @@ const shootTrade = async (browser) => {
     const box = page.locator('p', { hasText: 'Send this to the customer' }).first()
       .locator('xpath=ancestor::div[contains(@class,"r-inner")][1]')
     await box.scrollIntoViewIfNeeded()
+    await asLive(page)
     return box.screenshot({ type: 'png' })
   })
 

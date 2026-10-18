@@ -44,7 +44,7 @@ const EMPTY = {
   as: null, name: '', email: '', business: '', trade: '', postcode: '', outcode: '',
   line1: '', lat: null, lng: null, accuracy: null, photo: null, house: null,
   jobs: '', jobsOther: '', coming: [], people: [], work: null, workName: '', workPostcode: '',
-  filed: {}, listed: false,
+  filed: {}, listed: false, card: null,
 }
 
 const STEPS = {
@@ -203,11 +203,15 @@ function HomeCard({ d }) {
   const living = [first(d.name), ...d.people.map((p) => first(p.name))].filter(Boolean)
   return (
     <div>
-      <p className="mb-2 text-[13px] font-semibold uppercase tracking-wider" style={{ color: 'var(--label-3)' }}>Your card</p>
+      <p className="mb-2 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-wider" style={{ color: 'var(--label-3)' }}>
+        Your card
+        {d.card && <span className="filed-in rounded-full px-2 py-0.5 text-[11px] text-white" style={{ background: 'var(--stage-done, #34c759)' }}>Live</span>}
+      </p>
       <div className="glass r-outer overflow-hidden">
         <div className="p-4">
           <p className="text-[15px] font-semibold" style={{ color: 'var(--tint)' }}>
-            <Fill v={d.line1 ? `${d.line1}${d.outcode ? `, ${d.outcode}` : ''}` : (d.name && `${first(d.name)}’s home`)} w={140} />
+            {/* Once live, the name the card really carries; before, the street, which stays on this phone. */}
+            <Fill v={d.card?.label || (d.line1 ? `${d.line1}${d.outcode ? `, ${d.outcode}` : ''}` : (d.name && `${first(d.name)}’s home`))} w={140} />
           </p>
           <p className="mt-0.5 text-[24px] font-bold leading-tight tracking-[-0.02em]">1 person coming, 1 thing arriving</p>
         </div>
@@ -512,6 +516,112 @@ function People({ d, set }) {
   )
 }
 
+/* --- making the home card real (v1.63.0) -------------------------------- */
+
+/**
+ * The end of the home path: the card on this phone becomes a real /h/ link.
+ *
+ * Only the name the household picks for it goes to the server; the card is a
+ * link that gets shared, so it never carries the street, the pin, the photos
+ * or who lives there. The forwarding address comes back once and is kept on
+ * this phone, and is shown only when the letterbox is actually receiving.
+ */
+function GoLive({ d, set, onRestart }) {
+  const [label, setLabel] = useState(d.card?.label || (d.name ? `${first(d.name)}’s home` : 'Our home'))
+  const [state, setState] = useState(null) // null | 'making' | error text
+  const [receiving, setReceiving] = useState(null)
+  const [copied, setCopied] = useState(null)
+  const url = d.card ? `${typeof window !== 'undefined' ? window.location.origin : 'https://www.getturnup.com'}/h/${d.card.code}` : null
+
+  useEffect(() => {
+    if (!d.card) return
+    fetch('/api/places').then((r) => r.json()).then((b) => setReceiving(Boolean(b.receiving))).catch(() => setReceiving(false))
+  }, [d.card])
+
+  const make = async () => {
+    setState('making')
+    try {
+      const r = await fetch('/api/places', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ label }) })
+      const b = await r.json().catch(() => ({}))
+      if (!r.ok || !b.code) {
+        setState(b.error === 'too_many' ? 'That is a few cards now. Give it an hour.' : 'That did not work. Try again in a moment.')
+        return
+      }
+      set({ card: { code: b.code, label: b.label, inbox: b.inbox } })
+      setState(null)
+    } catch {
+      setState('That did not work. Check the signal and try again.')
+    }
+  }
+  const copy = async (text, what) => {
+    try { await navigator.clipboard.writeText(text); setCopied(what) } catch { setCopied(null) }
+  }
+  const share = async () => {
+    try { await navigator.share({ title: d.card.label || 'Our home', url }) } catch { copy(url, 'link') }
+  }
+
+  if (!d.card) {
+    return (
+      <div className="glass r-outer filed-in mt-4 p-5">
+        <p className="text-[20px] font-semibold">Make it live</p>
+        <p className="mt-1 text-[16px] leading-snug muted">Your card becomes a link for everyone at home. Only its name goes on it.</p>
+        <div className="mt-4">
+          <Field label="Name on the card" value={label} maxLength={40} onChange={(e) => setLabel(e.target.value)} />
+        </div>
+        {state && state !== 'making' && (
+          <p className="r-inner mt-3 p-3 text-[14px]" style={{ background: 'color-mix(in srgb, #ff3b30 12%, transparent)', color: '#ff3b30' }}>{state}</p>
+        )}
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <button type="button" onClick={make} disabled={state === 'making' || !label.trim()} className="btn btn-filled disabled:opacity-40">
+            {state === 'making' ? 'Making it…' : 'Make my card live'}
+          </button>
+          <button type="button" onClick={onRestart} className="btn btn-grey">Start again</button>
+        </div>
+        {d.listed && <p className="mt-3 text-center text-[13px]" style={{ color: 'var(--label-3)' }}>You are on the list either way.</p>}
+      </div>
+    )
+  }
+
+  return (
+    <div className="glass r-outer filed-in mt-4 p-5">
+      <div className="flex items-center gap-3">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white" style={{ background: 'var(--tint)' }}><TickIcon size={22} /></span>
+        <span className="min-w-0">
+          <span className="block text-[20px] font-semibold leading-tight">Your card is live</span>
+          <span className="block truncate text-[15px] muted">{d.card.label || 'Your home'}</span>
+        </span>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        <a href={url} className="btn btn-filled">Open your card</a>
+        <button type="button" onClick={share} className="btn btn-tinted">{copied === 'link' ? 'Link copied' : 'Share with who lives there'}</button>
+      </div>
+
+      <div className="r-inner mt-4 p-4" style={{ background: 'rgb(var(--glass-line) / .07)' }}>
+        <p className="text-[13px] font-semibold uppercase tracking-wider" style={{ color: 'var(--label-3)' }}>Forward delivery emails to</p>
+        {receiving ? (
+          <>
+            <p className="mt-1 break-all font-mono text-[15px] font-semibold">{d.card.inbox}</p>
+            <button type="button" onClick={() => copy(d.card.inbox, 'inbox')} className="btn btn-grey mt-2 !min-h-[40px] !px-4 !text-[14px]">
+              {copied === 'inbox' ? 'Copied' : 'Copy the address'}
+            </button>
+            <p className="mt-2 text-[14px] leading-snug muted">Keep it to yourself. It is the one way onto your card. The card link is the one to share.</p>
+          </>
+        ) : (
+          <p className="mt-1 text-[15px] leading-snug muted">
+            {receiving === null ? 'Checking…' : 'Not switched on yet. Your own address appears here, on this phone, when it is.'}
+          </p>
+        )}
+      </div>
+
+      <p className="mt-3 text-[13px] leading-snug" style={{ color: 'var(--label-3)' }}>
+        Saved on this phone. Start again forgets it here, so keep the link first.
+      </p>
+      <button type="button" onClick={onRestart} className="mt-2 text-[14px] font-medium muted underline">Start again</button>
+    </div>
+  )
+}
+
 /* --- the page ------------------------------------------------------------ */
 
 export default function Join() {
@@ -687,17 +797,17 @@ export default function Join() {
           })}
         </ol>
 
-        {done && (
+        {done && d.as === 'home' && <GoLive d={d} set={set} onRestart={restart} />}
+
+        {done && d.as === 'trade' && (
           <div className="glass r-outer filed-in mt-4 p-5 text-center">
             <span className="mx-auto grid h-12 w-12 place-items-center rounded-full text-white" style={{ background: 'var(--tint)' }}><TickIcon size={24} /></span>
-            <p className="mt-3 text-[20px] font-semibold">{d.listed ? 'You are on the list' : 'Your card is ready'}</p>
+            <p className="mt-3 text-[20px] font-semibold">You are on the list</p>
             <p className="mt-1.5 text-[16px] leading-snug muted">
               Your card is saved on this phone. When your place opens, it goes live from here.
             </p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              <Link href={d.as === 'trade' ? '/demo' : '/for-homes'} className="btn btn-tinted">
-                {d.as === 'trade' ? 'See a live job' : 'How the card works'}
-              </Link>
+              <Link href="/demo" className="btn btn-tinted">See a live job</Link>
               <button type="button" onClick={restart} className="btn btn-grey">Start again</button>
             </div>
           </div>
@@ -706,7 +816,7 @@ export default function Join() {
         <div className="mt-6 flex items-start gap-2.5 text-[13px] leading-snug" style={{ color: 'var(--label-3)' }}>
           <span className="mt-0.5 shrink-0"><PeopleIcon size={16} /></span>
           <p>
-            Sent to me: your name, email, {d.as === 'trade' ? 'trade' : 'that it is for a home'} and the first half of your postcode.
+            Sent to me: your name, email, {d.as === 'trade' ? 'trade' : 'that it is for a home'} and the first half of your postcode{d.as === 'home' ? ', and the name on your card if you make it live' : ''}.
             Everything else stays on this phone. <Link href="/privacy" className="underline">Privacy</Link>
           </p>
         </div>

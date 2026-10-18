@@ -15,8 +15,8 @@ that panel; the panel is the thing anybody should actually follow.
 a delivery email
    |  forwarded by a household mail rule
    v
-<inboxKey>@in.getturnup.com
-   |  MX on the subdomain, Cloudflare Email Routing
+cards+<inboxKey>@in.getturnup.com
+   |  MX on the subdomain, Cloudflare Email Routing, one rule for cards@
    v
 Email Worker  (cloudflare/email-worker/worker.js)
    |  POST {to, from, raw}
@@ -69,7 +69,15 @@ same reason, and that is tested.
 |---|---|---|
 | — | **Switch it on** | one tap on the dashboard. Writes the password to a row |
 | 1 | `getturnup.com` onto Cloudflare DNS, nameservers changed at Hostinger | a Cloudflare account and a Hostinger login |
-| 2 | Email Routing on, subdomain `in` added, the Worker pasted in, catch-all → it | a browser |
+| 2 | Email Routing on, subdomain `in` added, subaddressing on, the Worker pasted in, one rule `cards@in…` → it | a browser |
+
+**Not a catch-all (corrected 18 Oct 2026, v1.63.0).** Cloudflare's catch-all
+works on the apex only; a subdomain takes literal rules. Every card had its own
+`<key>@in.getturnup.com`, which would have needed a rule per card. Cards now get
+`cards+<key>@in.getturnup.com`: one literal rule for `cards@` with subaddressing
+switched on matches them all (RFC 5233, in Cloudflare's docs), and
+`inboxKeyFrom()` reads the key out of the plus part. The bare form is still read.
+The whole job is a Cowork paste in `docs/cowork-letterbox.md`.
 
 **This used to be four steps and two of them needed a laptop.** The Vercel
 environment variable and the wrangler deploy are both gone: the password is

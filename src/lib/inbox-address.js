@@ -6,7 +6,10 @@
  * whichever inbound mail provider is in front of it, and that choice is not
  * settled. Two shapes have to work:
  *
- *   q7rmt4ndkw82lp@in.getturnup.com          an MX record on our own subdomain
+ *   cards+q7rmt4ndkw82lp@in.getturnup.com    our own subdomain: one Cloudflare
+ *                                            rule for cards@, the key in the plus
+ *   q7rmt4ndkw82lp@in.getturnup.com          the bare form, handed out before
+ *                                            v1.63.0; still read
  *   abc123+q7rmt4ndkw82lp@inbound.example    a provider-hosted address, where
  *                                            the key rides in the plus part
  *
@@ -19,8 +22,21 @@
 /** The forwarding host. Configuration, so a second trade is a variable. */
 export const INBOUND_HOST = process.env.INBOUND_EMAIL_HOST || 'in.getturnup.com'
 
+/**
+ * The one mailbox name the letterbox listens on. Every card's address is this
+ * plus its key: cards+q7rmt4ndkw82jp@in.getturnup.com.
+ *
+ * Not the bare key, which is what this handed out until v1.63.0, because
+ * Cloudflare's catch-all rule works on the apex only: on a subdomain each
+ * address needs a literal routing rule, and a rule per card cannot be made from
+ * here. One literal rule for `cards@`, with Cloudflare's subaddressing switched
+ * on, matches every `cards+<key>@` (RFC 5233; their docs, checked 18 Oct 2026),
+ * and the key rides in the plus part, which inboxKeyFrom() already read.
+ */
+export const INBOUND_LOCAL = process.env.INBOUND_EMAIL_LOCAL || 'cards'
+
 /** The forwarding address for a place: the half that may be given out. */
-export const inboxAddress = (inboxKey, host = INBOUND_HOST) => `${inboxKey}@${host}`
+export const inboxAddress = (inboxKey, host = INBOUND_HOST) => `${INBOUND_LOCAL}+${inboxKey}@${host}`
 
 // An inbox key as generateCode(14) makes it, lowercased. The alphabet is the
 // unambiguous one — no 0/O and no 1/I/L — which is why this is a useful test

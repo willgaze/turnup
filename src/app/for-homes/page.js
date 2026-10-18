@@ -63,11 +63,11 @@ export default function ForHomes() {
         </h1>
         <p className="mt-5 text-[19px] leading-snug muted">The plumber, the sofa, four parcels. In the order you have to be in for them.</p>
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link href="/join?as=home" className="btn btn-filled !px-6">Get on the list</Link>
+          <Link href="/join?as=home" className="btn btn-filled !px-6">Make your card</Link>
         </div>
         <p className="mt-4 inline-flex items-center rounded-full border px-3 py-1 text-[13px] font-semibold"
            style={{ color: 'var(--tint)', borderColor: 'color-mix(in srgb, var(--tint) 35%, transparent)' }}>
-          Built · running at one house while it is made
+          Make one now · forwarding is being switched on
         </p>
       </section>
 
@@ -125,9 +125,9 @@ export default function ForHomes() {
       </section>
 
       <section className="glass r-outer mt-10 p-6 text-center">
-        <p className="text-[21px] font-semibold">Want one for your home?</p>
-        <p className="mt-1.5 text-[16px] leading-snug muted">Watch your card build as you sign up. Pin your door, add who lives there.</p>
-        <Link href="/join?as=home" className="btn btn-filled mt-5 w-full sm:w-auto sm:!px-8">Get on the list</Link>
+        <p className="text-[21px] font-semibold">Make one for your home</p>
+        <p className="mt-1.5 text-[16px] leading-snug muted">It builds as you go, then it is a link for everyone at home.</p>
+        <Link href="/join?as=home" className="btn btn-filled mt-5 w-full sm:w-auto sm:!px-8">Make your card</Link>
       </section>
     </SiteShell>
   )
