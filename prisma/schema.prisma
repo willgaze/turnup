@@ -86,6 +86,12 @@ model TradeStatus {
 
   askedAt        DateTime?
   askAnsweredAt  DateTime?
+  // How many times the trade has been buzzed about THIS ask, counting the one
+  // ask() sends itself. Capped at MAX_ASK_NUDGES in src/lib/nudge.js. Before
+  // it, nothing counted: an unanswered ask repeated every ten minutes for
+  // ever, and an ask made at 15:34 on 18 Oct 2026 buzzed the owner's phone
+  // all night. Reset to 0 whenever a new ask opens.
+  askNudges      Int       @default(0)
   lateMinutes    Int?
   lateAt         DateTime?
   // Nudges to the trade: 1 after the window started with the card still
