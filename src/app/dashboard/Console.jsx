@@ -538,6 +538,10 @@ export default function Console({ assistant = false }) {
                       ))}
                       {t.lateMinutes && <button type="button" onClick={() => patch(t.id, { lateMinutes: null })} className="btn btn-grey !min-h-[40px] !px-3.5 !text-[13px]">Clear</button>}
                       {t.customerPhone && <a href={`tel:${t.customerPhone.replace(/\s+/g, '')}`} className="btn btn-grey !min-h-[40px] !px-3.5 !text-[13px]">Call</a>}
+                      {/* Quiets the buzzing without moving the card. For when
+                          you have rung them: the question is dealt with, but
+                          nothing the customer sees should claim you set off. */}
+                      {askOpen && <button type="button" onClick={() => patch(t.id, { stopAsk: true })} className="btn btn-grey !min-h-[40px] !px-3.5 !text-[13px]">Stop reminders</button>}
                     </div>
                   </div>
                 )

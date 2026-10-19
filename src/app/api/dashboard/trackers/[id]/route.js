@@ -1,5 +1,5 @@
 import { NextResponse, after } from 'next/server'
-import { runningLate, answeredByStage } from '@/lib/nudge'
+import { runningLate, answeredByStage, stopAskReminders } from '@/lib/nudge'
 import { pausedBack, pauseStampFor } from '@/lib/pause'
 import { diaryFor } from '@/lib/sm8-oauth'
 import { STAGES } from '@/lib/trade-status'
@@ -34,6 +34,16 @@ export async function PATCH(request, { params }) {
     // open "are you still coming?". Null clears it.
     if (body.lateMinutes !== undefined) {
       const updated = await runningLate(current, body.lateMinutes === null ? null : Number(body.lateMinutes))
+      return NextResponse.json({ tracker: updated })
+    }
+
+    // "Stop reminders": the trade has seen the question and is handling it
+    // some other way. It quiets the buzzing and changes nothing the customer
+    // can see — no stage, no note on their page, no claim that anyone has set
+    // off. Deliberately its own verb rather than a stage tap, because the
+    // only way to silence this used to be to move the card.
+    if (body.stopAsk === true) {
+      const updated = await stopAskReminders(current)
       return NextResponse.json({ tracker: updated })
     }
 

@@ -4,7 +4,9 @@ import { TRADE_NAME } from '@/lib/trade'
 import { dayBeforeAskDue } from '@/lib/day-before'
 import { diaryFor } from '@/lib/sm8-oauth'
 import { dayWord } from '@/lib/nudge-words'
+import { askNudgeDue, inQuietHours, askExpired, MAX_ASK_NUDGES, REPEAT_MS } from '@/lib/ask-reminder'
 export { dayWord }
+export { askNudgeDue, inQuietHours, askExpired, MAX_ASK_NUDGES, QUIET_FROM, QUIET_UNTIL } from '@/lib/ask-reminder'
 
 /**
  * What happens when the window arrives and the card has not moved.
@@ -37,7 +39,9 @@ export { dayWord }
  * which is exactly when it matters), on every ServiceM8 event, and from the
  * cron route. It is idempotent: each level fires once, paced by nudgedAt.
  */
-const REPEAT_MS = 10 * 60_000
+// How often an unanswered ask may buzz, when it must not, and when it stops:
+// src/lib/ask-reminder.js, which is pure so scripts/check-nudge-ask.mjs can
+// run the whole decision without a database.
 
 // The email fallback when no push landed (src/lib/customer-email.js). Imported
 // at call time: customer-email needs servicem8, and servicem8 imports this file.
@@ -49,12 +53,14 @@ const hhmm = (d) => new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', m
 
 export function nudgeDue(t, now = new Date()) {
   if (!t.isActive || t.stage === 'DONE') return null
-  const since = (d) => now - new Date(d)
 
-  // an unanswered question outranks everything, every ten minutes
-  if (t.askedAt && !t.askAnsweredAt && (!t.nudgedAt || new Date(t.nudgedAt) < new Date(t.askedAt) || since(t.nudgedAt) >= REPEAT_MS)) {
-    return { kind: 'ask', title: `${first(t)} is asking`, body: `"Are you still coming?" — asked at ${hhmm(t.askedAt)}, no answer yet. Tap to reply from the card.` }
-  }
+  // An unanswered question outranks everything — but it is not endless, it is
+  // not nocturnal, and it does not outlive the day it is about.
+  const open = askNudgeDue(t, now)
+  if (open) return open
+  // Spent, asleep or stale: fall through rather than stop. The window nudges
+  // below fire once each, and the missed notice is the CUSTOMER being told
+  // their window has passed — silencing a reminder must never silence that.
 
   // Only real hours make a window. A job booked for a day with no hours
   // carries scheduledFor at midnight, and this used to fall back to it: the
@@ -78,6 +84,12 @@ export function nudgeDue(t, now = new Date()) {
     const promised = t.lateMinutes && t.lateAt ? new Date(t.lateAt).getTime() + t.lateMinutes * 60_000 + MISSED_GRACE_MS : 0
     if (now >= promised) return { kind: 'missed', title: `${first(t)} has been told the window was missed`, body: `It ended at ${hhmm(end)}. They can choose to wait, have it later today, or rebook. Set off, say how late, or give them a new window.` }
   }
+  // Both of these buzz the trade and nobody else, so both sleep. They fire
+  // once each (nudgeLevel), so waiting until 07:00 delays them; it never
+  // loses them. The missed notice above is deliberately NOT gated: that one
+  // is the customer being told, and a window that genuinely ended at one in
+  // the morning is a thing they are owed.
+  if (inQuietHours(now)) return null
   if (t.nudgeLevel < 1 && now >= new Date(start) && t.stage === 'BOOKED') {
     return { kind: 'start', level: 1, title: `${first(t)}'s window has started`, body: `From ${hhmm(start)}, and the card still says Booked in. Set off, or say you are running late.` }
   }
@@ -147,6 +159,9 @@ export async function nudgeIfDue(tracker) {
     if (r.devices === 0) return { ...due, sent: 0 }
     const data = { nudgedAt: new Date() }
     if (due.level) data.nudgeLevel = due.level
+    // Count this buzz against the ask's allowance. `spend` is the morning
+    // summary taking the rest of it, so nothing follows.
+    if (due.ask) data.askNudges = due.spend ?? (tracker.askNudges || 0) + 1
     await prisma.tradeStatus.update({ where: { id: tracker.id }, data })
     return { ...due, sent: r.sent }
   } catch (error) {
@@ -165,17 +180,47 @@ export async function nudgeAll() {
   return { checked: rows.length, nudged: out }
 }
 
-/** The customer asked. Once per ten minutes, then it buzzes the trade. */
+/**
+ * The customer asked. Once per ten minutes, then it buzzes the trade.
+ *
+ * This push is the FIRST of the three the ask is allowed, so askNudges starts
+ * at 1 rather than 0 — counting it from zero here is how three reminders
+ * quietly become four.
+ */
 export async function ask(tracker) {
   const now = new Date()
   if (tracker.askedAt && !tracker.askAnsweredAt && now - new Date(tracker.askedAt) < REPEAT_MS) return { ok: true, repeated: true }
   await prisma.tradeStatus.update({ where: { id: tracker.id }, data: {
-    askedAt: now, askAnsweredAt: null, nudgedAt: now,
+    askedAt: now, askAnsweredAt: null, nudgedAt: now, askNudges: 1,
     events: { create: { stage: tracker.stage, note: 'Asked: are you still coming?' } },
   } })
   diaryFor(tracker, 'Customer asked: are you still coming?').catch(() => {})
-  const r = await pushTrade({ title: `${first(tracker)} is asking`, body: `"Are you still coming?" Reply from the card: On my way, or how late.`, tag: `nudge-${tracker.code}` })
+  // The lock screen carries the trade's own stage and nothing of the
+  // customer's: their first name is not needed to know which card to open,
+  // and whoever picks the phone up off the table is not the person who holds
+  // the link. See the lock-screen rule in CLAUDE.md.
+  const r = await pushTrade({ title: 'A customer is asking', body: `"Are you still coming?" Reply from the card: On my way, or how late.`, tag: `nudge-${tracker.code}` })
   return { ok: true, devices: r.devices, sent: r.sent }
+}
+
+/**
+ * Stop reminders, without answering the question and without moving the card.
+ *
+ * The trade has seen it and is dealing with it another way — a phone call,
+ * usually. Setting askAnsweredAt is what every other answer does, so this
+ * reuses exactly that rather than inventing a second kind of silence. The
+ * stage is untouched: a tap that quiets a buzz must never tell a customer
+ * their plumber has set off.
+ */
+export async function stopAskReminders(tracker) {
+  if (!tracker.askedAt || tracker.askAnsweredAt) return tracker
+  const now = new Date()
+  const updated = await prisma.tradeStatus.update({ where: { id: tracker.id }, data: {
+    askAnsweredAt: now, askNudges: MAX_ASK_NUDGES,
+    events: { create: { stage: tracker.stage, note: 'Reminders stopped by the trade; the question is still open.' } },
+  } })
+  diaryFor(tracker, 'Trade stopped the reminders for "are you still coming?".').catch(() => {})
+  return updated
 }
 
 /**

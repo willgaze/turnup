@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.68.0](./v1.68.0/) | 2026-10-19 | Slate — a reminder that stops: three buzzes, nothing overnight, and Stop reminders on the card |
 | [v1.67.0](./v1.67.0/) | 2026-10-19 | Moss — the pilot numbers count what they say; Gmail and tracking-by-number sources built, dark until their keys |
 | [v1.66.0](./v1.66.0/) | 2026-10-19 | Harbour — Are you still coming? no longer crashes the page at the window; the email reader proven in every client; audit and the inbox-connect plan |
 | [v1.65.3](./v1.65.3/) | 2026-10-18 | Ochre — card titles say the thing ("Screwfix order"); Fwd: leftovers hidden |
