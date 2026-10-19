@@ -683,9 +683,14 @@ that splits trades from parcels makes them do the merging in their head.
 Getting thirteen delivery firms to integrate is not a thing a sole trader can
 do. Getting one household to add a forwarding rule is. `src/lib/arrival-email.js`
 reads a forwarded email and returns an arrival or **null**; it is pure, has no
-database, and `node scripts/check-arrival-email.mjs` is its test: 31 cases, five
-of them raw forwarded emails in `scripts/fixtures/forwards/` run through
-`readRawEmail()` first, which is the real path.
+database, and `node scripts/check-arrival-email.mjs` is its test: 50 cases. Six
+are raw forwarded emails in `scripts/fixtures/forwards/` and twelve more are in
+`scripts/fixtures/forwards/matrix/`: Gmail, Outlook and Apple Mail forwards,
+each at all four stages (ordered, on its way, out for delivery, delivered), from
+one invented shop. Every one runs through `readRawEmail()` first, which is the
+real path. **Fixtures use invented people and addresses** (`example.*`
+domains, the Oakleys, Harbour Home). Since 19 Oct 2026 none of them names a
+real household or a mailbox somebody could own.
 
 **Every card email is a forward, so the forward is unwrapped first**
 (`unwrapForward()`, v1.64.0). Until then nothing did: a live test on 18 Oct 2026
@@ -933,10 +938,54 @@ MX on the subdomain) and `/join` shows the forwarding address only when it is
 true: an address nothing is listening on is the push row that opened onto an
 empty drawer.
 
-Still to do: a way to connect a source other than forwarding (Gmail's
-`gmail.readonly` is a restricted scope — Google verification plus a CASA
-assessment renewed yearly, weeks of lead time and a four-figure annual cost,
-which is why forwarding came first).
+Still to do: a way to connect a source other than forwarding, because a
+household will not set up a filter. **The plan is `docs/research/inbox-connect.md`
+(19 Oct 2026), every claim with its URL.** In short: `gmail.readonly` and
+`gmail.metadata` are both restricted, and no Gmail scope can be narrowed to
+matching messages or one label. An Internal app on the owner's own Workspace
+needs no Google review, so that is stage 1. Testing mode allows 100 named
+users with seven-day tokens (stage 2). Public needs restricted-scope
+verification plus a CASA assessment by an authorised lab every year (stage 3).
+The best public figure for that is roughly $540 to $1,800 a year, not the
+"four-figure" sum this paragraph used to say. A tracking-number aggregator
+keeps a card moving from one email. **No OAuth app is created by a session**;
+the Google Cloud project and the consent screen are the owner's to make.
+
+## The card's other two sources: Gmail and tracking by number
+
+Forwarding is the floor and it works (the letterbox, above). Two more sources
+were built on 19 Oct 2026 (v1.67.0), both dark until a setting only the owner
+can make exists, both on the dashboard panel **Where the card hears from**
+(`src/app/dashboard/Sources.jsx`, `/api/dashboard/sources`), both swept by
+the five-minute cron.
+
+**Connect Gmail, stage 1** (`src/lib/gmail.js`, pure parts in
+`src/lib/gmail-words.js`, `node scripts/check-gmail-poll.mjs`): the owner's
+own Workspace mailbox, as an **Internal** Google app, read with
+`gmail.readonly` and filed onto one chosen card through `fileEmail()`, the
+same path as a forward. The query (`gmailQuery()`) asks Gmail only for mail
+after the newest already read, from a courier's or shop's domain or with an
+order word in the subject, never spam, bin or sent; what the reader drops is
+read by nobody and nothing is stored but the row. Tokens are sealed with a
+key from `JWT_SECRET` in one `GmailLink` row and no route returns them.
+Disconnect revokes at Google first. Gated on `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET`; the Google project, the Internal consent screen and
+the OAuth client are the owner's to make (`docs/connect-gmail.md`, one Cowork
+paste). **No session creates an OAuth app.** Other households are stages 2
+and 3 of `docs/research/inbox-connect.md` and wait on Google's review.
+
+**Tracking by number** (`src/lib/ship24.js`, pure parts in
+`src/lib/ship24-words.js`, `node scripts/check-ship24.mjs` with Ship24's own
+example payload): a parcel row with a courier and a reference is registered
+with Ship24 (`registerTracker()` from `fileEmail()`, and `registerDue()` in
+the sweep for rows from before the key existed), and Ship24's webhook
+(`/api/ship24/webhook/<token>`, token derived from `JWT_SECRET` like the
+ServiceM8 one, `SHIP24_WEBHOOK_SECRET` checked as a bearer when set) moves the
+row from the courier's scans: in transit is on its way, out for delivery, a
+failed attempt or a pickup point is missed, delivered is arrived. Stages only
+move forwards. The row's note is the courier's latest words, attributed; the
+courier's **estimated** date is never copied onto the card, because the card
+says what has happened. Gated on `SHIP24_API_KEY` (`docs/tracking-by-number.md`).
 
 ## When the window arrives and nothing has moved (`src/lib/nudge.js`)
 
@@ -1025,13 +1074,35 @@ under When suits you? like any other window. `dayWord()` lives in
 the card are stated only when the window is AGREED.
 
 **The pilot is four numbers** (`src/lib/pilot.js`, panel under Setup and
-settings, `node scripts/check-pilot.mjs`): links opened, "will someone be in?"
-answered, wasted trips (No one home records), and "when are you coming?" calls
-to the booking line. The product cannot see a phone ring, so the fourth is
-counted by a person and the panel says so; "Are you still coming?" taps are
-shown beside it as the nearest thing the product sees, never as calls. Decided
-11 Oct 2026: nothing moves on housing or pricing until thirty days of these
-are in.
+settings, `node scripts/check-pilot.mjs`, 19 cases): links opened, "will
+someone be in?" answered, wasted trips (No one home records), and "when are you
+coming?" calls to the booking line. The product cannot see a phone ring, so the
+fourth is typed by the trade on the panel (`TradeProfile.pilotCalls`, a +1
+button) and the panel says so; "Are you still coming?" taps are shown beside it
+as the nearest thing the product sees, never as calls. Decided 11 Oct 2026:
+nothing moves on housing or pricing until thirty days of these are in.
+
+**The counting was wrong until v1.67.0, and the audit of 19 Oct 2026 found how.**
+Four faults, each fixed where it sits:
+
+- **"Links opened" counted the trade.** Every load of `/t/<code>` added one,
+  including the dashboard's own Open buttons and the preview WhatsApp fetches
+  the moment a link is pasted, so the first pilot number read near 100% by
+  construction. `src/app/t/[code]/page.js` now counts only when
+  `countsAsCustomerView()` says so: not an operator cookie, not a user agent
+  in `PREVIEW_UA`.
+- **A wasted trip could count twice.** `queueFetch()` made the tap id only
+  when it queued, so an online attempt that timed out after the server had
+  taken it replayed as a new tap: two No one home rows, two sorry-we-missed-you
+  notes. The id is now made before the first attempt and sent with it.
+- **A wasted trip could vanish.** It was counted only while its job sat in the
+  window, so rebooking the job into the future, which is what happens after a
+  wasted trip, dropped the record. Counted by its own `startedAt` now.
+- **The thirty days rolled.** No start date, so the count reached back into
+  the weeks of test cards. `TradeProfile.pilotStart` (the Start button) is
+  the floor; until it is pressed the panel says the window is rolling and
+  includes test cards. "Answered" is a share of the jobs **asked**, not of
+  every job.
 
 ## When no notification lands: email (`src/lib/customer-email.js`)
 
@@ -1077,6 +1148,18 @@ reached no phone of theirs, they get an email instead.
 The day-before nudge to the trade says when the ask went by email. Running late
 and Job done are not emailed yet: the first is a figure the trade typed, which
 the page shows with when it was said; the second is not urgent.
+
+## No hook after an early return (`node scripts/check-hook-order.mjs`)
+
+There is no ESLint config in this repo, so React's rules-of-hooks never runs.
+Until v1.66.0 `src/app/t/StillComing.jsx` called `useState` below two
+`return null`s: the render that crossed the window's start called one hook
+more than the one before, React threw #310, and the customer's page showed
+"Application error" at the exact moment it exists for. Reproduced in a browser
+on 19 Oct 2026 (a Booked-in card, agreed window starting 40 seconds after the
+page opened) and gone after the fix. The check reads every component's
+top-level lines and fails a `useX(` that follows a top-level return; it
+carries a self-test with the original bug. Run it before every push.
 
 ## A tap with no signal still counts (`src/app/dashboard/offline-queue.js`)
 

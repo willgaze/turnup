@@ -66,16 +66,21 @@ const isNetworkFailure = (e) => e instanceof TypeError || e?.name === 'AbortErro
 export async function queueFetch(url, { method = 'POST', body = null, timeoutMs = 12_000 } = {}) {
   const deviceAt = new Date().toISOString()
   const offline = typeof navigator !== 'undefined' && navigator.onLine === false
+  // The tap's id is made BEFORE the first attempt and sent with it. Until
+  // v1.67.0 it was made only when the tap was queued, so an online attempt
+  // that timed out after the server had already taken it came back later as
+  // a new tap: two No one home records, two "sorry we missed you" notes,
+  // and a wasted trip counted twice on the pilot panel.
+  const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
   if (!offline) {
     try {
-      const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(timeoutMs) })
+      const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify({ ...body, tapId: id }) : JSON.stringify({ tapId: id }), signal: AbortSignal.timeout(timeoutMs) })
       let json = null; try { json = await r.json() } catch { json = null }
       return { ok: r.ok, status: r.status, json }
     } catch (e) {
       if (!isNetworkFailure(e)) throw e
     }
   }
-  const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
   const item = { id, url, method, body: body || {}, deviceAt, attempts: 0 }
   await put(item); notify()
   // The fix is added after the tap is safe, so a slow GPS never costs the tap.

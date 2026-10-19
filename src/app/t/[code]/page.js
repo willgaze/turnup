@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import { headers } from 'next/headers'
+import { isOperator } from '@/lib/operator-auth'
+import { countsAsCustomerView } from '@/lib/pilot'
 import { prisma } from '@/lib/prisma'
 import { publicShape } from '@/lib/trade-status'
 import { publicProfile, publicBrand, publicTerms, tradeSeenAt } from '@/lib/profile'
@@ -34,10 +37,16 @@ export default async function TrackPage({ params }) {
       review = status.stage === 'DONE' ? await reviewUrl() : null
       // One visit, one count — this runs per page load (force-dynamic) rather
       // than per poll. Deliberately not awaited: a counter must never hold up
-      // or break the customer's page.
-      prisma.tradeStatus
-        .update({ where: { id: row.id }, data: { viewCount: { increment: 1 }, lastViewedAt: new Date() } })
-        .catch(() => {})
+      // or break the customer's page. The trade's own Open buttons and the
+      // preview a messaging app fetches the moment the link is pasted are not
+      // the customer opening it, and since v1.67.0 they do not count: this is
+      // the first pilot number, and it was reading near 100% by construction.
+      const ua = (await headers()).get('user-agent') || ''
+      if (countsAsCustomerView({ operator: await isOperator().catch(() => false), userAgent: ua })) {
+        prisma.tradeStatus
+          .update({ where: { id: row.id }, data: { viewCount: { increment: 1 }, lastViewedAt: new Date() } })
+          .catch(() => {})
+      }
     }
   } catch (error) {
     console.error('track lookup failed:', error)

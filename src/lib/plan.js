@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '17 Oct 2026',
+  updated: '19 Oct 2026',
 }
 
 export const STAGES = [
@@ -67,7 +67,7 @@ export const MOATS = [
   },
   {
     n: '3', name: 'One integration', line: 'Both wallets, the update loop, push, SMS fallback, the privacy rules. They would rather buy that than own it.',
-    today: ['Apple pass signing: built, unsigned', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, written; routing not switched on yet', 'Privacy rules: written and checked by script'],
+    today: ['Apple pass signing: built, unsigned', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Privacy rules: written and checked by script'],
     missing: ['A signed pass in a real wallet', 'Google Wallet', 'The pass update web service', 'An API another firm can call'],
     gate: 'A firm that is not customer zero calls the API', pct: 40,
   },
@@ -79,12 +79,12 @@ export const STATUS = [
   { item: 'Customer card and dashboard', state: 'green', note: `version ${VERSION}` },
   { item: 'Nightly build', state: 'green', note: '02:00, one improvement a night; the words updated with it' },
   { item: 'Push to the lock screen', state: 'green', note: 'live 10 Oct 2026, a real buzz on a real phone' },
-  { item: 'Household card', state: 'green', note: 'live 12 Oct 2026; fills from forwarded email once the letterbox is on' },
+  { item: 'Household card', state: 'green', note: 'live 12 Oct 2026; fills from forwarded email since the letterbox came on, 18 Oct' },
   { item: 'Nudges on time', state: 'green', note: 'every five minutes on Vercel Cron since 17 Oct 2026; GitHub had run it every four hours' },
   { item: 'ServiceM8 connector', state: 'green', note: 'connected 9 Oct 2026: reads every booking, texts the link, follows a move, check-in is On site' },
-  { item: 'Email letterbox (Cloudflare)', state: 'amber', note: 'getturnup.com is on Cloudflare; Email Routing for in.getturnup.com is not on yet, so nothing arrives' },
-  { item: 'Pilot: thirty days, four numbers', state: 'amber', note: 'panel built and ServiceM8 connected; the count has not started' },
-  { item: 'Van lookup (DVSA MOT API)', state: 'amber', note: 'DVSA approved 14 Oct; three settings in Vercel to go' },
+  { item: 'Email letterbox (Cloudflare)', state: 'green', note: 'receiving since 18 Oct 2026: in.getturnup.com, a Worker, /api/inbound; forwarded emails land on the card' },
+  { item: 'Pilot: thirty days, four numbers', state: 'amber', note: 'panel built, counting fixed 19 Oct 2026 (own opens and link previews no longer count); the clock starts when Start is pressed on the panel' },
+  { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live 18 Oct 2026: the plate fills in make, model and colour' },
   { item: 'Apple Wallet card', state: 'amber', note: 'signing built; the Apple enrolment is under review and Apple asks to be contacted' },
   { item: 'Google Wallet card', state: 'red', note: 'not built; decide whether to build on a pass platform' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
@@ -95,8 +95,7 @@ export const STATUS = [
 /** The three things only the owner can move, each with the link and the step. */
 export const WAITING_ON_OWNER = [
   { label: 'Ring Apple about the enrolment', step: 'Under review since 14 Oct and Apple asks to be contacted. Membership and Account, Program Enrollment, phone. Move 2 and the lock-screen app wait on it', href: 'https://developer.apple.com/contact/' },
-  { label: 'Start the thirty-day count', step: 'ServiceM8 is connected, so the clock can start. Two numbers counted by hand each working day; the app counts the other two. Move 1', href: 'https://www.getturnup.com/dashboard' },
-  { label: 'DVSA keys into Vercel', step: 'Approved 14 Oct. MOT_CLIENT_ID, MOT_CLIENT_SECRET, MOT_API_KEY from the DVSA email, then redeploy', href: 'https://vercel.com/willgazes-projects/turnup/settings/environment-variables' },
+  { label: 'Start the thirty-day count', step: 'Press Start on the pilot panel: the thirty days count from that day, not from whenever you look. The app counts three numbers; you type the calls to the booking line on the same panel. Move 1', href: 'https://www.getturnup.com/dashboard' },
   { label: 'ServiceM8 developer account', step: 'Free. Puts every TurnUp event in the job diary and opens the add-on listing. Move 3', href: 'https://www.servicem8.com/developer-registration' },
 ]
 
@@ -161,7 +160,7 @@ export const WALLET = {
     { label: 'Pass design and signing', note: 'tested end to end with a stand-in certificate chain, v1.15.4' },
     { label: 'Add to Apple Wallet button', note: 'appears on the customer page on an Apple device, once a pass can be signed' },
     { label: 'Two-command certificate script', note: 'scripts/apple-wallet.sh: csr, then finish' },
-    { label: 'Logo and stage on the pass', note: 'from the trade profile' },
+    { label: 'Name and stage on the pass', note: 'from the trade profile; the logo itself is not on the pass yet' },
   ],
   missing: [
     { label: 'Apple Developer Programme', note: 'the owner enrols as an individual, 79 pounds a year', who: 'owner' },

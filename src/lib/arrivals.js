@@ -8,6 +8,7 @@ import { INBOUND_HOST, inboxAddress } from './inbox-address'
 import { readForwardingConfirm, CONFIRM_KEY } from './gmail-confirm'
 import { nameOfSender } from './arrival-email'
 import { arrivalFromTracker, trackerDedupeKey } from './arrival-sync'
+import { registerTracker } from './ship24'
 
 /**
  * The household card: everything coming to one door, from wherever it came.
@@ -175,9 +176,13 @@ export async function fileEmail({ inboxKey, from, subject, text, receivedAt }) {
           expectedSaid: data.expectedFor ? data.expectedSaid : existing.expectedSaid,
         },
       })
+      // A courier's number on a row that is still moving: hand it to Ship24,
+      // so the courier's scans move it from here. Not awaited; fails soft.
+      registerTracker({ ...existing, ...data, reference: data.reference || existing.reference, stage: nextStage(existing.stage, parsed.stage) }).catch(() => {})
       return { ok: true, filed: true, updated: true, stage: nextStage(existing.stage, parsed.stage) }
     }
-    await prisma.arrival.create({ data: { ...data, placeId: place.id, dedupeKey, stage: parsed.stage } })
+    const created = await prisma.arrival.create({ data: { ...data, placeId: place.id, dedupeKey, stage: parsed.stage } })
+    registerTracker(created).catch(() => {})
     // The same email, filed before a forward could be read (v1.64.2): a row
     // under the household's own name with this exact title is this thing,
     // filed wrongly. Narrow on purpose: same card, same title, and the sender

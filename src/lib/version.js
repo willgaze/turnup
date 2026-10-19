@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.65.3'
-export const BUILD_DATE = '2026-10-18'
+export const VERSION = '1.68.0'
+export const BUILD_DATE = '2026-10-19'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 47
+export const THEME_INDEX = 50
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,23 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.68.0', date: '2026-10-19', notes: [
+    'A reminder that stops. An unanswered "Are you still coming?" buzzed the trade every ten minutes for as long as it stayed open \u2014 one asked at 15:34 on 18 October went all night and was still going at breakfast. Three locks now: three buzzes in total and no more; nothing between 21:00 and 07:00 in your own zone, with one summary at seven if a question was left open across the night; and an ask belongs to the day of the job it is about, so a stale one never pushes the next morning. A reminder that has not worked three times will not work the fortieth.',
+    'Stop reminders, on the card. The only way to silence a buzzing question used to be to move the stage, which tells the customer something that is not true. The button answers the question without touching the card: no stage, no note on their page, no claim that anybody has set off. For when you have already rung them.',
+    'The lock screen stops naming the customer on that one. "Sarah is asking" became "A customer is asking", and the time came out of the body. A notification is read by whoever picks the phone up off the kitchen table, and knowing which card to open never needed her name. The other trade notifications still carry a first name; that is the next thing to look at.',
+    'The two window nudges sleep as well, and they lose nothing by it: each fires once, so a window that ended at 22:00 is reported at 07:00 rather than at 22:00. The missed-window notice is deliberately NOT quietened \u2014 that one is the customer being told their window has passed, and they are owed it whatever the hour.',
+  ] },
+  { version: '1.67.0', date: '2026-10-19', notes: [
+    'The pilot numbers count what they say. Links opened no longer counts your own opens or the preview a messaging app fetches when the link is pasted. A wasted trip is counted on the day it happened, so rebooking the job no longer loses it, and a tap that timed out no longer records it twice. The thirty days start when you press Start on the panel; before that the panel says the window is rolling. Calls to the booking line are typed on the panel with one button.',
+    'Where the card hears from: two new sources on the dashboard, both off until their setting exists. Read my own inbox connects your Google Workspace mailbox and files delivery emails on one card every five minutes, with no forwarding rule. Track parcels by their number hands a courier reference to Ship24 and the courier\'s own scans move the row from then on. Each panel shows exactly what it needs and ends in a Check now or a tracked count.',
+    'Honest words: You are 2nd today shows only on the day; the roadmap says the van lookup is live, that door photos are yours alone, and that the wallet card does not carry your logo yet; the homepage no longer says the wallet card moves on its own.',
+  ] },
+  { version: '1.66.0', date: '2026-10-19', notes: [
+    'Are you still coming? no longer crashes the customer\'s page. If the page was open when the window started, it went to Application error, at the exact moment a customer was watching for you. Found in an audit, reproduced in a browser, fixed, and a new check fails any change that brings it back.',
+    'The household card\'s email reader is proven in every client: Gmail, Outlook and Apple Mail forwards, each at ordered, on its way, out for delivery and delivered. Dispatched never files as arrived in any of them. "Ordered:" (Amazon\'s wording) and "you ordered" now count as an order. The test emails use invented people and addresses only.',
+    'An audit of everything the roadmap and the build list say, checked against the code: docs/audit/2026-10-19.md. The build list no longer says every event has an email fallback; three do.',
+    'A plan for reading a household\'s inbox the way Shop does, without forwarding: docs/research/inbox-connect.md, with a source for every claim. On the roadmap as Connect Gmail, an idea with no date, because Google has to review it first.',
+  ] },
   { version: '1.65.3', date: '2026-10-18', notes: [
     'Card titles say what the thing is. "Confirmation of your order: A28609474611. Please find your invoice attached." is now "Screwfix order", and "Your Order with divapor.com has been marked as dispatched" is "Di Vapor order": the stage already shows above the title, and an order number and an invoice line name nothing.',
     'Rows left over from before forwarded emails were read properly, with "Fwd:" at the front of the title and the household as the sender, no longer show on the card.',

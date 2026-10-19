@@ -24,7 +24,9 @@ capability we do not have) · No.
 | Arrival window on every booking, headline above the start time | Copy | Done 1.17.1 (from ServiceM8); manual windows done earlier |
 | Booking confirmation carrying cancellation info, express-start request, no-access terms (CCR 2013 regs 28/36) | Improve | Done 1.29.0 — Before the visit on the customer page (notice, charge if any, 14-day right), one-tap Got it, go ahead recorded with the words; Booking terms panel on the dashboard; confirmation line points at it |
 | Day-before reminder with reply: confirm / reschedule / someone else will be in | Copy | Done 1.31.0 + 1.32.0 — asked at 16:00 the day before (push + page); replies still fine / someone else / move it reach the trade; SMS via ServiceM8's Booking Reminder automation |
-| Non-push fallback for every customer-critical event | Copy | Done 1.65.0 (email) — set off, window missed and the day-before ask go by email through ServiceM8 when no push landed; once each per job, to the email on the ServiceM8 job, switch on the ServiceM8 panel (off by default). SMS for the same three is still the capability to buy |
+| Household card fed without forwarding: own Gmail inbox (stage 1) | Build | Built 1.67.0, dark until the Google project exists (docs/connect-gmail.md); other households wait on Google review (docs/research/inbox-connect.md) |
+| Parcel tracked by its number after one email (Ship24 webhooks) | Build | Built 1.67.0, dark until SHIP24_API_KEY (docs/tracking-by-number.md) |
+| Non-push fallback for every customer-critical event | Copy | Partly done 1.65.0 (email) — three of the events, not every one: no one home, running late and paused have no fallback yet (audit 19 Oct). Covered: set off, window missed and the day-before ask go by email through ServiceM8 when no push landed; once each per job, to the email on the ServiceM8 job, switch on the ServiceM8 panel (off by default). SMS for the same three is still the capability to buy |
 | Offline tap queue: device time + fix time + server time, "location not validated" flag, never dropped | Improve | Done 1.39.0 — IndexedDB queue in the dashboard page (no background sync on iOS); event keeps deviceAt, server time, fix and fixValidated; customer sees both times |
 | Customer page shows "last updated hh:mm" and the last honest stage | Improve | Done 1.40.0 — footer says Updated / Last checked; mid-visit the card says when the trade's phone last reached the server after 15 quiet minutes (dashboard heartbeat) |
 | "Customer not home" in one tap: fix, door photo, attempts, wait clock, message with three replies | Copy | Done 1.26.0 (fee deliberately absent; the next step is offered first) |
@@ -42,7 +44,7 @@ capability we do not have) · No.
 | Prompted reconstruction: "near this address since 09:04 — use it?", "no activity since 10:40 — were you away?" | Improve | Later — needs fixes captured at each tap first |
 | "On my way" offered automatically at the previous job's Job done | Improve | Next |
 | Ordered day with running expected start; next customer told only if the shift leaves their window | Improve | Later |
-| "You are next" / stop count on the customer page | Improve | Done (position: "You are 2nd today") |
+| "You are next" / stop count on the customer page | Improve | Done (position: "You are 2nd today"), a number the trade types; shown only on the day since 1.67.0 |
 | Confirmation re-sent on every reschedule, however the booking moved | Copy | Done 1.38.0 — Follow every booking texts the new hours once a move has settled, through ServiceM8, with the old hours in brackets |
 | Red "Not sent" badge on the dashboard until the customer has been told | Copy | Done 1.33.0 — This week in ServiceM8 reads ServiceM8's own email/SMS history: Link texted / emailed, opened / not sent, with Text the link in one tap |
 | Logged send and logged open of every customer message | Improve | Partly (viewCount, lastViewedAt); per-message log: Later |

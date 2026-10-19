@@ -86,6 +86,12 @@ model TradeStatus {
 
   askedAt        DateTime?
   askAnsweredAt  DateTime?
+  // How many times the trade has been buzzed about THIS ask, counting the one
+  // ask() sends itself. Capped at MAX_ASK_NUDGES in src/lib/nudge.js. Before
+  // it, nothing counted: an unanswered ask repeated every ten minutes for
+  // ever, and an ask made at 15:34 on 18 Oct 2026 buzzed the owner's phone
+  // all night. Reset to 0 whenever a new ask opens.
+  askNudges      Int       @default(0)
   lateMinutes    Int?
   lateAt         DateTime?
   // Nudges to the trade: 1 after the window started with the card still
@@ -268,6 +274,14 @@ model TradeProfile {
   // Off by default: it writes to customers from the business's address.
   emailFallback Boolean @default(false)
 
+  // The pilot's clock and its hand-counted number (src/lib/pilot.js). The
+  // Start button sets pilotStart; before it is set the thirty days roll back
+  // from now and sweep up every test card. pilotCalls is the running total of
+  // "when are you coming?" calls to the booking line, typed on the panel.
+  pilotStart   DateTime?
+  pilotCalls   Int?
+  pilotCallsAt DateTime?
+
   updatedAt DateTime @updatedAt
 }
 
@@ -385,6 +399,23 @@ model CustomerEmail {
   createdAt     DateTime @default(now())
 
   @@unique([tradeStatusId, kind])
+}
+
+/// Connect Gmail, stage 1 (src/lib/gmail.js): the owner's own Workspace
+/// mailbox, read with gmail.readonly, filed onto ONE household card. One row.
+/// Tokens are sealed with a key derived from JWT_SECRET and never returned by
+/// any route. `lastSeenAt` is the newest message already read, so a sweep
+/// asks Gmail only for what came after it.
+model GmailLink {
+  id          String    @id @default("singleton")
+  cipher      String // AES-256-GCM of { access, refresh, expiresAt }
+  email       String?
+  placeCode   String? // the household card this inbox feeds
+  lastSeenAt  DateTime?
+  lastCheckedAt DateTime?
+  lastOutcome String?
+  connectedAt DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Sm8Event {
@@ -507,6 +538,11 @@ model Arrival {
   /// Set when this arrival IS one of our own tracked jobs, so the card can
   /// send the customer to the live page instead of a flat row.
   tradeStatusCode String?
+
+  /// Tracking by number (src/lib/ship24.js): the Ship24 tracker that moves
+  /// this row from the courier's own scans, once one email gave the number.
+  trackerId String?
+  trackedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
