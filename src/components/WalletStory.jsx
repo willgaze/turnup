@@ -313,7 +313,7 @@ function PassBack() {
 const LIKE = [
   ['One per job', 'like a ticket', <TickIcon key="t" size={20} />],
   ['Beside their bank card', 'where they already look', <WalletIcon key="w" size={20} />],
-  ['Changes as the job moves', 'gate changes, card changes', <BellIcon key="b" size={20} />],
+  ['Will change as the job moves', 'once Apple signs it: not yet', <BellIcon key="b" size={20} />],
   ['Scan it', 'the page opens', <PhoneIcon key="p" size={20} />],
 ]
 
@@ -336,8 +336,8 @@ export default function WalletStory() {
       </div>
 
       <div>
-        <H3>It moves with the job</H3>
-        <p className="mt-1 text-[15px] muted">Same card. The dot moves.</p>
+        <H3>It will move with the job</H3>
+        <p className="mt-1 text-[15px] muted">Same card. The dot moves, once the pass is signed and its update service is built. Today the page does this; the card is next.</p>
         <div className="mt-4"><Stages /></div>
       </div>
 

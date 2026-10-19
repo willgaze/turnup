@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { nudgeAll } from '@/lib/nudge'
 import { autoFollow } from '@/lib/sm8-auto'
 import { reviewAsks } from '@/lib/review'
+import { pollGmail } from '@/lib/gmail'
+import { registerDue } from '@/lib/ship24'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,12 +53,16 @@ export async function GET(request) {
     const follow = await autoFollow().catch((e) => ({ on: true, error: e.message }))
     // Two hours after Job done: how did it go? Once per job.
     const reviews = await reviewAsks().catch((e) => ({ on: true, error: e.message }))
+    // The household card's other two sources, both dark until configured:
+    // the connected Gmail inbox, and Ship24 trackers for rows with a number.
+    const gmail = await pollGmail().catch((e) => ({ on: true, error: e.message }))
+    const tracking = await registerDue().catch((e) => ({ on: true, error: e.message }))
     // One line per sweep, so the schedule can be checked in Vercel's logs: a
     // warm function otherwise logs nothing, and a schedule with no evidence is
     // a schedule nobody can tell has stopped. Counts only, no names.
     const who = /vercel-cron/i.test(request.headers.get('user-agent') || '') ? 'vercel-cron' : 'other'
     console.log(`sweep by=${who} checked=${r.checked ?? 0} nudged=${(r.nudged || []).length}`)
-    return NextResponse.json({ ok: true, at: new Date().toISOString(), ...r, follow, reviews })
+    return NextResponse.json({ ok: true, at: new Date().toISOString(), ...r, follow, reviews, gmail, tracking })
   } catch (error) {
     console.error('cron nudge failed:', error)
     return NextResponse.json({ error: 'unavailable' }, { status: 503 })

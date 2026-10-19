@@ -951,6 +951,42 @@ The best public figure for that is roughly $540 to $1,800 a year, not the
 keeps a card moving from one email. **No OAuth app is created by a session**;
 the Google Cloud project and the consent screen are the owner's to make.
 
+## The card's other two sources: Gmail and tracking by number
+
+Forwarding is the floor and it works (the letterbox, above). Two more sources
+were built on 19 Oct 2026 (v1.67.0), both dark until a setting only the owner
+can make exists, both on the dashboard panel **Where the card hears from**
+(`src/app/dashboard/Sources.jsx`, `/api/dashboard/sources`), both swept by
+the five-minute cron.
+
+**Connect Gmail, stage 1** (`src/lib/gmail.js`, pure parts in
+`src/lib/gmail-words.js`, `node scripts/check-gmail-poll.mjs`): the owner's
+own Workspace mailbox, as an **Internal** Google app, read with
+`gmail.readonly` and filed onto one chosen card through `fileEmail()`, the
+same path as a forward. The query (`gmailQuery()`) asks Gmail only for mail
+after the newest already read, from a courier's or shop's domain or with an
+order word in the subject, never spam, bin or sent; what the reader drops is
+read by nobody and nothing is stored but the row. Tokens are sealed with a
+key from `JWT_SECRET` in one `GmailLink` row and no route returns them.
+Disconnect revokes at Google first. Gated on `GOOGLE_CLIENT_ID` and
+`GOOGLE_CLIENT_SECRET`; the Google project, the Internal consent screen and
+the OAuth client are the owner's to make (`docs/connect-gmail.md`, one Cowork
+paste). **No session creates an OAuth app.** Other households are stages 2
+and 3 of `docs/research/inbox-connect.md` and wait on Google's review.
+
+**Tracking by number** (`src/lib/ship24.js`, pure parts in
+`src/lib/ship24-words.js`, `node scripts/check-ship24.mjs` with Ship24's own
+example payload): a parcel row with a courier and a reference is registered
+with Ship24 (`registerTracker()` from `fileEmail()`, and `registerDue()` in
+the sweep for rows from before the key existed), and Ship24's webhook
+(`/api/ship24/webhook/<token>`, token derived from `JWT_SECRET` like the
+ServiceM8 one, `SHIP24_WEBHOOK_SECRET` checked as a bearer when set) moves the
+row from the courier's scans: in transit is on its way, out for delivery, a
+failed attempt or a pickup point is missed, delivered is arrived. Stages only
+move forwards. The row's note is the courier's latest words, attributed; the
+courier's **estimated** date is never copied onto the card, because the card
+says what has happened. Gated on `SHIP24_API_KEY` (`docs/tracking-by-number.md`).
+
 ## When the window arrives and nothing has moved (`src/lib/nudge.js`)
 
 The one thing the card could not do until v1.18.0 was notice that a time the
@@ -1038,13 +1074,35 @@ under When suits you? like any other window. `dayWord()` lives in
 the card are stated only when the window is AGREED.
 
 **The pilot is four numbers** (`src/lib/pilot.js`, panel under Setup and
-settings, `node scripts/check-pilot.mjs`): links opened, "will someone be in?"
-answered, wasted trips (No one home records), and "when are you coming?" calls
-to the booking line. The product cannot see a phone ring, so the fourth is
-counted by a person and the panel says so; "Are you still coming?" taps are
-shown beside it as the nearest thing the product sees, never as calls. Decided
-11 Oct 2026: nothing moves on housing or pricing until thirty days of these
-are in.
+settings, `node scripts/check-pilot.mjs`, 19 cases): links opened, "will
+someone be in?" answered, wasted trips (No one home records), and "when are you
+coming?" calls to the booking line. The product cannot see a phone ring, so the
+fourth is typed by the trade on the panel (`TradeProfile.pilotCalls`, a +1
+button) and the panel says so; "Are you still coming?" taps are shown beside it
+as the nearest thing the product sees, never as calls. Decided 11 Oct 2026:
+nothing moves on housing or pricing until thirty days of these are in.
+
+**The counting was wrong until v1.67.0, and the audit of 19 Oct 2026 found how.**
+Four faults, each fixed where it sits:
+
+- **"Links opened" counted the trade.** Every load of `/t/<code>` added one,
+  including the dashboard's own Open buttons and the preview WhatsApp fetches
+  the moment a link is pasted, so the first pilot number read near 100% by
+  construction. `src/app/t/[code]/page.js` now counts only when
+  `countsAsCustomerView()` says so: not an operator cookie, not a user agent
+  in `PREVIEW_UA`.
+- **A wasted trip could count twice.** `queueFetch()` made the tap id only
+  when it queued, so an online attempt that timed out after the server had
+  taken it replayed as a new tap: two No one home rows, two sorry-we-missed-you
+  notes. The id is now made before the first attempt and sent with it.
+- **A wasted trip could vanish.** It was counted only while its job sat in the
+  window, so rebooking the job into the future, which is what happens after a
+  wasted trip, dropped the record. Counted by its own `startedAt` now.
+- **The thirty days rolled.** No start date, so the count reached back into
+  the weeks of test cards. `TradeProfile.pilotStart` (the Start button) is
+  the floor; until it is pressed the panel says the window is rolling and
+  includes test cards. "Answered" is a share of the jobs **asked**, not of
+  every job.
 
 ## When no notification lands: email (`src/lib/customer-email.js`)
 

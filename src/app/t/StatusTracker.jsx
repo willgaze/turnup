@@ -20,6 +20,7 @@ import { presenceOf, presenceIsFresh, presenceAgeLabel } from '@/lib/presence'
 import Mark from '@/components/Mark'
 import BuildStamp from '@/components/BuildStamp'
 import { windowLabel, positionLabel } from '@/lib/calendar'
+import { isoDay } from '@/lib/when'
 import { windowSummary, windowRevisionLine } from '@/lib/window'
 import { pauseBackLine, pauseBackDue, PAUSE_BACK } from '@/lib/pause-words'
 import { w3wUrl, mapsSearchUrl } from '@/lib/places'
@@ -102,6 +103,11 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
   // hours are agreed the day is implied and repeating it is clutter, and on a
   // job that is only booked the day is the one thing the customer came for.
   const whenLine = windowLabel(status) || (status.scheduledFor ? dayOnly(status.scheduledFor) : null)
+  // "You are 2nd today" is a fact about today. It used to show on a job
+  // booked for next week, which read as a promise about a day nobody had
+  // started (audit, 19 Oct 2026). Only on the day, in the trade's zone.
+  const jobDay = status.window?.start || status.scheduledFor
+  const positionToday = jobDay && isoDay(jobDay) === isoDay(new Date()) ? positionLabel(status.position) : null
 
   // Tint the browser's own chrome to match the page. The blend is computed by
   // the stylesheet so a stage colour stays defined in one place — but a custom
@@ -242,7 +248,7 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
           )
         })()}
 
-        {(whenLine || positionLabel(status.position)) && stage.key !== 'DONE' && (
+        {(whenLine || positionToday) && stage.key !== 'DONE' && (
           /* Two facts that usually fit on one line and sometimes do not. A
              flex row with a gap gives the browser somewhere to break, and
              nowrap on each keeps a part whole — left to itself it broke "You
@@ -253,8 +259,8 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
                 {whenLine}
               </span>
             )}
-            {positionLabel(status.position) && (
-              <span className="whitespace-nowrap text-[14px] font-medium muted">{positionLabel(status.position)}</span>
+            {positionToday && (
+              <span className="whitespace-nowrap text-[14px] font-medium muted">{positionToday}</span>
             )}
           </p>
         )}

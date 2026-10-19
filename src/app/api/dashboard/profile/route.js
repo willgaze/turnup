@@ -47,6 +47,13 @@ export async function PUT(request) {
       // pounds or nothing. Nothing else about a charge is stored anywhere.
       ...('autoFollow' in b ? { autoFollow: Boolean(b.autoFollow) } : {}),
       ...('emailFallback' in b ? { emailFallback: Boolean(b.emailFallback) } : {}),
+      // The pilot clock: 'now' starts it today, null clears it, a date sets it.
+      ...('pilotStart' in b ? { pilotStart: b.pilotStart === 'now' ? new Date() : b.pilotStart ? (Number.isNaN(new Date(b.pilotStart).getTime()) ? undefined : new Date(b.pilotStart)) : null } : {}),
+      // The hand count: a whole number, never below zero, stamped when typed.
+      ...('pilotCalls' in b ? (() => {
+        const n = Math.round(Number(b.pilotCalls))
+        return b.pilotCalls === null ? { pilotCalls: null, pilotCallsAt: null } : Number.isFinite(n) && n >= 0 ? { pilotCalls: Math.min(9999, n), pilotCallsAt: new Date() } : {}
+      })() : {}),
       // Only Google's own review surfaces. Anything else is dropped, not stored.
       ...('reviewUrl' in b ? { reviewUrl: cleanReviewUrl(b.reviewUrl) } : {}),
       ...('noticeHours' in b ? { noticeHours: Math.min(336, Math.max(1, Math.round(Number(b.noticeHours)) || 24)) } : {}),

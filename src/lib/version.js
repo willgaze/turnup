@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.66.0'
+export const VERSION = '1.67.0'
 export const BUILD_DATE = '2026-10-19'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 48
+export const THEME_INDEX = 49
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,11 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.67.0', date: '2026-10-19', notes: [
+    'The pilot numbers count what they say. Links opened no longer counts your own opens or the preview a messaging app fetches when the link is pasted. A wasted trip is counted on the day it happened, so rebooking the job no longer loses it, and a tap that timed out no longer records it twice. The thirty days start when you press Start on the panel; before that the panel says the window is rolling. Calls to the booking line are typed on the panel with one button.',
+    'Where the card hears from: two new sources on the dashboard, both off until their setting exists. Read my own inbox connects your Google Workspace mailbox and files delivery emails on one card every five minutes, with no forwarding rule. Track parcels by their number hands a courier reference to Ship24 and the courier\'s own scans move the row from then on. Each panel shows exactly what it needs and ends in a Check now or a tracked count.',
+    'Honest words: You are 2nd today shows only on the day; the roadmap says the van lookup is live, that door photos are yours alone, and that the wallet card does not carry your logo yet; the homepage no longer says the wallet card moves on its own.',
+  ] },
   { version: '1.66.0', date: '2026-10-19', notes: [
     'Are you still coming? no longer crashes the customer\'s page. If the page was open when the window started, it went to Application error, at the exact moment a customer was watching for you. Found in an audit, reproduced in a browser, fixed, and a new check fails any change that brings it back.',
     'The household card\'s email reader is proven in every client: Gmail, Outlook and Apple Mail forwards, each at ordered, on its way, out for delivery and delivered. Dispatched never files as arrived in any of them. "Ordered:" (Amazon\'s wording) and "you ordered" now count as an order. The test emails use invented people and addresses only.',
