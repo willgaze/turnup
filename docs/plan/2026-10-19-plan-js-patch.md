@@ -7,10 +7,11 @@ run `node scripts/check-current.mjs`.
 
 **Applied 19 Oct 2026, on the owner's word that night.** Another session had
 already landed the letterbox, van-lookup and pilot rows and dropped the DVSA
-tap (main at v1.68.0); this branch applied the rest to `src/lib/plan.js`. Not
-applied, left for the next build because they sit outside `plan.js`: the
-roadmap's `dvla` state, the hero sub-line in `sections-now.jsx`, and the DVSA
-paragraph in `Profile.jsx`. The text below is the patch as written.
+tap (main at v1.68.0); this branch applied the rest to `src/lib/plan.js`. The two
+lines outside `plan.js` followed the same night on the owner's word: the
+roadmap's `dvla` item (already `live` on main; moved from Built, waiting on
+someone else to Working now) and the hero sub-line in `sections-now.jsx`. The
+DVSA paragraph in `Profile.jsx` is left: it is the how-to for a second trade. The text below is the patch as written.
 
 ## STATUS
 
