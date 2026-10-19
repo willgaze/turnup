@@ -5,8 +5,12 @@ version). Every change is an exact old string and its replacement, read from
 `main` at v1.65.3. Apply, then set `PLAN_META.updated` to the build date and
 run `node scripts/check-current.mjs`.
 
-Not applied by the review itself: two other sessions were building in `src/`
-that night, so the review only wrote this down.
+**Applied 19 Oct 2026, on the owner's word that night.** Another session had
+already landed the letterbox, van-lookup and pilot rows and dropped the DVSA
+tap (main at v1.68.0); this branch applied the rest to `src/lib/plan.js`. Not
+applied, left for the next build because they sit outside `plan.js`: the
+roadmap's `dvla` state, the hero sub-line in `sections-now.jsx`, and the DVSA
+paragraph in `Profile.jsx`. The text below is the patch as written.
 
 ## STATUS
 

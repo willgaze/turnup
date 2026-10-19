@@ -55,9 +55,9 @@ export const ROADMAP_COUNTS = ALL_ITEMS.reduce(
 export const MOATS = [
   {
     n: '1', name: 'The household end', line: 'A courier holds a parcel for a day. We hold the home for years.',
-    today: ['Which door, the dog, what3words: live', 'Will someone be in: live, four taps, asked the day before', 'Answers stay on the device that gave them: live', 'A household card per address: the plumber, the sofa, the parcels, from forwarded email. Live 12 Oct 2026', 'A person told from a parcel: Coming to the door before Also arriving'],
-    missing: ['A household makes its own card; today the trade gives one', 'Remembered for the next trade', 'Who is allowed to ask if you are in'],
-    gate: 'A second trade reads what the first one learned', pct: 70,
+    today: ['Which door, the dog, what3words: live', 'Will someone be in: live, four taps, asked the day before', 'Answers stay on the device that gave them: live', 'A household card per address: the plumber, the sofa, the parcels, from forwarded email. Live 12 Oct 2026', 'A person told from a parcel: Coming to the door before Also arriving', 'A home makes its own card on /join: live 18 Oct 2026'],
+    missing: ['Remembered for the next trade', 'Who is allowed to ask if you are in'],
+    gate: 'A second trade reads what the first one learned', pct: 75,
   },
   {
     n: '2', name: 'Recognition', line: 'When the plumber, the cleaner and the courier send the same card, a big firm adopting it is a tick-box.',
@@ -67,7 +67,7 @@ export const MOATS = [
   },
   {
     n: '3', name: 'One integration', line: 'Both wallets, the update loop, push, SMS fallback, the privacy rules. They would rather buy that than own it.',
-    today: ['Apple pass signing: built, unsigned', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Privacy rules: written and checked by script'],
+    today: ['Apple pass signing: built, unsigned', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Email through ServiceM8 when push cannot reach a phone', 'Privacy rules: written and checked by script'],
     missing: ['A signed pass in a real wallet', 'Google Wallet', 'The pass update web service', 'An API another firm can call'],
     gate: 'A firm that is not customer zero calls the API', pct: 40,
   },
@@ -85,6 +85,9 @@ export const STATUS = [
   { item: 'Email letterbox (Cloudflare)', state: 'green', note: 'receiving since 18 Oct 2026: in.getturnup.com, a Worker, /api/inbound; forwarded emails land on the card' },
   { item: 'Pilot: thirty days, four numbers', state: 'amber', note: 'panel built, counting fixed 19 Oct 2026 (own opens and link previews no longer count); the clock starts when Start is pressed on the panel' },
   { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live 18 Oct 2026: the plate fills in make, model and colour' },
+  { item: 'Privacy policy', state: 'green', note: 'a public page, getturnup.com/privacy, since 17 Oct 2026' },
+  { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },
+  { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; compiles the day the Apple enrolment is active' },
   { item: 'Apple Wallet card', state: 'amber', note: 'signing built; the Apple enrolment is under review and Apple asks to be contacted' },
   { item: 'Google Wallet card', state: 'red', note: 'not built; decide whether to build on a pass platform' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
@@ -94,8 +97,8 @@ export const STATUS = [
 
 /** The three things only the owner can move, each with the link and the step. */
 export const WAITING_ON_OWNER = [
+  { label: 'Start the thirty-day count', step: 'Press Start on the pilot panel: the thirty days count from that day, not from whenever you look. The app counts three numbers; you type the calls to the booking line on the same panel. Move 1', href: 'https://www.getturnup.com/dashboard?open=pilot' },
   { label: 'Ring Apple about the enrolment', step: 'Under review since 14 Oct and Apple asks to be contacted. Membership and Account, Program Enrollment, phone. Move 2 and the lock-screen app wait on it', href: 'https://developer.apple.com/contact/' },
-  { label: 'Start the thirty-day count', step: 'Press Start on the pilot panel: the thirty days count from that day, not from whenever you look. The app counts three numbers; you type the calls to the booking line on the same panel. Move 1', href: 'https://www.getturnup.com/dashboard' },
   { label: 'ServiceM8 developer account', step: 'Free. Puts every TurnUp event in the job diary and opens the add-on listing. Move 3', href: 'https://www.servicem8.com/developer-registration' },
 ]
 
@@ -119,12 +122,13 @@ export const PRODUCT = {
     { label: 'Agree a window, never announce one', note: 'either end proposes, the other agrees; a move is shown as a move, the first hours kept' },
     { label: 'Asked the day before, once', note: 'at four, trade’s own time: still fine, someone else will be in, or move it' },
     { label: 'Will someone be in?', note: 'answers stay on the device that gave them' },
-    { label: 'Who is coming, with a face', note: 'name, van, plate and a photo, from On my way' },
+    { label: 'Who is coming, with a face', note: 'name, van, plate and a photo, from On my way; the plate fills the van in, from the DVSA MOT record' },
     { label: 'Paused, and when you are back', note: 'seven fixed words, with the time they were said' },
     { label: 'A buzz on the lock screen', note: 'set off, arrived, done; the trade’s name and the stage, nothing else' },
     { label: 'Terms agreed before the day', note: 'one tap, the words kept; TurnUp never takes a fee' },
     { label: 'How did it go?', note: 'a review or a private note, both doors always open' },
-    { label: 'A household card per address', note: 'the plumber, the sofa, the parcels, from forwarded email' },
+    { label: 'A household card per address', note: 'the plumber, the sofa, the parcels, from forwarded email; a home makes its own on /join' },
+    { label: 'Email when no notification lands', note: 'set off, window missed, the day-before ask; through ServiceM8, from the trade’s own address, once per job' },
     { label: 'ServiceM8 sends the link', note: 'every booking followed; check-in moves the card to On site, completion to Job done' },
     { label: 'Apple Wallet card', note: 'signing built, pending Apple' },
     { label: 'Old links keep working', note: 'tradestatus.vercel.app still serves' },
@@ -250,9 +254,9 @@ export const CALC_DEFAULTS = { freeSenders: 50, newFree: 20, enterprises: 0, new
 export const GTM_PHASES = [
   { phase: '1', label: 'Prove it on my own jobs', gate: 'Thirty days, four numbers', moves: ['ServiceM8 connected, the link in every booking text', 'Asked the day before: will someone be in? Built 11 Oct 2026', 'Links opened, “in?” answered, wasted trips, “when are you coming?” calls', 'If the first two stay low, the product is wrong, not the pitch'], when: 'Now', state: 'amber' },
   { phase: '2', label: 'Sign the pass', gate: 'One card in one wallet', moves: ['Apple Developer, as an individual', 'First real pass, on the owner’s phone', 'The update loop so it moves'], when: 'Now', state: 'amber' },
-  { phase: '3', label: 'Be ServiceM8’s card', gate: 'Ten ServiceM8 trades sending', moves: ['Connector live on customer zero: done, 9 Oct 2026', 'Add-on listing: written 17 Oct 2026; public release needs an account per trade', 'An account per trade, so a second business can sign up', 'Stage vocabulary published'], when: 'Q4 2026', state: 'gray' },
+  { phase: '3', label: 'Be ServiceM8’s card', gate: 'Ten ServiceM8 trades sending', moves: ['Connector live on customer zero: done, 9 Oct 2026', 'Add-on listing: written 17 Oct 2026; public release needs an account per trade and a support mailbox', 'Ask ten ServiceM8 trades, once, whether they would pay £9.99 a month: the research’s one cheap test, before any billing is built', 'An account per trade, so a second business can sign up', 'Stage vocabulary published'], when: 'Q4 2026', state: 'gray' },
   { phase: '4', label: 'Android, on a pass platform if faster', gate: 'Both wallets live', moves: ['Decide: PassKit or our own', 'Google Wallet pass class', 'Same update loop'], when: 'Q1 2027', state: 'gray' },
-  { phase: '5', label: 'The household asks for it', gate: 'Household-requested cards outnumber trade-sent', moves: ['The household card exists, 12 Oct 2026; a household makes its own, today the trade gives it', 'Customer-invite: one screen', 'Remembered for the next trade'], when: '2027 H1', state: 'gray' },
+  { phase: '5', label: 'The household asks for it', gate: 'Household-requested cards outnumber trade-sent', moves: ['The household card exists, 12 Oct 2026; a home makes its own on /join since 18 Oct', 'Customer-invite: one screen', 'Remembered for the next trade'], when: '2027 H1', state: 'gray' },
   { phase: '6', label: 'Enterprise: housing first, then carriers', gate: 'One free pilot, one paid contract', moves: ['Parked 11 Oct 2026 until move 1 has its numbers', 'Resident card beside their repairs system; attendance record built', 'Ombudsman cases as the deck; the Ltd before any contract', 'Then a button in a carrier’s email, then energy, broadband, water'], when: '2027 H2', state: 'gray' },
 ]
 
@@ -272,7 +276,7 @@ export const RECENT_RELEASES = CHANGELOG.filter((r) => {
 export const RISKS = [
   { label: 'Apple or Google add visits to Wallet', likelihood: 'medium', answer: 'Service visits, Android, the two-way question. Move fast on the pass', kind: 'estimate' },
   { label: 'Descartes bundles Localz into enterprise deals', likelihood: 'medium', answer: 'Sell under them, one to fifty vans. Be the card their SMS opens', kind: 'estimate' },
-  { label: 'ServiceM8 ships its own pass', likelihood: 'high', answer: 'Be their card first. Public standard', kind: 'estimate' },
+  { label: 'ServiceM8 ships a reopenable status page', likelihood: 'high', answer: 'Be their card first: the add-on in their store, the record they do not keep. Public standard', kind: 'estimate' },
   { label: 'Free for everyone earns nothing for a year', likelihood: 'high', answer: 'Hosting is pence a card. The Ltd and a raise decision come before the first enterprise', kind: 'estimate' },
   { label: 'The owner has no spare hours', likelihood: 'high', answer: 'The nightly build does the building', kind: 'estimate' },
   { label: 'Apple never signs the pass', likelihood: 'low', answer: 'The link works without it. The card is the upgrade, not the floor', kind: 'estimate' },
@@ -363,7 +367,7 @@ export const DECISIONS = [
   { key: 'householdCard', question: 'Does the household card join the pilot?', options: ['Wait: my own jobs first', 'My own customers get one now', 'Only once a household asks'], decided: 'Wait: my own jobs first', decidedAt: '11 Oct 2026', note: 'The job link is the pilot. The household card keeps building in the background and stays secondary until the four numbers are in.' },
   { key: 'pricing', question: 'Who pays?', options: ['Nobody, for now', 'Free for every sender; enterprise per card', 'Trades: a monthly plan', 'Trades: activation, then features'], decided: 'Free for every sender; enterprise per card', decidedAt: '9 Oct 2026', note: 'Third shape of the day. The card has to spread; only an enterprise is already paying for missed visits.' },
   { key: 'firstMoat', question: 'Which moat first?', options: ['The household end', 'Recognition: customer-invite', 'One integration: the API and spec'], decided: 'The household end', decidedAt: '9 Oct 2026' },
-  { key: 'firstWedge', question: 'First enterprise wedge?', options: ['Social housing', 'Energy supplier', 'Broadband provider', 'Water company'], decided: 'Social housing', decidedAt: '10 Oct 2026', note: 'No incumbent tracker, a repairs manager you can meet, and a tenancy is already an account per address: the first wedge and the first moat are one build.' },
+  { key: 'firstWedge', question: 'First enterprise wedge?', options: ['Social housing', 'Energy supplier', 'Broadband provider', 'Water company'], decided: 'Social housing', decidedAt: '10 Oct 2026', note: 'A live-ETA tracker at some contractors (Fortem), none with Paused, the day-before answer or a record; a repairs manager you can meet; and a tenancy is already an account per address: the first wedge and the first moat are one build.' },
   { key: 'googleWallet', question: 'Google Wallet: build on a pass platform, or our own?', options: ['On a pass platform, faster', 'Our own, like Apple', 'Apple only until there is money'] },
   { key: 'perCard', question: 'Enterprise price per card, pence?', options: ['10', '25', '50'] },
   { key: 'entity', question: 'Which company owns TurnUp?', options: ['New Ltd', 'Existing dormant Ltd', 'Sole trader for now', 'Ask the accountant first'], decided: 'New Ltd', decidedAt: '9 Oct 2026' },
@@ -382,6 +386,8 @@ export const FACTS_TABLE = [
   { figure: 'A tracking number', what: 'What a forwarded email needs before Shop will read it. A sofa with a Tuesday window has none; nor does a boiler service', source: 'Shop help centre', href: 'https://help.shop.app/en/shop/delivery-tracking/add-a-delivery-with-email-forwarding', kind: 'fact' },
   { figure: 'Shortly after', what: 'When ServiceM8’s Track My Arrival map goes dark: once navigation ends', source: 'ServiceM8 help centre, updated 26 Feb 2026', href: 'https://support.servicem8.com/hc/en-us/articles/201190600-What-is-Track-My-Arrival', kind: 'fact' },
   { figure: '17 July 2026', what: 'Yodel merged into InPost; its tracking links now land on inpost.co.uk, which the household card reads', source: 'Wikipedia, checked 14 Oct 2026', href: 'https://en.wikipedia.org/wiki/Yodel_(company)', kind: 'fact' },
+  { figure: '£9.99, ~300 trades', what: 'What a monthly trade plan would need for a £36k run rate, by the repo’s own research. Not the decision; the number the decision was made against', source: 'docs/research/shop-competitive-landscape.md, 12 Oct 2026', href: 'https://github.com/willgaze/turnup/blob/main/docs/research/shop-competitive-landscape.md', kind: 'estimate' },
+  { figure: 'Fortem On My Way', what: 'A housing repairs contractor already texts the day before and shows a live ETA on the day. No Paused, no answer back, no record', source: 'Housing Technology', href: 'https://www.housing-technology.com/fortem-offers-on-my-way-tracking/', kind: 'fact' },
   { figure: '~$15 a seat a month', what: 'Glympse PRO, the one small-business tracker with a status vocabulary beyond the drive', source: 'TrustRadius listing', href: 'https://tr-web.dev.trustradius.com/compare-products/glympse-pro-vs-localz', kind: 'fact' },
   { figure: '16 Sept 2026', what: 'Rated People entered liquidation; Checkatrade bought the brand the next day', source: 'MyJobQuote', href: 'https://www.myjobquote.co.uk/blog/rated-people-acquired-by-checkatrade', kind: 'fact' },
   { figure: PLAN_META.liveSince, what: 'Live on getturnup.com', source: 'This repository', href: PLAN_META.repoUrl, kind: 'fact' },
