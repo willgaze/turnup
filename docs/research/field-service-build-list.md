@@ -42,7 +42,7 @@ capability we do not have) · No.
 | Feature | Verdict | Status |
 |---|---|---|
 | Prompted reconstruction: "near this address since 09:04 — use it?", "no activity since 10:40 — were you away?" | Improve | Later — needs fixes captured at each tap first |
-| "On my way" offered automatically at the previous job's Job done | Improve | Next |
+| "On my way" offered automatically at the previous job's Job done | Improve | Done 1.70.0 — tap Job done and the card offers On my way to the earliest job still Booked in today, one tap, nothing sent until pressed; "that was the last one today" otherwise |
 | Ordered day with running expected start; next customer told only if the shift leaves their window | Improve | Later |
 | "You are next" / stop count on the customer page | Improve | Done (position: "You are 2nd today"), a number the trade types; shown only on the day since 1.67.0 |
 | Confirmation re-sent on every reschedule, however the booking moved | Copy | Done 1.38.0 — Follow every booking texts the new hours once a move has settled, through ServiceM8, with the old hours in brackets |

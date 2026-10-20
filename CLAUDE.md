@@ -1180,6 +1180,21 @@ page opened) and gone after the fix. The check reads every component's
 top-level lines and fails a `useX(` that follows a top-level return; it
 carries a self-test with the original bug. Run it before every push.
 
+## Job done? On my way to the next one, offered (`src/lib/next-job.js`)
+
+v1.70.0. The moment one job ends is the moment the next customer most wants
+"on my way" and the moment the trade is packing a van. So a Job done tap on
+the dashboard puts a card at the top: *On your way to Janet?* with the job,
+the address and the hours, and one button that is the same `patch(id,
+{stage: 'ON_MY_WAY'})` as the stage button, so push, the email fallback and
+the ServiceM8 diary all follow. **Nothing is sent until it is tapped**; Not
+yet puts it away, and the offered job moving on its own takes it away. Next
+means the earliest job still Booked in for **today in the trade's zone**, by
+window, then by day, then by the typed position; tomorrow's job is never
+pulled forward and a job with no day is not today's. If nothing else is
+booked today the card says so once. `node scripts/check-next-job.mjs` (9
+cases, the clock change included). It never names a time.
+
 ## A tap with no signal still counts (`src/app/dashboard/offline-queue.js`)
 
 Every write from the dashboard that is safe to replay — a stage tap, a note, a

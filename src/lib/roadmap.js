@@ -13,6 +13,8 @@ export const PHASES = [
     title: 'Working now',
     blurb: 'Everything below is live on this app today.',
     items: [
+      { key: 'next-job', name: 'Job done? On my way to the next one, offered', state: 'live',
+        what: 'Tap Job done and the dashboard asks whether you are heading to the next job booked today, with their name and hours. One tap sends On my way, the same as the button on their card. Nothing goes until you tap, and it never offers tomorrow\u2019s job or a time.' },
       { key: 'ask-or-tell', name: 'Ask it or tell it', state: 'live',
         what: 'The box at the top of the dashboard. "What is on today?" gets an answer. "On my way to Whitfield", "paused on Hale, waiting on the cylinder", a pasted booking email: a card to confirm. It never saves anything itself and never promises a time. The rest of the dashboard learns you one tip at a time.',
         needs: 'Live since 11 Oct 2026. About a penny a go.' },

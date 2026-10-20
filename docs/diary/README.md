@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.70.0](./v1.70.0/) | 2026-10-20 | Indigo — Job done? On my way to the next one, offered |
 | [v1.69.0](./v1.69.0/) | 2026-10-19 | Clay — the trade's lock screen stops naming customers; one vocabulary, one check |
 | [v1.68.0](./v1.68.0/) | 2026-10-19 | Slate — a reminder that stops: three buzzes, nothing overnight, and Stop reminders on the card |
 | [v1.67.0](./v1.67.0/) | 2026-10-19 | Moss — the pilot numbers count what they say; Gmail and tracking-by-number sources built, dark until their keys |

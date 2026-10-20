@@ -24,6 +24,7 @@ import NoAccess from './NoAccess'
 import Pilot from './Pilot'
 import Sm8Week from './Sm8Week'
 import { AttendanceSheet } from './Pictures'
+import { nextJobAfterDone, leftToday } from '@/lib/next-job'
 import { queueFetch, startQueue, onQueue } from './offline-queue'
 import { presenceOf, presenceIsFresh, presenceAgeLabel } from '@/lib/presence'
 import { dayAndTime } from '@/lib/when'
@@ -186,10 +187,19 @@ export default function Console({ assistant = false }) {
   }, [load])
   const queuedFor = (id) => queued.filter((q) => q.url === `/api/dashboard/trackers/${id}` || q.url.startsWith(`/api/dashboard/trackers/${id}/`))
 
+  // Job done, so who is next? The offer card at the top of the list: the
+  // earliest job still Booked in today, one tap to set off, nothing sent
+  // until it is pressed (src/lib/next-job.js). Dismissed by Not yet, by a
+  // tap, or by the offered job moving on its own.
+  const [offer, setOffer] = useState(null)
   const patch = async (id, body) => {
     // Optimistic: signal is patchy in a van, and a button that does nothing for
     // three seconds gets pressed four times.
     setTrackers((rows) => rows.map((r) => (r.id === id ? { ...r, ...body } : r)))
+    if (body.stage === 'DONE') {
+      const next = nextJobAfterDone(trackers, id)
+      setOffer(next ? { id, next: next.id } : { id, next: null, left: leftToday(trackers, id) })
+    } else if (body.stage && offer && (id === offer.next || id === offer.id)) setOffer(null)
     let ok = false
     try {
       const r = await queueFetch(`/api/dashboard/trackers/${id}`, { method: 'PATCH', body })
@@ -201,6 +211,7 @@ export default function Console({ assistant = false }) {
     } finally { await load() }
     return ok
   }
+  const offered = offer?.next ? trackers.find((t) => t.id === offer.next && t.stage === 'BOOKED') : null
 
   const revoke = async (id) => {
     try {
@@ -374,6 +385,33 @@ export default function Console({ assistant = false }) {
           read from ServiceM8 itself. Renders nothing unless it is connected
           and there is something coming. */}
       <Sm8Week />
+
+      {offer && (offered || offer.next === null) && (
+        <section className="glass r-outer tone-onmyway mt-6 p-4" aria-live="polite">
+          {offered ? (
+            <>
+              <p className="text-[16px] font-semibold">Job done. On your way to {offered.customerName ? offered.customerName.split(' ')[0] : 'the next one'}?</p>
+              <p className="mt-0.5 text-[14px] muted">
+                {[offered.jobSummary, offered.jobAddress].filter(Boolean).join(' · ') || 'Next job booked for today.'}
+                {offered.windowStart ? ` Window from ${new Date(offered.windowStart).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' })}.` : ''}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button type="button" onClick={() => { const id = offered.id; setOffer(null); patch(id, { stage: 'ON_MY_WAY' }) }}
+                        className="btn tone-onmyway stage-seg stage-seg-on !min-h-[44px] !px-4 !text-[15px]">
+                  <StageIcon tone={STAGES.ON_MY_WAY.tone} size={18} /> <span>On my way to {offered.customerName ? offered.customerName.split(' ')[0] : 'them'}</span>
+                </button>
+                <button type="button" onClick={() => setOffer(null)} className="btn btn-grey !min-h-[44px] !px-4 !text-[15px]">Not yet</button>
+              </div>
+              <p className="mt-2 text-[12px] muted">Tells them you have set off, the same as the button on their card. Nothing is sent until you tap.</p>
+            </>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-[15px] font-semibold">Job done. That was the last one booked for today.</p>
+              <button type="button" onClick={() => setOffer(null)} className="btn btn-grey !min-h-[40px] !px-3.5 !text-[14px]">OK</button>
+            </div>
+          )}
+        </section>
+      )}
 
       {loading ? null
        : trackers.length === 0 ? <p className="mt-8 text-center text-[15px] muted">No jobs yet.</p>

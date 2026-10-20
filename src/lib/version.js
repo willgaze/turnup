@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.69.0'
-export const BUILD_DATE = '2026-10-19'
+export const VERSION = '1.70.0'
+export const BUILD_DATE = '2026-10-20'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 51
+export const THEME_INDEX = 52
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.70.0', date: '2026-10-20', notes: [
+    'Job done? On my way to the next one, offered. Tap Job done and a card at the top asks whether you are heading to the next job booked today, with their name, the job and the hours. One tap sends On my way, exactly as the button on their card would: push, the email fallback, the ServiceM8 diary. Not yet puts it away. If nothing else is booked today it says so. It never offers tomorrow\'s job and never names a time.',
+  ] },
   { version: '1.69.0', date: '2026-10-19', notes: [
     'Your lock screen stops naming your customers. Ten notifications to your phone carried a first name \u2014 "Sarah\u2019s window has started", "Sarah left a note after the job" \u2014 and one of them put the customer\u2019s own private note straight in the body, which is the thing the rule in this product bans hardest. The rule was written for the customer\u2019s phone and had simply never been applied to yours. Your phone sits on a kitchen table too.',
     'The cost, so it is your call and not a surprise: with four jobs on, the lock screen no longer says which one it is about. You tap, and the dashboard says. A name is the only thing that could tell them apart and a name is the thing that should not be there.',
