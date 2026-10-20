@@ -165,6 +165,25 @@ privacy decision, not a copy one.
 The no-promised-time rule applies here hardest. "Has set off" is a fact. A push
 notification is the very worst place to promise an arrival.
 
+**The same rule binds the TRADE's phone, and for nine versions it did not**
+(v1.69.0). Everything above was written for the customer's side and silently
+skipped on the trade's: ten notifications named the customer, and
+`feedbackLeft` put the customer's own private note in the body, which is
+`stageNote` by another name. A trade's phone sits on a kitchen table too, and
+the people who pick it up are their family. So **`TRADE_LINES` in
+`src/lib/trade-push-words.js` is the whole vocabulary for that side**, the way
+`LINES` is for the customer's, and no builder in it takes a customer-supplied
+argument — the leak is impossible rather than merely avoided. The cost is
+real and was accepted knowingly: with four jobs on, the lock screen cannot say
+which one it is about, so the trade taps and the dashboard says. A name is the
+only thing that could tell them apart, and a name is the thing that must not
+be there. `node scripts/check-trade-push.mjs` proves both halves — that no
+line can leak, and that no call site has gone back to building its own — and
+carries the five shapes the bug really took so it fails if it stops catching
+them. The Live Activity in `native/` is still the one exception, because it
+renders on the trade's own screen inside their own app rather than on a lock
+screen anyone can read.
+
 **Push never blocks a stage change.** `notifyStage()` is called un-awaited from
 the tracker PATCH handler and swallows everything: the trade tapped a button on
 a driveway and is waiting on that response, and a push service having a bad

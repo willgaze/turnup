@@ -25,6 +25,7 @@
  * without a database or a bundler. nudge.js does the sending.
  */
 import { isoDay, zoned, atLocalTime } from './when.js'
+import { TRADE_LINES } from './trade-push-words.js'
 
 export const MAX_ASK_NUDGES = 3
 export const QUIET_FROM = 21
@@ -85,23 +86,14 @@ export function askNudgeDue(t, now = new Date()) {
   if (inQuietHours(now)) return null
 
   const asked = new Date(t.askedAt)
-  const body = (lead) => `${lead} Open the card to reply, or to stop the reminders.`
 
   if (morningSummaryDue(t, now)) {
-    return {
-      kind: 'ask', ask: true, spend: MAX_ASK_NUDGES,
-      title: 'A customer is asking',
-      body: body(`"Are you still coming?" has been waiting since yesterday and is still unanswered.`),
-    }
+    return { kind: 'ask', ask: true, spend: MAX_ASK_NUDGES, ...TRADE_LINES.askOvernight() }
   }
 
   if ((t.askNudges || 0) >= MAX_ASK_NUDGES) return null
   const paced = !t.nudgedAt || new Date(t.nudgedAt) < asked || now - new Date(t.nudgedAt) >= REPEAT_MS
   if (!paced) return null
 
-  return {
-    kind: 'ask', ask: true,
-    title: 'A customer is asking',
-    body: body(`"Are you still coming?" — asked earlier, no answer yet.`),
-  }
+  return { kind: 'ask', ask: true, ...TRADE_LINES.askWaiting() }
 }

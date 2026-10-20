@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { TRADE_LINES } from '@/lib/trade-push-words'
 import { pushTrade } from '@/lib/push'
 import { diaryFor } from '@/lib/sm8-oauth'
 
@@ -31,7 +32,9 @@ export async function POST(request, { params }) {
       customerLateMinutes: m, customerLateAt: now,
       events: { create: { stage: row.stage, note: m ? `Customer says about ${m} minutes late.` : 'Customer says they are there now.' } },
     } })
-    const r = await pushTrade({ title: line, body: m ? `Said at ${hhmm(now)}. Expect them from about ${hhmm(now.getTime() + m * 60_000)}.` : `Said at ${hhmm(now)}.`, tag: `nudge-${row.code}` })
+    // `line` is the record and the diary, which are behind the password. The
+    // notification says the same thing without naming them.
+    const r = await pushTrade({ ...TRADE_LINES.customerLate(m, hhmm(now), m ? hhmm(now.getTime() + m * 60_000) : null), tag: `nudge-${row.code}` })
     diaryFor(updated, `${line} (${hhmm(now)})`).catch(() => {})
     return NextResponse.json({ ok: true, customerLateAt: now.toISOString(), minutes: m, sent: r.sent })
   } catch (error) {
