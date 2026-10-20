@@ -46,7 +46,7 @@ export function WhereWeAre({ readOnly }) {
     <Section kicker="Where we are" title={`Version ${VERSION}, live since ${PLAN_META.liveSince}`}>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Hero value={ROADMAP_COUNTS.live} label="features live" sub="counted from the roadmap" kind="fact" />
-        <Hero value={ROADMAP_COUNTS.ready} label="built, waiting on a key" sub="Apple, DVSA, ServiceM8" kind="fact" />
+        <Hero value={ROADMAP_COUNTS.ready} label="built, waiting on a key" sub="Apple: the pass and the lock-screen app" kind="fact" />
         <Hero value={ROADMAP_COUNTS.idea} label="ideas, not built" sub="and said so" kind="fact" />
         <Hero value={RECENT_RELEASES} label="releases this week" sub="from the changelog, each with a diary" kind="fact" />
       </div>

@@ -90,6 +90,8 @@ export const PHASES = [
         what: 'A message to the customer in plain words: the window has passed, sorry, and three buttons — wait, later today, rebook. You then offer the new hours from the card; nothing invents them. Sent on an objective trigger, the way Ofcom and Ofgem fire a payment, not left to whoever remembers.' },
       { key: 'not-home', name: 'Customer not home, in one tap', state: 'live',
         what: 'Door photo, location fix, two logged attempts, a short wait, and a sorry-we-missed-you message with a rebook link. The evidence a carrier keeps, from a one-van firm. A fee only if it was agreed in the booking and no notice was given.' },
+      { key: 'dvla', name: 'Van details from the number plate', state: 'live',
+        what: 'Type the plate and the make, model and colour fill themselves in, from the DVSA MOT history record. DVLA is the fallback and has no model. Live since 18 Oct 2026.' },
     ],
   },
   {
@@ -103,8 +105,6 @@ export const PHASES = [
       { key: 'wallet-pass', name: 'The card in Apple Wallet', state: 'ready',
         what: 'Updates itself on the lock screen when you tap a stage.',
         needs: 'Apple Developer Program, £79/yr' },
-      { key: 'dvla', name: 'Van details from the number plate', state: 'live',
-        what: 'Type the plate and the make, model and colour fill themselves in, from the DVSA MOT history record. DVLA is the fallback and has no model. Live since 18 Oct 2026.' },
       { key: 'google-wallet', name: 'The same card on Android', state: 'idea',
         what: 'Google Wallet pass alongside the Apple one.',
         needs: 'Google Wallet issuer account, free' },

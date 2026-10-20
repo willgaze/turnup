@@ -5,8 +5,13 @@ version). Every change is an exact old string and its replacement, read from
 `main` at v1.65.3. Apply, then set `PLAN_META.updated` to the build date and
 run `node scripts/check-current.mjs`.
 
-Not applied by the review itself: two other sessions were building in `src/`
-that night, so the review only wrote this down.
+**Applied 19 Oct 2026, on the owner's word that night.** Another session had
+already landed the letterbox, van-lookup and pilot rows and dropped the DVSA
+tap (main at v1.68.0); this branch applied the rest to `src/lib/plan.js`. The two
+lines outside `plan.js` followed the same night on the owner's word: the
+roadmap's `dvla` item (already `live` on main; moved from Built, waiting on
+someone else to Working now) and the hero sub-line in `sections-now.jsx`. The
+DVSA paragraph in `Profile.jsx` is left: it is the how-to for a second trade. The text below is the patch as written.
 
 ## STATUS
 
@@ -126,9 +131,30 @@ Add, after the Glympse row:
   updated: '<the build date>',
 ```
 
-## If the DVSA keys have gone into Vercel
+## Van lookup: live, owner confirmed 19 Oct 2026
 
-Only then: the STATUS van row and WAITING_ON_OWNER's DVSA entry go, the
-roadmap's `dvla` moves to `live`, and PRODUCT.does' "Van make, model, colour"
-note drops "pending key". The review could not see Vercel's settings, so this
-is conditional.
+STATUS, old:
+```
+  { item: 'Van lookup (DVSA MOT API)', state: 'amber', note: 'DVSA approved 14 Oct; three settings in Vercel to go' },
+```
+New:
+```
+  { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live since 18 Oct 2026: type the plate, make, model and colour fill themselves in' },
+```
+
+WAITING_ON_OWNER: delete the `DVSA keys into Vercel` entry. Three taps remain.
+
+PRODUCT.does, old:
+```
+    { label: 'Van make, model, colour', note: 'DVSA lookup, pending key' },
+```
+New:
+```
+    { label: 'Van make, model, colour', note: 'from the plate, DVSA MOT history; live 18 Oct 2026' },
+```
+
+Outside `plan.js`, same build:
+
+- `src/lib/roadmap.js`: `dvla` moves from `ready` to `live`, under Working now; its `needs` line goes.
+- `src/app/plan/sections-now.jsx`: the hero sub-line `"Apple, DVSA, ServiceM8"` becomes `"Apple"`.
+- `src/app/dashboard/Profile.jsx`: the paragraph telling the owner to register with DVSA and put three settings in Vercel is now for a second trade, not this one; read it before leaving it.
