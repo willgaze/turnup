@@ -83,7 +83,7 @@ export async function replyNoAccess(tracker, noAccessId, choice) {
   await prisma.tradeStatus.update({ where: { id: tracker.id }, data: { events: { create: { stage: tracker.stage, note: `After no access: ${who} ${REPLIES[choice]}.` } } } })
   const next = choice === 'HERE' ? 'Go back if you still can, or say how long.' : 'Set new hours on the card.'
   diaryFor(tracker, `After no access: ${who} ${REPLIES[choice]}.`).catch(() => {})
-  const r = await pushTrade({ title: `${who} ${REPLIES[choice]}`, body: next, tag: `nudge-${tracker.code}` })
+  const r = await pushTrade({ ...TRADE_LINES.afterNoAccess(REPLIES[choice], next), tag: `nudge-${tracker.code}` })
   return { ok: true, sent: r.sent }
 }
 

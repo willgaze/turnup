@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.68.0'
+export const VERSION = '1.69.0'
 export const BUILD_DATE = '2026-10-19'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 50
+export const THEME_INDEX = 51
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.69.0', date: '2026-10-19', notes: [
+    'Your lock screen stops naming your customers. Ten notifications to your phone carried a first name \u2014 "Sarah\u2019s window has started", "Sarah left a note after the job" \u2014 and one of them put the customer\u2019s own private note straight in the body, which is the thing the rule in this product bans hardest. The rule was written for the customer\u2019s phone and had simply never been applied to yours. Your phone sits on a kitchen table too.',
+    'The cost, so it is your call and not a surprise: with four jobs on, the lock screen no longer says which one it is about. You tap, and the dashboard says. A name is the only thing that could tell them apart and a name is the thing that should not be there.',
+    'What is left is a vocabulary rather than ten lines written in ten places (src/lib/trade-push-words.js), and nothing in it can take anything a customer supplied \u2014 there is nowhere to put it. What a notification may say is now a decision made in one file, the way it already was for the customer\u2019s side.',
+    'A check that can actually fail (node scripts/check-trade-push.mjs): it builds every line and reads it, then reads every notification call in the app as source and refuses one that passes a customer field. It carries the five shapes this bug really took, and fails if it stops catching them. A check that cannot fail is decoration.',
+  ] },
   { version: '1.68.0', date: '2026-10-19', notes: [
     'A reminder that stops. An unanswered "Are you still coming?" buzzed the trade every ten minutes for as long as it stayed open \u2014 one asked at 15:34 on 18 October went all night and was still going at breakfast. Three locks now: three buzzes in total and no more; nothing between 21:00 and 07:00 in your own zone, with one summary at seven if a question was left open across the night; and an ask belongs to the day of the job it is about, so a stale one never pushes the next morning. A reminder that has not worked three times will not work the fortieth.',
     'Stop reminders, on the card. The only way to silence a buzzing question used to be to move the stage, which tells the customer something that is not true. The button answers the question without touching the card: no stage, no note on their page, no claim that anybody has set off. For when you have already rung them.',

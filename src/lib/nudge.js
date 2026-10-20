@@ -5,6 +5,7 @@ import { dayBeforeAskDue } from '@/lib/day-before'
 import { diaryFor } from '@/lib/sm8-oauth'
 import { dayWord } from '@/lib/nudge-words'
 import { askNudgeDue, inQuietHours, askExpired, MAX_ASK_NUDGES, REPEAT_MS } from '@/lib/ask-reminder'
+import { TRADE_LINES } from '@/lib/trade-push-words'
 export { dayWord }
 export { askNudgeDue, inQuietHours, askExpired, MAX_ASK_NUDGES, QUIET_FROM, QUIET_UNTIL } from '@/lib/ask-reminder'
 
@@ -82,7 +83,7 @@ export function nudgeDue(t, now = new Date()) {
   // never told. Once the window is missed, "it has started" is stale anyway.
   if (!t.missedAt && !['ON_SITE', 'PAUSED', 'DONE'].includes(t.stage) && now >= new Date(end).getTime() + MISSED_GRACE_MS) {
     const promised = t.lateMinutes && t.lateAt ? new Date(t.lateAt).getTime() + t.lateMinutes * 60_000 + MISSED_GRACE_MS : 0
-    if (now >= promised) return { kind: 'missed', title: `${first(t)} has been told the window was missed`, body: `It ended at ${hhmm(end)}. They can choose to wait, have it later today, or rebook. Set off, say how late, or give them a new window.` }
+    if (now >= promised) return { kind: 'missed', ...TRADE_LINES.windowMissed(hhmm(end)) }
   }
   // Both of these buzz the trade and nobody else, so both sleep. They fire
   // once each (nudgeLevel), so waiting until 07:00 delays them; it never
@@ -91,10 +92,10 @@ export function nudgeDue(t, now = new Date()) {
   // the morning is a thing they are owed.
   if (inQuietHours(now)) return null
   if (t.nudgeLevel < 1 && now >= new Date(start) && t.stage === 'BOOKED') {
-    return { kind: 'start', level: 1, title: `${first(t)}'s window has started`, body: `From ${hhmm(start)}, and the card still says Booked in. Set off, or say you are running late.` }
+    return { kind: 'start', level: 1, ...TRADE_LINES.windowStarted(hhmm(start)) }
   }
   if (t.nudgeLevel < 2 && now >= new Date(end) && !['ON_SITE', 'PAUSED', 'DONE'].includes(t.stage)) {
-    return { kind: 'end', level: 2, title: `${first(t)}'s window has ended`, body: `It ran to ${hhmm(end)} and the card is not On site. Tell them where you are.` }
+    return { kind: 'end', level: 2, ...TRADE_LINES.windowEnded(hhmm(end)) }
   }
   return null
 }
@@ -130,13 +131,7 @@ export async function askPresenceIfDue(tracker, now = new Date()) {
     let e = { emailed: false }
     if (!c.sent) {
       e = await emailCustomer(tracker, 'DAY_BEFORE', c)
-      t = await pushTrade({
-        title: `${first(tracker)} is booked tomorrow`,
-        body: e.emailed
-          ? 'No notifications on their phone, so the ask went by email. Text them the link if you want to be sure.'
-          : 'They cannot be reached by notification. Text them the link so they can say whether anyone will be in.',
-        tag: `nudge-${tracker.code}`,
-      })
+      t = await pushTrade({ ...TRADE_LINES.bookedTomorrow(e.emailed), tag: `nudge-${tracker.code}` })
     }
     return { kind: 'day-before', sent: c.sent, emailed: e.emailed, tradeSent: t.sent }
   } catch (error) {
@@ -199,7 +194,7 @@ export async function ask(tracker) {
   // customer's: their first name is not needed to know which card to open,
   // and whoever picks the phone up off the table is not the person who holds
   // the link. See the lock-screen rule in CLAUDE.md.
-  const r = await pushTrade({ title: 'A customer is asking', body: `"Are you still coming?" Reply from the card: On my way, or how late.`, tag: `nudge-${tracker.code}` })
+  const r = await pushTrade({ ...TRADE_LINES.asking(), tag: `nudge-${tracker.code}` })
   return { ok: true, devices: r.devices, sent: r.sent }
 }
 
@@ -267,14 +262,14 @@ async function tellMissed(tracker, due) {
 export async function chooseAfterMissed(tracker, choice) {
   if (!MISSED_CHOICES[choice]) throw new Error('bad_choice')
   const now = new Date()
-  const line = `${first(tracker)} ${MISSED_CHOICES[choice]}`
+  const line = `${first(tracker)} ${MISSED_CHOICES[choice]}`   // for the record and the diary, never the lock screen
   await prisma.tradeStatus.update({ where: { id: tracker.id }, data: {
     missedChoice: choice, missedChoiceAt: now,
     events: { create: { stage: tracker.stage, note: `After the missed window: ${line}.` } },
   } })
   diaryFor(tracker, `After the missed window: ${line}.`).catch(() => {})
   const next = choice === 'WAIT' ? 'Set off, or say how late.' : 'Propose a new window on the card.'
-  const r = await pushTrade({ title: line, body: next, tag: `nudge-${tracker.code}` })
+  const r = await pushTrade({ ...TRADE_LINES.afterMissed(MISSED_CHOICES[choice], next), tag: `nudge-${tracker.code}` })
   return { ok: true, sent: r.sent }
 }
 
@@ -293,6 +288,6 @@ export async function replyReminder(tracker, choice) {
   } })
   diaryFor(tracker, `Reply to the day-before ask: ${line}.`).catch(() => {})
   const next = choice === 'MOVE' ? 'Offer new hours on the card; they can counter from theirs.' : choice === 'SOMEONE_ELSE' ? 'Read the door notes before you knock.' : 'Nothing to do.'
-  const r = await pushTrade({ title: line, body: next, tag: `nudge-${tracker.code}` })
+  const r = await pushTrade({ ...TRADE_LINES.reminderReply(REMINDER_REPLIES[choice], next), tag: `nudge-${tracker.code}` })
   return { ok: true, sent: r.sent, reminderReply: choice, reminderReplyAt: now.toISOString() }
 }

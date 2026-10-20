@@ -41,7 +41,7 @@ export async function reviewTapped(tracker) {
     ...(tracker.reviewClickedAt ? {} : { events: { create: { stage: tracker.stage, note: 'Customer went to leave a Google review.' } } }),
   } })
   if (!tracker.reviewClickedAt) {
-    pushTrade({ title: `${(tracker.customerName || 'The customer').split(' ')[0]} went to leave a review`, body: 'Opened your Google review link from their page.', tag: `nudge-${tracker.code}` }).catch(() => {})
+    pushTrade({ ...TRADE_LINES.reviewTapped(), tag: `nudge-${tracker.code}` }).catch(() => {})
     diaryFor(updated, 'Customer opened the Google review link').catch(() => {})
   }
   return updated
@@ -54,8 +54,10 @@ export async function feedbackLeft(tracker, text) {
     feedbackText: text, feedbackAt: now,
     events: { create: { stage: tracker.stage, note: 'Customer left a note after the job.' } },
   } })
-  const who = (tracker.customerName || 'The customer').split(' ')[0]
-  pushTrade({ title: `${who} left a note after the job`, body: text.slice(0, 120), tag: `nudge-${tracker.code}` }).catch(() => {})
+  // The note itself never goes on the lock screen: it is free text a customer
+  // typed and it can say anything, which is the same reason stageNote never
+  // does. "Left a note" is all the trade needs to go and read it.
+  pushTrade({ ...TRADE_LINES.feedbackLeft(), tag: `nudge-${tracker.code}` }).catch(() => {})
   diaryFor(updated, `Customer note after the job: ${text.slice(0, 300)}`).catch(() => {})
   return updated
 }
