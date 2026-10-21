@@ -88,7 +88,7 @@ export const STATUS = [
   { item: 'Privacy policy', state: 'green', note: 'a public page, getturnup.com/privacy, since 17 Oct 2026' },
   { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },
   { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is next' },
-  { item: 'Apple Wallet card', state: 'amber', note: 'signing built; Apple enrolment live 21 Oct 2026; the certificate is one Cowork job on the Mac (docs/cowork-apple-wallet.md)' },
+  { item: 'Apple Wallet card', state: 'amber', note: 'certificate live 21 Oct 2026: /api/passes serves a pass signed by Apple\'s chain (checked). Amber until the first card is seen in a real wallet' },
   { item: 'Google Wallet card', state: 'red', note: 'not built; decide whether to build on a pass platform' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
   { item: 'Pricing', state: 'amber', note: 'free for every sender, enterprise per card, decided 9 Oct 2026' },
@@ -98,7 +98,7 @@ export const STATUS = [
 /** The three things only the owner can move, each with the link and the step. */
 export const WAITING_ON_OWNER = [
   { label: 'Start the thirty-day count', step: 'Press Start on the pilot panel: the thirty days count from that day, not from whenever you look. The app counts three numbers; you type the calls to the booking line on the same panel. Move 1', href: 'https://www.getturnup.com/dashboard?open=pilot' },
-  { label: 'Make the Apple Wallet certificate', step: 'Enrolment live 21 Oct. One Cowork paste on the Mac: key, request, certificate, six Vercel settings, redeploy, and a 200 from /api/passes. Move 2 waits on it; the lock-screen app is the job after', href: 'https://github.com/willgaze/turnup/blob/main/docs/cowork-apple-wallet.md' },
+  { label: 'Put the first card in a wallet', step: 'Certificate done 21 Oct; /api/passes answers 200 with a signed pass. Next: Add to Apple Wallet on the owner\'s iPhone, then the badge, the roadmap and this row go live. The pass web service is the build after', href: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md' },
   { label: 'ServiceM8 developer account', step: 'Free. Puts every TurnUp event in the job diary and opens the add-on listing. Move 3', href: 'https://www.servicem8.com/developer-registration' },
 ]
 
@@ -130,7 +130,7 @@ export const PRODUCT = {
     { label: 'A household card per address', note: 'the plumber, the sofa, the parcels, from forwarded email; a home makes its own on /join' },
     { label: 'Email when no notification lands', note: 'set off, window missed, the day-before ask; through ServiceM8, from the trade’s own address, once per job' },
     { label: 'ServiceM8 sends the link', note: 'every booking followed; check-in moves the card to On site, completion to Job done' },
-    { label: 'Apple Wallet card', note: 'signing built, pending Apple' },
+    { label: 'Apple Wallet card', note: 'signed pass served since 21 Oct 2026; first wallet add still to be seen' },
     { label: 'Old links keep working', note: 'tradestatus.vercel.app still serves' },
   ],
   never: [

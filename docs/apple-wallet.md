@@ -85,6 +85,10 @@ names the `turnup` project and redeploys the live build; it never runs
 
 ## 5. What happens then
 
+**Seen on 21 Oct 2026:** `/api/passes/<code>` returned 200, a signed `.pkpass`
+for `pass.com.getturnup.job`, team `WTS45T2YD3`, and the signature verified
+against Apple's WWDR G4 chain. The first add to a real wallet is the next thing.
+
 - `/api/passes/<code>` starts returning a signed `.pkpass` instead of a 503.
 - **Add to Apple Wallet** appears on every live customer page, on Apple devices.
 - The homepage frame badge "Built · awaiting Apple" is still a static label in

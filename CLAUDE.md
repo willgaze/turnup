@@ -1522,6 +1522,10 @@ repository does not have:
   uploads the folder, key and all, to a new project named after it. It now
   links to `turnup` by name, writes `.vercelignore` with `*`, and uses
   `vercel redeploy` on the live host. Keep `vercel deploy`/`--prod` out of it.
+  **The certificate is live since 21 Oct 2026**: `/api/passes/<code>` serves a
+  signed pass and the signature verifies against Apple's chain (checked from a
+  session the same day). The badge, the roadmap and the plan stay amber until
+  the first card is seen in a real wallet.
   Still to build once a real pass is in a wallet: the `/api/passes/v1` web
   service (device registration, "what changed" and APNs pushes) so the card
   updates itself; today a pass shows the stage at the moment it was added.

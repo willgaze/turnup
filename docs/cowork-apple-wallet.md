@@ -7,9 +7,12 @@ is this certificate. A Claude session cannot start Cowork, and must not make
 the key (it would die with the container, and the certificate with it); it
 hands over the prompt. On the Mac the key lives in a folder that stays.
 
-**It ran on 21 Oct 2026.** The certificate (pass type `pass.com.getturnup.job`,
-team `WTS45T2YD3`) is good until 20 Nov 2027, and a calendar reminder on 20 Oct
-2027 says to run this again. The paste below is now the re-run.
+**It ran on 21 Oct 2026, and it worked.** The certificate (pass type
+`pass.com.getturnup.job`, team `WTS45T2YD3`) is good until 20 Nov 2027, and a
+calendar reminder on 20 Oct 2027 says to run this again. Checked the same day
+from a session: `/api/passes/<live code>` answers 200 with a `.pkpass` whose
+signature verifies against Apple's WWDR G4 chain. The paste below is now the
+re-run.
 
 **Check first.** If `https://www.getturnup.com/api/passes/<any live code>`
 already answers 200, this job is done and must not be run again: a second
