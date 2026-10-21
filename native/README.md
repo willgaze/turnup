@@ -31,8 +31,10 @@ Everything here is written and nothing here is compiled: this container has no
 Xcode. The project builds on a Mac, or on the GitHub macOS runner in
 `.github/workflows/ios.yml`, once three things exist:
 
-1. **Apple Developer Program membership** (individual, £79). The enrolment is
-   currently stuck "under review"; see the chat of 14 Oct 2026 for the call.
+1. **Apple Developer Program membership** (individual, £79). **Done:** the
+   enrolment went through on 21 Oct 2026. The wallet certificate is first
+   (`docs/cowork-apple-wallet.md`); the two items below are the app's own
+   Cowork job, still to be written.
 2. **An App ID `com.getturnup.app` with the App Groups capability**, a group
    `group.com.getturnup.app`, and the same group on `com.getturnup.app.widget`.
    Xcode's automatic signing creates these when signed in; the workflow uses

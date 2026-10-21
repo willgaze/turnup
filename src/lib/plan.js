@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '19 Oct 2026',
+  updated: '21 Oct 2026',
 }
 
 export const STAGES = [
@@ -87,8 +87,8 @@ export const STATUS = [
   { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live 18 Oct 2026: the plate fills in make, model and colour' },
   { item: 'Privacy policy', state: 'green', note: 'a public page, getturnup.com/privacy, since 17 Oct 2026' },
   { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },
-  { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; compiles the day the Apple enrolment is active' },
-  { item: 'Apple Wallet card', state: 'amber', note: 'signing built; the Apple enrolment is under review and Apple asks to be contacted' },
+  { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is next' },
+  { item: 'Apple Wallet card', state: 'amber', note: 'signing built; Apple enrolment live 21 Oct 2026; the certificate is one Cowork job on the Mac (docs/cowork-apple-wallet.md)' },
   { item: 'Google Wallet card', state: 'red', note: 'not built; decide whether to build on a pass platform' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
   { item: 'Pricing', state: 'amber', note: 'free for every sender, enterprise per card, decided 9 Oct 2026' },
@@ -98,7 +98,7 @@ export const STATUS = [
 /** The three things only the owner can move, each with the link and the step. */
 export const WAITING_ON_OWNER = [
   { label: 'Start the thirty-day count', step: 'Press Start on the pilot panel: the thirty days count from that day, not from whenever you look. The app counts three numbers; you type the calls to the booking line on the same panel. Move 1', href: 'https://www.getturnup.com/dashboard?open=pilot' },
-  { label: 'Ring Apple about the enrolment', step: 'Under review since 14 Oct and Apple asks to be contacted. Membership and Account, Program Enrollment, phone. Move 2 and the lock-screen app wait on it', href: 'https://developer.apple.com/contact/' },
+  { label: 'Make the Apple Wallet certificate', step: 'Enrolment live 21 Oct. One Cowork paste on the Mac: key, request, certificate, six Vercel settings, redeploy, and a 200 from /api/passes. Move 2 waits on it; the lock-screen app is the job after', href: 'https://github.com/willgaze/turnup/blob/main/docs/cowork-apple-wallet.md' },
   { label: 'ServiceM8 developer account', step: 'Free. Puts every TurnUp event in the job diary and opens the add-on listing. Move 3', href: 'https://www.servicem8.com/developer-registration' },
 ]
 

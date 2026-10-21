@@ -37,6 +37,14 @@ and it takes weeks.
 - Pay £79. Apple then verifies you. Usually a day, sometimes two; you get an
   email saying the membership is active.
 
+## Enrolled on 21 Oct 2026. Steps 2 to 4 are one Cowork job on the Mac
+
+The enrolment is through. Steps 2, 3 and 4 below are written out as a single
+paste for Cowork in `docs/cowork-apple-wallet.md`: it makes the key in a
+folder on the Mac that survives, uploads the request, downloads the
+certificate, turns it into the six settings, puts them in Vercel, redeploys
+and proves a pass is served. Read on only to understand what that job does.
+
 ## 2. Make the key and the request — ONLY once the membership is live
 
 **Do steps 2 to 4 in one sitting, and not before the "your membership is

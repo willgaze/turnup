@@ -19,6 +19,10 @@
 # takes a day or two; the container will not last that long. Wait for the
 # "your membership is active" email, then do all of it at once.
 #
+# Better still, run it on the owner's own Mac, where ./apple/ survives: that is
+# the Cowork job in docs/cowork-apple-wallet.md. It needs only curl and the
+# openssl every Mac ships with.
+#
 # Why not Keychain Access: Apple's instructions assume a Mac and a trip through
 # Certificate Assistant, which is where most first-timers get lost. openssl
 # does the same job in two lines and works anywhere.
@@ -64,7 +68,13 @@ WARN
       say "Making a private key (encrypted; the passphrase is saved in $DIR/key.password)"
       PW=$(openssl rand -hex 16)
       printf '%s' "$PW" > "$DIR/key.password"; chmod 600 "$DIR/key.password"
-      openssl genrsa -aes256 -passout "pass:$PW" -traditional -out "$KEY" 2048 2>/dev/null
+      # -traditional is OpenSSL 3 (an encrypted PKCS#1 "RSA PRIVATE KEY", which
+      # is what the signing library reads). macOS ships LibreSSL, which has no
+      # such flag and writes that format anyway, so fall back without it.
+      openssl genrsa -aes256 -passout "pass:$PW" -traditional -out "$KEY" 2048 2>/dev/null \
+        || openssl genrsa -aes256 -passout "pass:$PW" -out "$KEY" 2048 2>/dev/null \
+        || die "openssl could not make a key."
+      grep -q 'BEGIN RSA PRIVATE KEY' "$KEY" || die "The key is not in the PKCS#1 form the signer reads. Which openssl is this? (openssl version)"
       chmod 600 "$KEY"
     fi
     PW=$(cat "$DIR/key.password")
