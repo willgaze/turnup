@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.70.0'
-export const BUILD_DATE = '2026-10-20'
+export const VERSION = '1.70.1'
+export const BUILD_DATE = '2026-10-21'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 52
+export const THEME_INDEX = 53
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.70.1', date: '2026-10-21', notes: [
+    'The Apple Wallet script can no longer publish its own private key. Its last step put the six signing settings into Vercel and then redeployed with a plain deploy command, run from the folder on the Mac that holds the key. From an unlinked folder that command makes a new project named after the folder and uploads everything in it, the key included. It did not happen, and now it cannot: the step names the turnup project, switches off every upload from that folder, and redeploys the build that is already live, the same as the Redeploy button. The Cowork paste and the guide say so.',
+  ] },
   { version: '1.70.0', date: '2026-10-20', notes: [
     'Job done? On my way to the next one, offered. Tap Job done and a card at the top asks whether you are heading to the next job booked today, with their name, the job and the hours. One tap sends On my way, exactly as the button on their card would: push, the email fallback, the ServiceM8 diary. Not yet puts it away. If nothing else is booked today it says so. It never offers tomorrow\'s job and never names a time.',
   ] },

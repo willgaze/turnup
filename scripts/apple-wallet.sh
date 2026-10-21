@@ -5,6 +5,8 @@
 #   bash scripts/apple-wallet.sh csr            # 1. makes a key + a request file to upload to Apple
 #   bash scripts/apple-wallet.sh finish pass.cer  # 2. turns Apple's certificate into the six settings
 #
+#   bash scripts/apple-wallet.sh vercel          # 3. (optional) puts the six into Vercel and redeploys; never uploads this folder
+#
 # Everything lands in ./apple/ which is gitignored. The private key never
 # leaves this folder except as the value you paste into Vercel.
 #
@@ -35,6 +37,12 @@ KEY=$DIR/pass.key
 CSR=$DIR/pass.csr
 PASS_ID="${PASS_TYPE_ID:-pass.com.getturnup.job}"
 WWDR_URL=https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer
+# Where the settings go. Named here so the vercel step can never fall back to
+# "whatever project this folder is", which is how a key folder gets deployed.
+SCOPE="${VERCEL_SCOPE:-willgazes-projects}"
+PROJECT="${VERCEL_PROJECT:-turnup}"
+HOST="${TURNUP_HOST:-www.getturnup.com}"
+ENV_URL="https://vercel.com/$SCOPE/$PROJECT/settings/environment-variables"
 
 say() { printf '\n\033[1;34m==>\033[0m %s\n' "$1"; }
 die() { printf '\n\033[1;31mStopped:\033[0m %s\n' "$1" >&2; exit 1; }
@@ -152,25 +160,49 @@ Put them in Vercel (each line is Key=Value; the long ones are one line on purpos
   Add each, Production, Save. Six times. Then
   https://vercel.com/willgazes-projects/turnup/deployments  ->  ... -> Redeploy.
 
-Or, if the Vercel CLI is logged in here, let it do all six:
+Or let the Vercel CLI do all six and the redeploy (it never uploads this folder):
   bash scripts/apple-wallet.sh vercel
 
 MSG
     ;;
 
   vercel)
+    # Writes the six settings to the TurnUp project and redeploys what is already
+    # live. It NEVER runs `vercel deploy` or `vercel --prod` from here: this
+    # folder holds the private key, its passphrase and turnup.env, and a deploy
+    # from inside it uploads the folder as a site (in an unlinked folder, into a
+    # brand-new project named after it). That is the private key on a public
+    # URL. So the project is named, not guessed from the folder, every upload
+    # from here is switched off with .vercelignore, and the redeploy re-runs the
+    # production deployment Git already made, exactly as the dashboard's
+    # Redeploy button does.
     ENV=$DIR/turnup.env
     [ -f "$ENV" ] || die "No $ENV yet. Run 'finish' first."
-    command -v vercel >/dev/null || die "Vercel CLI not installed (npm i -g vercel), or paste the six lines by hand."
+    command -v vercel >/dev/null || die "Vercel CLI not installed. In Terminal:  npm i -g vercel && vercel login   then run this again. Or paste the six lines by hand at $ENV_URL"
+    vercel whoami --scope "$SCOPE" >/dev/null 2>&1 || die "Vercel CLI is not signed in. In Terminal:  vercel login   then run this again."
+    printf '*\n' > .vercelignore
+    say "Pointing this folder at the $PROJECT project (nothing in it is ever uploaded)"
+    vercel link --yes --scope "$SCOPE" --project "$PROJECT" >/dev/null 2>&1 \
+      || die "Could not link to the $PROJECT project. Paste the six lines by hand at $ENV_URL"
     while IFS='=' read -r k v; do
       [ -n "$k" ] || continue
       say "Setting $k"
-      vercel env rm "$k" production --yes >/dev/null 2>&1 || true
-      printf '%s' "$v" | vercel env add "$k" production --sensitive >/dev/null \
-        || die "Vercel refused $k. Paste it by hand at https://vercel.com/willgazes-projects/turnup/settings/environment-variables"
+      vercel env rm "$k" production --yes --scope "$SCOPE" >/dev/null 2>&1 || true
+      printf '%s' "$v" | vercel env add "$k" production --sensitive --scope "$SCOPE" >/dev/null \
+        || die "Vercel refused $k. Paste it by hand at $ENV_URL"
     done < "$ENV"
-    say "All six set. Redeploying production."
-    vercel --prod --yes >/dev/null && echo "Deployed. Open a job card at https://www.getturnup.com/dashboard and press Add to Apple Wallet."
+    say "All six set. Redeploying the live production build so it reads them."
+    vercel redeploy "$HOST" --scope "$SCOPE" >/dev/null \
+      || die "Could not redeploy from here. Open https://vercel.com/$SCOPE/$PROJECT/deployments, press the three dots on the top Production deployment, Redeploy, Redeploy."
+    cat <<MSG
+
+Deployed. Prove it: with a live job code in place of CODE,
+
+  curl -s -o /dev/null -w '%{http_code}\n' https://$HOST/api/passes/CODE
+
+200 is a signed pass. 503 means a setting is missing: check all six at $ENV_URL
+
+MSG
     ;;
 
   *)

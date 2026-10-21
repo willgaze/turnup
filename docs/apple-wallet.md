@@ -79,7 +79,9 @@ intermediate, reads your Team ID and pass type out of the certificate, and
 writes six `KEY=value` lines to `apple/turnup.env`. Paste them into
 <https://vercel.com/willgazes-projects/turnup/settings/environment-variables>
 (Production, Sensitive), then Redeploy. Or `bash scripts/apple-wallet.sh vercel`
-does the pasting if the Vercel CLI is signed in.
+does the pasting and the redeploy if the Vercel CLI is signed in. That step
+names the `turnup` project and redeploys the live build; it never runs
+`vercel deploy` from the key folder, because that would upload the key.
 
 ## 5. What happens then
 

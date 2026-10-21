@@ -163,7 +163,7 @@ export const WALLET = {
   built: [
     { label: 'Pass design and signing', note: 'tested end to end with a stand-in certificate chain, v1.15.4' },
     { label: 'Add to Apple Wallet button', note: 'appears on the customer page on an Apple device, once a pass can be signed' },
-    { label: 'Two-command certificate script', note: 'scripts/apple-wallet.sh: csr, then finish' },
+    { label: 'Three-command certificate script', note: 'scripts/apple-wallet.sh: csr, finish, then vercel, which never uploads the key folder' },
     { label: 'Name and stage on the pass', note: 'from the trade profile; the logo itself is not on the pass yet' },
   ],
   missing: [
