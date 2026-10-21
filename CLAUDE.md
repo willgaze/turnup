@@ -1512,6 +1512,11 @@ repository does not have:
   chain (v1.15.4): `bash scripts/apple-wallet.sh csr` makes the key and the
   request, `finish pass.cer` turns Apple's certificate into the six `PASSKIT_*`
   settings (`docs/apple-wallet.md`). The library wants **PEM, never a .p12**.
+  **The enrolment went through on 21 Oct 2026**, so the certificate is the
+  next thing, and it is a Cowork job on the owner's Mac
+  (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
+  never in a session container. The script falls back for macOS's LibreSSL,
+  which has no `-traditional` flag and writes PKCS#1 anyway.
   Still to build once a real pass is in a wallet: the `/api/passes/v1` web
   service (device registration, "what changed" and APNs pushes) so the card
   updates itself; today a pass shows the stage at the moment it was added.
