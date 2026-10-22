@@ -1517,6 +1517,15 @@ repository does not have:
   (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
   never in a session container. The script falls back for macOS's LibreSSL,
   which has no `-traditional` flag and writes PKCS#1 anyway.
+  **The `vercel` step can never upload the key folder (v1.70.1).** On 21 Oct
+  2026 its last line, `vercel --prod --yes` run inside `~/TurnUp-Apple`, put
+  that folder, `pass.key` included, on a production deployment. Every Vercel
+  command in the script now goes through `vc()`, which allows only
+  `whoami`/`link`/`env`/`redeploy`/`promote`/`inspect` and only from an empty
+  temporary folder linked to `turnup` by name; the redeploy re-runs what is
+  live on the host and promotes it. Keep `vercel deploy` and `--prod` out of
+  it for good. `csr` stops if a key exists; `rotate` retires the old one to
+  `apple/old-<time>/` and starts again.
   Still to build once a real pass is in a wallet: the `/api/passes/v1` web
   service (device registration, "what changed" and APNs pushes) so the card
   updates itself; today a pass shows the stage at the moment it was added.

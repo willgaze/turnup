@@ -12,6 +12,11 @@ already answers 200, this job is done and must not be run again: a second
 certificate for the same pass type is a second key, and the one Vercel holds
 is the one that signs.
 
+**Replacing a key that has been exposed** is not this job run again: it is
+`bash scripts/apple-wallet.sh rotate` in `~/TurnUp-Apple`, then steps 3 to 7,
+then revoking the old certificate (the script prints where). `csr` refuses to
+run over an existing key since v1.70.1.
+
 ---
 
 ```
