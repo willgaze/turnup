@@ -46,6 +46,17 @@ Xcode. The project builds on a Mac, or on the GitHub macOS runner in
    builds, and uploads to TestFlight. Will installs TestFlight on the iPhone
    and gets the build in minutes.
 
+## Nightly builds
+
+The workflow also runs every night at 03:07 UTC, after the web nightly build.
+A small Linux job checks first: if nothing under `native/` changed in the last
+day it stops there, so a quiet night costs seconds, not a Mac build. Mondays
+always build, so a TestFlight build never reaches Apple's 90-day expiry.
+
+Every upload needs a higher build number than the last, or App Store Connect
+rejects it. The archive step sets `CURRENT_PROJECT_VERSION` to the workflow's
+run number, which only ever goes up. Don't hard-code it back to 1.
+
 ## Building on a Mac, by hand
 
     cd native && npm install
