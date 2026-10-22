@@ -6,7 +6,8 @@ import { recentCustomerEmails } from '@/lib/customer-email'
 import { emailFor, validEmail } from '@/lib/customer-email-words'
 import { pushConfigured } from '@/lib/push'
 import { TRADE_NAME, CANONICAL_HOST } from '@/lib/trade'
-import { oauthState, disconnect, redirectUri } from '@/lib/sm8-oauth'
+import { oauthState, disconnect, redirectUri, saveApp, forgetApp, validAppId, validAppSecret } from '@/lib/sm8-oauth'
+import { cleanText } from '@/lib/clean-text'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,8 +31,9 @@ export async function GET(request) {
         .map((s) => ({ event: s.event, callback_url: s.callback_url, active: s.active ?? 1 }))
     } catch (e) { state.subscriptionsError = e.message }
   }
-  // The add-on half: configured means SM8_APP_ID and SM8_APP_SECRET are set;
-  // connected means the operator has authorised it and tokens are held.
+  // The add-on half: configured means an App ID and App Secret are held, from
+  // the panel or from SM8_APP_ID / SM8_APP_SECRET; connected means the
+  // operator has authorised it and tokens are held.
   state.oauth = { ...(await oauthState()), redirectUri: redirectUri(origin(request)) }
   try {
     const p = await prisma.tradeProfile.findUnique({ where: { id: 'singleton' } })
@@ -61,6 +63,17 @@ export async function POST(request) {
     }
     if (body.action === 'unsubscribe') return NextResponse.json({ removed: await unsubscribe() })
     if (body.action === 'oauth_disconnect') { await disconnect(); return NextResponse.json({ ok: true }) }
+    // The two values from ServiceM8's Developer page, pasted on the phone.
+    // Never echoed back: the panel only ever sees the last four of the ID.
+    if (body.action === 'oauth_app_save') {
+      const appId = (cleanText(body.appId) || '').replace(/\s+/g, '')
+      const appSecret = (cleanText(body.appSecret) || '').replace(/\s+/g, '')
+      if (!validAppId(appId)) return NextResponse.json({ error: 'bad_app_id' }, { status: 400 })
+      if (!validAppSecret(appSecret)) return NextResponse.json({ error: 'bad_app_secret' }, { status: 400 })
+      await saveApp(appId, appSecret)
+      return NextResponse.json({ ok: true })
+    }
+    if (body.action === 'oauth_app_forget') { await forgetApp(); return NextResponse.json({ ok: true }) }
     // The switch ends with an email arriving, not a sentence: the set-off
     // email as a customer would get it, to an address the trade types, with
     // a demo link. Not linked to any job, so it lands in no diary.

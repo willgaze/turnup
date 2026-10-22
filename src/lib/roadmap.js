@@ -174,7 +174,7 @@ export const PHASES = [
         what: 'Deposit now, balance at Job done, and in between the customer can show the trade the balance is set aside. Holding a customer\u2019s money is regulated in the UK, so this is a regulated escrow partner plugged into the card, never TurnUp holding funds. Decided 11 Oct 2026: later, through a partner, after pay-to-book has earned its place.' },
       { key: 'sm8-addon', name: 'TurnUp inside ServiceM8: every event in the job diary', state: 'ready',
         what: 'Built. Once the add-on is authorised, set off, on site, paused, done, terms agreed, no one home, running late and each customer reply are written into the ServiceM8 job diary as a line from TurnUp, so the trade\'s system of record holds the evidence without anyone copying it. Sending the text through ServiceM8 already works on the key.',
-        needs: 'A free ServiceM8 developer account and two settings in Vercel: docs/servicem8-add-on.md. The store listing is written (docs/servicem8-listing.md); listing it publicly needs an account per trade first' },
+        needs: 'A free ServiceM8 developer account, then the App ID and App Secret pasted into the ServiceM8 panel: no Vercel, no redeploy (docs/servicem8-add-on.md). The store listing is written (docs/servicem8-listing.md); listing it publicly needs an account per trade first' },
       { key: 'reconstruct', name: 'Looks like you arrived at 09:04', state: 'idea',
         what: 'When your On site tap is late but an earlier fix put you at the address, the card offers the earlier time. A suggestion with one-tap undo, never a silent change. Materials runs the same way once there is a native app to notice them.' },
       { key: 'late-call', name: 'A phone call when a push is not enough', state: 'idea',

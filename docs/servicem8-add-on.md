@@ -1,6 +1,6 @@
 # Connecting TurnUp to ServiceM8 as an add-on
 
-*For Will. About fifteen minutes, once. Everything TurnUp does with ServiceM8
+*For Will. About ten minutes, once, all on the phone. Everything TurnUp does with ServiceM8
 today runs on the API key; this adds the one thing the key cannot do, which is
 write into the job diary.*
 
@@ -37,30 +37,32 @@ by hand.
    Leave it unlisted. You do not need to submit it to the Store for it to
    work on your own account.
 
-4. **Copy the two values.** The page now shows an **App ID** and an **App
-   Secret**. Keep the secret private.
+4. **Paste the two values into TurnUp.** The ServiceM8 page now shows an
+   **App ID** and an **App Secret**. Open
+   [your dashboard](https://www.getturnup.com/dashboard) → Setup and settings →
+   **ServiceM8**, paste them into the two boxes under *As an add-on*, and tap
+   **Save**. They are kept encrypted in TurnUp's own database and the secret
+   is never shown again. No Vercel, no redeploy: the **Connect** button
+   appears straight away.
 
-5. **Put them in Vercel.** Open
-   [Vercel → turnup → Environment Variables](https://vercel.com/willgazes-projects/turnup/settings/environment-variables).
-   Add `SM8_APP_ID` with the App ID and `SM8_APP_SECRET` with the App Secret,
-   both for **Production**, both marked Sensitive. Then
-   [Deployments](https://vercel.com/willgazes-projects/turnup/deployments) →
-   **⋯** on the top one → **Redeploy**. About a minute.
+   *(Until 22 Oct 2026 this step was two Vercel settings and a redeploy. It was
+   asked for three times and never happened, so it moved to the phone.
+   `SM8_APP_ID` and `SM8_APP_SECRET` in Vercel still win if they are ever set.)*
 
-6. **Connect.** Open [your dashboard](https://www.getturnup.com/dashboard) →
-   Setup and settings → **ServiceM8** → **Connect ServiceM8 as an add-on**.
+5. **Connect.** Tap **Connect ServiceM8 as an add-on** on the same panel.
    ServiceM8 asks you to allow two things (write diary items, read the
    account name). Allow, and you land back on the
    dashboard with the panel saying connected.
 
-7. **Check it.** Move any card that follows a ServiceM8 job (your Thimbles job
+6. **Check it.** Move any card that follows a ServiceM8 job (your Thimbles job
    2742 is fine) to On my way and back. Open the job in ServiceM8: two new diary
    lines from TurnUp.
 
 ## If something is off
 
-- **The Connect button is missing:** the two Vercel settings are not in, or the
-  redeploy has not run. The panel says which.
+- **The Connect button is missing:** the two boxes are still showing, so
+  nothing was saved. Paste both again and tap Save; the panel says if one
+  does not look right.
 - **ServiceM8 says the redirect does not match:** the Return URL in step 3 must
   be the exact line above, no trailing slash, `www` included.
 - **Connected but nothing in the diary:** look under ServiceM8 → Lately on the
