@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.70.0'
-export const BUILD_DATE = '2026-10-20'
+export const VERSION = '1.70.1'
+export const BUILD_DATE = '2026-10-22'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.70.1', date: '2026-10-22', notes: [
+    'The Apple Wallet script can no longer publish its own private key. Its last step used to redeploy with a plain deploy command, run from the folder on the Mac that holds the key, and on 21 Oct that uploaded the folder, key included. Now every Vercel command in it goes through one gate that only allows commands that upload nothing, run from an empty temporary folder, and the redeploy re-runs the build that is already live and promotes it.',
+    'Making a key now stops if one already exists, so the certificate Apple issued is never orphaned by accident, and a new rotate command retires an exposed key (kept in a dated folder, never deleted) and starts a fresh one, with the steps to revoke the old certificate once the new one works.',
+  ] },
   { version: '1.70.0', date: '2026-10-20', notes: [
     'Job done? On my way to the next one, offered. Tap Job done and a card at the top asks whether you are heading to the next job booked today, with their name, the job and the hours. One tap sends On my way, exactly as the button on their card would: push, the email fallback, the ServiceM8 diary. Not yet puts it away. If nothing else is booked today it says so. It never offers tomorrow\'s job and never names a time.',
   ] },
