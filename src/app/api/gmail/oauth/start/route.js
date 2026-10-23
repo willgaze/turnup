@@ -16,6 +16,6 @@ const origin = (request) => {
 export async function GET(request) {
   const operator = await requireOperator()
   if (operator !== true) return NextResponse.json({ error: operator.error }, { status: operator.status })
-  if (!gmailConfigured()) return NextResponse.json({ error: 'gmail_not_configured' }, { status: 409 })
-  return NextResponse.redirect(authorizeUrl(origin(request)), 302)
+  if (!(await gmailConfigured())) return NextResponse.json({ error: 'gmail_not_configured' }, { status: 409 })
+  return NextResponse.redirect(await authorizeUrl(origin(request)), 302)
 }

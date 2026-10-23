@@ -105,7 +105,7 @@ export const PHASES = [
         what: 'The iOS app: the dashboard in a native window, and the job you are on as a Live Activity — stage, time, note, and On site / Paused / Job done buttons on the lock screen and in the Dynamic Island. Written in native/; builds and lands on TestFlight the day Apple says yes.',
         needs: 'Apple Developer Program, £79/yr' },
       { key: 'wallet-pass', name: 'The card in Apple Wallet', state: 'ready',
-        what: 'A card that sits in Wallet and moves itself when you tap a stage: the service Wallet calls to register a phone, ask what changed and fetch the card is built and tested end to end (v1.72.0). Nothing is in a wallet yet, because signing a pass needs the certificate.',
+        what: 'A card that sits in Wallet and moves itself when you tap a stage: the service Wallet calls to register a phone, ask what changed and fetch the card is built and tested end to end (v1.73.0). Nothing is in a wallet yet, because signing a pass needs the certificate.',
         needs: 'The Pass Type ID certificate. The Apple Developer membership went through on 21 Oct 2026, so this is the one step left' },
       { key: 'google-wallet', name: 'The same card on Android', state: 'idea',
         what: 'Google Wallet pass alongside the Apple one.',

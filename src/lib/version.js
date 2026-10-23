@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.72.0'
+export const VERSION = '1.73.0'
 export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 54
+export const THEME_INDEX = 55
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,11 +48,14 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
-  { version: '1.72.0', date: '2026-10-23', notes: [
+  { version: '1.73.0', date: '2026-10-23', notes: [
     'The wallet card can now update itself. Until tonight a pass showed the stage it was added at and nothing moved it again, which is the difference between a card and a screenshot. The four service calls Wallet makes are built: it registers a phone against a job, it asks what has changed since it last looked, it fetches the current card, and it reports back when something went wrong. A stage tap on the dashboard, or a booking moving in ServiceM8, now tells every phone holding that card to come and look.',
     'The push that does it carries no words at all — Apple’s pass push is an empty body that only says "ask me again", so there is nothing on a lock screen to get wrong and no vocabulary to guard. Everything the card says still comes from the same builder as the download, so the card in a pocket and the page on the link cannot say different things.',
     'A revoked link takes the card with it. Switch a job’s link off and the next time Wallet asks it is told the pass is no longer theirs, and it comes off the phone. The token a pass sends back is worked out from the job code and your own secret rather than stored, so there is no new column, nothing extra to leak, and one job’s pass cannot ask about another’s.',
     'Still waiting on one thing, and it is not code: the Pass Type ID certificate from Apple. The enrolment went through on 21 October, so that is the next job, and this half is ready for the day it lands. Two checks on it, and the second one earned its keep immediately: run against a real server it found that a card whose link had been switched off was told \u201ccome back later\u201d instead of being removed from the phone. The paths Wallet itself calls are the one thing left to a real card, and every route logs a line so the log says whether it found them.',
+  ] },
+  { version: '1.72.0', date: '2026-10-23', notes: [
+    'Connect Gmail is two boxes on the phone, not Vercel. The Google Client ID and secret are pasted into the panel under Where the card hears from, sealed before they are stored, and Connect Gmail appears straight away: no settings page, no redeploy. The three Google steps are links you can tap. Same fix the ServiceM8 add-on got the day before, for the same reason.',
   ] },
   { version: '1.71.0', date: '2026-10-22', notes: [
     'The ServiceM8 add-on no longer needs Vercel. The App ID and App Secret from ServiceM8\'s Developer page are pasted into two boxes on the ServiceM8 panel and saved encrypted in your own database, and the Connect button appears straight away: no settings page, no redeploy. Two Vercel settings were asked for three times and never happened, so the ask changed. The panel now says the three steps with a link for each and a Copy button for the Return URL, instead of pointing at a file in the repository you could not tap.',

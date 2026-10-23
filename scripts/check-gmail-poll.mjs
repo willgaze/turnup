@@ -8,7 +8,7 @@
  * Google's and is proven by connecting; these are the parts that would fail
  * quietly if they drifted.
  */
-import { gmailQuery, decodeRaw, needsRefresh, sweepFrom, GMAIL_SCOPE, SENDER_DOMAINS } from '../src/lib/gmail-words.js'
+import { gmailQuery, decodeRaw, needsRefresh, sweepFrom, GMAIL_SCOPE, SENDER_DOMAINS, validClientId, validClientSecret } from '../src/lib/gmail-words.js'
 import { readRawEmail } from '../src/lib/mime.js'
 import { readArrivalEmail } from '../src/lib/arrival-email.js'
 
@@ -39,6 +39,12 @@ const now = Date.parse('2026-10-19T09:00:00Z')
 check(needsRefresh(now + 30_000, now) && !needsRefresh(now + 120_000, now) && needsRefresh(null, now), 'a token is refreshed a minute before it dies, and when nothing is known')
 check(sweepFrom({ lastSeenAt: '2026-10-19T08:00:00Z' }, now) === Date.parse('2026-10-19T08:00:00Z'), 'a sweep starts after the newest message already read')
 check(sweepFrom({ connectedAt: '2026-10-19T08:30:00Z' }, now) === Date.parse('2026-10-18T08:30:00Z'), 'the first sweep reaches one day back from connecting, no further')
+
+// The two boxes on the panel: loose, Google is the real judge.
+check(validClientId('123456789012-abc1def2ghi3jkl4mno5pqr6stu7vwx8.apps.googleusercontent.com'), 'a Google client ID passes')
+check(!validClientId('123456789012') && !validClientId('GOCSPX-abcdefghijklmnop') && !validClientId(''), 'a bare number, a secret in the ID box, or nothing: refused')
+check(validClientSecret('GOCSPX-abcdefghijklmnopqrstuvwxyz'), 'a Google client secret passes')
+check(!validClientSecret('short') && !validClientSecret('has a space in it 1234567890') && !validClientSecret(''), 'too short, a space, or nothing: refused')
 
 console.log(`\n${failed === 0 ? 'Connect Gmail holds.' : `${failed} check(s) failed.`}`)
 process.exit(failed === 0 ? 0 : 1)

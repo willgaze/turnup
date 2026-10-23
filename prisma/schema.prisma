@@ -419,6 +419,19 @@ model CustomerEmail {
 /// Tokens are sealed with a key derived from JWT_SECRET and never returned by
 /// any route. `lastSeenAt` is the newest message already read, so a sweep
 /// asks Gmail only for what came after it.
+/// The Google OAuth client for Connect Gmail, pasted into the dashboard
+/// panel (src/lib/gmail.js). Same reason as Sm8App: two Vercel settings and
+/// a redeploy were asked for and did not happen in two days; a box on the
+/// phone does. The secret is sealed with the key the tokens use.
+/// GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET in the environment still win.
+model GoogleApp {
+  id        String   @id @default("singleton")
+  clientId  String
+  cipher    String // AES-256-GCM of the client secret, key from JWT_SECRET
+  savedAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model GmailLink {
   id            String    @id @default("singleton")
   cipher        String // AES-256-GCM of { access, refresh, expiresAt }

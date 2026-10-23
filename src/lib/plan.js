@@ -165,7 +165,7 @@ export const WALLET = {
     { label: 'Add to Apple Wallet button', note: 'appears on the customer page on an Apple device, once a pass can be signed' },
     { label: 'Two-command certificate script', note: 'scripts/apple-wallet.sh: csr, then finish' },
     { label: 'Name and stage on the pass', note: 'from the trade profile; the logo itself is not on the pass yet' },
-    { label: 'The update service', note: '/api/passes/v1: a phone registers, asks what changed, fetches the current card; a stage tap pushes it. Tested against the real routes, v1.72.0. A revoked link takes the card off the phone' },
+    { label: 'The update service', note: '/api/passes/v1: a phone registers, asks what changed, fetches the current card; a stage tap pushes it. Tested against the real routes, v1.73.0. A revoked link takes the card off the phone' },
   ],
   missing: [
     { label: 'Apple Developer Programme', note: 'the owner enrols as an individual, 79 pounds a year', who: 'owner' },

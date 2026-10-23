@@ -33,6 +33,8 @@ export default function Sources() {
   const [s, setS] = useState(null)
   const [busy, setBusy] = useState(null)
   const [note, setNote] = useState(null)
+  const [clientId, setClientId] = useState('')
+  const [clientSecret, setClientSecret] = useState('')
 
   const load = useCallback(() => fetch('/api/dashboard/sources', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then(setS).catch(() => setS(null)), [])
   useEffect(() => { load() }, [load])
@@ -47,7 +49,9 @@ export default function Sources() {
     try {
       const r = await fetch('/api/dashboard/sources', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action, ...extra }) })
       const j = await r.json().catch(() => ({}))
-      if (!r.ok) setNote(`Did not work: ${j.error || r.status}`)
+      if (!r.ok) setNote({ bad_client_id: 'That Client ID does not look right: it ends .apps.googleusercontent.com, no spaces.', bad_client_secret: 'That secret does not look right: copy the whole thing, no spaces.' }[j.error] || `Did not work: ${j.error || r.status}`)
+      else if (action === 'gmail_app_save') { setClientId(''); setClientSecret(''); setNote('Saved. Now press Connect Gmail.') }
+      else if (action === 'gmail_app_forget') setNote('Cleared. Paste the Client ID and secret again when you have them.')
       else if (action === 'gmail_poll') setNote(j.error ? `Gmail: ${j.error}` : j.why === 'no_card_chosen' ? 'Choose a card first.' : `Checked ${j.checked ?? 0} email${j.checked === 1 ? '' : 's'}: ${j.filed ?? 0} on the card, ${j.dropped ?? 0} not a delivery.`)
       else if (action === 'gmail_disconnect') setNote('Disconnected, and the permission revoked at Google.')
       await load()
@@ -83,13 +87,29 @@ export default function Sources() {
           </>
         ) : g.configured ? (
           <>
-            <p className="mt-1 muted">The Google settings are in. Connect your own Workspace mailbox: Google asks once, you choose the card, and delivery emails land on it with no forwarding rule.</p>
+            <p className="mt-1 muted">Client {g.app?.idTail ? `${g.app.idTail} ` : ''}is in{g.app?.source === 'saved' ? ', saved from this panel' : ''}. Connect your own Workspace mailbox: Google asks once, you choose the card, and delivery emails land on it with no forwarding rule.</p>
             <a href="/api/gmail/oauth/start" className="btn accent-fill mt-2.5 !min-h-[44px] !px-4 !text-[14px]">Connect Gmail</a>
+            {g.app?.source === 'saved' && <button type="button" disabled={busy} onClick={() => { if (confirm('Clear the saved Google client? You can paste it again.')) act('gmail_app_forget') }} className="mt-2 block text-[13px] underline muted">Wrong client? Clear it and paste again</button>}
           </>
         ) : (
           <>
-            <p className="mt-1 muted">Needs a Google Cloud project in your Workspace (an Internal app, which Google does not review) and two settings in Vercel: <code className="font-mono">GOOGLE_CLIENT_ID</code> and <code className="font-mono">GOOGLE_CLIENT_SECRET</code>. The steps are in <code className="font-mono">docs/connect-gmail.md</code>, as one Cowork paste. The redirect URI the client needs:</p>
+            {/* Three steps with a link each, then two boxes. No Vercel, no
+                redeploy, no file path: those were asked for and did not
+                happen. The Google project itself can only be made by the
+                owner, signed in to their Workspace. */}
+            <p className="mt-1 muted">Your own Workspace inbox feeds a card, with no forwarding rule. Three steps, in Chrome signed in as your Workspace account, then paste two things here.</p>
+            <ol className="mt-2 space-y-1.5 muted">
+              <li><span className="font-semibold">1. </span><a className="underline" href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noreferrer">Create a project</a> called TurnUp inbox in your organisation, then <a className="underline" href="https://console.cloud.google.com/apis/library/gmail.googleapis.com" target="_blank" rel="noreferrer">enable the Gmail API</a>.</li>
+              <li><span className="font-semibold">2. </span><a className="underline" href="https://console.cloud.google.com/auth/overview" target="_blank" rel="noreferrer">Set up the consent screen</a>: audience <b>Internal</b>, and add the scope <code className="font-mono text-[12px]">gmail.readonly</code>. If only External is offered, stop: the account is not in a Workspace.</li>
+              <li><span className="font-semibold">3. </span><a className="underline" href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noreferrer">Create an OAuth client</a>: Web application, with this redirect URI, then paste its Client ID and secret below.</li>
+            </ol>
             <p className="mt-1.5 flex flex-wrap items-center gap-2"><code className="font-mono break-all text-[13px]">{g.redirectUri}</code><Copy value={g.redirectUri} label="Copy" /></p>
+            <div className="mt-2.5 grid gap-2">
+              <input className="field" inputMode="text" autoComplete="off" autoCapitalize="off" spellCheck={false} placeholder="Client ID (ends .apps.googleusercontent.com)" value={clientId} onChange={(e) => setClientId(e.target.value)} />
+              <input className="field" type="password" autoComplete="off" autoCapitalize="off" spellCheck={false} placeholder="Client secret" value={clientSecret} onChange={(e) => setClientSecret(e.target.value)} />
+              <button type="button" disabled={busy || !clientId.trim() || !clientSecret.trim()} onClick={() => act('gmail_app_save', { clientId, clientSecret })} className="btn accent-fill !min-h-[44px] !px-4 !text-[14px]">{busy === 'gmail_app_save' ? 'Saving…' : 'Save'}</button>
+            </div>
+            <p className="mt-1.5 text-[12px] muted">The secret is sealed before it is stored and never shown again. Nothing is read until you press Connect and approve it with Google.</p>
           </>
         )}
       </div>

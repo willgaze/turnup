@@ -993,10 +993,15 @@ after the newest already read, from a courier's or shop's domain or with an
 order word in the subject, never spam, bin or sent; what the reader drops is
 read by nobody and nothing is stored but the row. Tokens are sealed with a
 key from `JWT_SECRET` in one `GmailLink` row and no route returns them.
-Disconnect revokes at Google first. Gated on `GOOGLE_CLIENT_ID` and
-`GOOGLE_CLIENT_SECRET`; the Google project, the Internal consent screen and
-the OAuth client are the owner's to make (`docs/connect-gmail.md`, one Cowork
-paste). **No session creates an OAuth app.** Other households are stages 2
+Disconnect revokes at Google first. **The OAuth client is pasted on the
+phone** (v1.72.0): two boxes on the panel, sealed into one `GoogleApp` row,
+with `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` still winning where both
+are set. Two Vercel settings were asked for on 20 Oct 2026 and had not
+happened by the 23rd, the same wall `Sm8App` was built for the day before;
+when an ask keeps not happening, the ask is the thing to change. The Google
+project, the Internal consent screen and the client are still the owner's to
+make, in their Workspace (`docs/connect-gmail.md`). **No session creates an
+OAuth app.** Other households are stages 2
 and 3 of `docs/research/inbox-connect.md` and wait on Google's review.
 
 **Tracking by number** (`src/lib/ship24.js`, pure parts in
@@ -1261,7 +1266,7 @@ card and the diary, and `publicShape` carries only the two times.
 
 ## The wallet card keeps itself current (`src/app/api/passes/v1/`)
 
-v1.72.0. A pass without an update service is a screenshot: it shows the stage
+v1.73.0. A pass without an update service is a screenshot: it shows the stage
 at the moment it was added and nothing ever moves it. Apple's answer is five
 calls Wallet makes to the `webServiceURL` baked into the pass, and all of them
 are built now, so the only thing between this product and a card that moves is
@@ -1611,7 +1616,7 @@ repository does not have:
   (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
   never in a session container. The script falls back for macOS's LibreSSL,
   which has no `-traditional` flag and writes PKCS#1 anyway.
-  The web service that keeps a pass current is **built** (v1.72.0, below);
+  The web service that keeps a pass current is **built** (v1.73.0, below);
   what is missing is only the certificate, so the day it lands the card
   updates itself rather than needing another build.
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
