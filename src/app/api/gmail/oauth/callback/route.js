@@ -17,7 +17,7 @@ const origin = (request) => {
 export async function GET(request) {
   const operator = await requireOperator()
   if (operator !== true) return NextResponse.redirect(new URL('/login?then=/dashboard', origin(request)), 302)
-  if (!gmailConfigured()) return NextResponse.json({ error: 'gmail_not_configured' }, { status: 409 })
+  if (!(await gmailConfigured())) return NextResponse.json({ error: 'gmail_not_configured' }, { status: 409 })
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
   if (url.searchParams.get('error')) return NextResponse.redirect(new URL(`/dashboard?gmail=${encodeURIComponent(url.searchParams.get('error'))}#panel-sources`, origin(request)), 302)

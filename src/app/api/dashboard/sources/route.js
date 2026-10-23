@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { requireOperator } from '@/lib/operator-auth'
-import { gmailState, setPlace, disconnect, pollGmail, redirectUri } from '@/lib/gmail'
+import { gmailState, setPlace, disconnect, pollGmail, redirectUri, saveApp, forgetApp } from '@/lib/gmail'
+import { validClientId, validClientSecret } from '@/lib/gmail-words'
 import { trackingState, ship24WebhookUrl } from '@/lib/ship24'
 
 /**
@@ -37,6 +38,16 @@ export async function POST(request) {
   const body = await request.json().catch(() => ({}))
   try {
     if (body.action === 'gmail_disconnect') { await disconnect(); return NextResponse.json({ ok: true }) }
+    // The OAuth client, pasted on the phone. Validated loosely; Google is the
+    // real judge and the Connect button carries its answer back.
+    if (body.action === 'gmail_app_save') {
+      const clientId = String(body.clientId || '').trim(), secret = String(body.clientSecret || '').trim()
+      if (!validClientId(clientId)) return NextResponse.json({ error: 'bad_client_id' }, { status: 400 })
+      if (!validClientSecret(secret)) return NextResponse.json({ error: 'bad_client_secret' }, { status: 400 })
+      await saveApp(clientId, secret)
+      return NextResponse.json({ ok: true })
+    }
+    if (body.action === 'gmail_app_forget') { await forgetApp(); return NextResponse.json({ ok: true }) }
     if (body.action === 'gmail_place') { await setPlace(body.placeCode); return NextResponse.json({ ok: true }) }
     if (body.action === 'gmail_poll') return NextResponse.json(await pollGmail())
     return NextResponse.json({ error: 'unknown_action' }, { status: 400 })

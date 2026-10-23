@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.71.0'
-export const BUILD_DATE = '2026-10-22'
+export const VERSION = '1.72.0'
+export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 53
+export const THEME_INDEX = 54
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.72.0', date: '2026-10-23', notes: [
+    'Connect Gmail is two boxes on the phone, not Vercel. The Google Client ID and secret are pasted into the panel under Where the card hears from, sealed before they are stored, and Connect Gmail appears straight away: no settings page, no redeploy. The three Google steps are links you can tap. Same fix the ServiceM8 add-on got the day before, for the same reason.',
+  ] },
   { version: '1.71.0', date: '2026-10-22', notes: [
     'The ServiceM8 add-on no longer needs Vercel. The App ID and App Secret from ServiceM8\'s Developer page are pasted into two boxes on the ServiceM8 panel and saved encrypted in your own database, and the Connect button appears straight away: no settings page, no redeploy. Two Vercel settings were asked for three times and never happened, so the ask changed. The panel now says the three steps with a link for each and a Copy button for the Return URL, instead of pointing at a file in the repository you could not tap.',
   ] },

@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.72.0](./v1.72.0/) | 2026-10-23 | Plum — Connect Gmail is two boxes on the phone, not Vercel |
 | [v1.71.0](./v1.71.0/) | 2026-10-22 | Teal — the ServiceM8 add-on is two boxes on the phone, not two Vercel settings and a redeploy |
 | [v1.70.0](./v1.70.0/) | 2026-10-20 | Indigo — Job done? On my way to the next one, offered |
 | [v1.69.0](./v1.69.0/) | 2026-10-19 | Clay — the trade's lock screen stops naming customers; one vocabulary, one check |
