@@ -18,11 +18,10 @@ import { STAGE_ORDER, stageOf } from '@/lib/trade-status'
  * standing up on dark tiles, and its back. All drawn from the same PassCard
  * the real pass is built from, so nothing here can drift from it.
  *
- * Honesty, because this is the one feature that is built but not in anybody's
- * wallet yet: the strip carries the same badge the posters do. The card is
- * built; the push notification on the lock screen is live today; the card
- * updating itself in Wallet waits on Apple's certificate and the pass web
- * service. Nothing below says otherwise.
+ * Honesty: the pass has been in a real wallet since 23 Oct 2026, so the
+ * strip says so. What it does not do yet is move on its own: the card shows
+ * the stage at the moment it was added, and updating itself in Wallet waits
+ * on the pass web service. Nothing below says otherwise.
  */
 const TRADE = 'Sam Hale Plumbing'
 const DEMO = {
@@ -313,7 +312,7 @@ function PassBack() {
 const LIKE = [
   ['One per job', 'like a ticket', <TickIcon key="t" size={20} />],
   ['Beside their bank card', 'where they already look', <WalletIcon key="w" size={20} />],
-  ['Will change as the job moves', 'once Apple signs it: not yet', <BellIcon key="b" size={20} />],
+  ['Will change as the job moves', 'once its update service is built: next', <BellIcon key="b" size={20} />],
   ['Scan it', 'the page opens', <PhoneIcon key="p" size={20} />],
 ]
 
@@ -324,9 +323,9 @@ export default function WalletStory() {
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <H3>Where it lives</H3>
-          <Badge>Built · awaiting Apple</Badge>
+          <Badge>In Apple Wallet since 23 Oct 2026</Badge>
         </div>
-        <p className="mt-1 text-[15px] muted">The buzz on the lock screen is live today.</p>
+        <p className="mt-1 text-[15px] muted">Add to Apple Wallet is on every job page. The buzz on the lock screen is live too.</p>
         <div className="mt-4"><Journey /></div>
       </div>
 
@@ -337,7 +336,7 @@ export default function WalletStory() {
 
       <div>
         <H3>It will move with the job</H3>
-        <p className="mt-1 text-[15px] muted">Same card. The dot moves, once the pass is signed and its update service is built. Today the page does this; the card is next.</p>
+        <p className="mt-1 text-[15px] muted">Same card. The dot will move once its update service is built. Today the card shows the stage when it was added, and the page does the moving.</p>
         <div className="mt-4"><Stages /></div>
       </div>
 

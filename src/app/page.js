@@ -121,7 +121,7 @@ export default function Home() {
         {/* --- what it looks like ------------------------------------------ */}
         {/* The card first and largest: it is the premise, and the owner's call
             (12 Oct 2026) was that it is the thing to show. The phone is the
-            same job from a text, which is what is live today. */}
+            same job from a text. Both are live: the pass since 23 Oct 2026. */}
         <section className="mt-12 grid items-start gap-8 sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <figure className="mx-auto w-full max-w-[400px]" style={{ '--tint': '#5856d6' }}>
             <WalletHero tracker={DEMO} tradeName="Sam Hale Plumbing" />
@@ -129,7 +129,7 @@ export default function Home() {
               <span>The job, as a card in their wallet.</span>
               <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[12px] font-semibold"
                     style={{ color: 'var(--tint)', borderColor: 'color-mix(in srgb, var(--tint) 35%, transparent)', background: 'color-mix(in srgb, var(--tint) 10%, transparent)' }}>
-                Built · awaiting Apple
+                In Apple Wallet
               </span>
             </figcaption>
           </figure>

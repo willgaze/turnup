@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '22 Oct 2026',
+  updated: '23 Oct 2026',
 }
 
 export const STAGES = [
@@ -67,8 +67,8 @@ export const MOATS = [
   },
   {
     n: '3', name: 'One integration', line: 'Both wallets, the update loop, push, SMS fallback, the privacy rules. They would rather buy that than own it.',
-    today: ['Apple pass signing: built, unsigned', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Email through ServiceM8 when push cannot reach a phone', 'Privacy rules: written and checked by script'],
-    missing: ['A signed pass in a real wallet', 'Google Wallet', 'The pass update web service', 'An API another firm can call'],
+    today: ['Apple pass: signed, in a real wallet since 23 Oct 2026', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Email through ServiceM8 when push cannot reach a phone', 'Privacy rules: written and checked by script'],
+    missing: ['The pass update web service, so the card moves on its own', 'Google Wallet', 'An API another firm can call'],
     gate: 'A firm that is not customer zero calls the API', pct: 40,
   },
 ]
@@ -87,8 +87,8 @@ export const STATUS = [
   { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live 18 Oct 2026: the plate fills in make, model and colour' },
   { item: 'Privacy policy', state: 'green', note: 'a public page, getturnup.com/privacy, since 17 Oct 2026' },
   { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },
-  { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is next' },
-  { item: 'Apple Wallet card', state: 'amber', note: 'signing built; Apple enrolment live 21 Oct 2026; the certificate is one Cowork job on the Mac (docs/cowork-apple-wallet.md)' },
+  { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is the next Cowork paste' },
+  { item: 'Apple Wallet card', state: 'green', note: 'live 23 Oct 2026: the first signed pass opened in a real wallet. It shows the stage when added; the update service so it moves on its own is the next build' },
   { item: 'Google Wallet card', state: 'red', note: 'not built; decide whether to build on a pass platform' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
   { item: 'Pricing', state: 'amber', note: 'free for every sender, enterprise per card, decided 9 Oct 2026' },
@@ -98,7 +98,7 @@ export const STATUS = [
 /** The three things only the owner can move, each with the link and the step. */
 export const WAITING_ON_OWNER = [
   { label: 'Start the thirty-day count', step: 'Press Start on the pilot panel: the thirty days count from that day, not from whenever you look. The app counts three numbers; you type the calls to the booking line on the same panel. Move 1', href: 'https://www.getturnup.com/dashboard?open=pilot' },
-  { label: 'Make the Apple Wallet certificate', step: 'Enrolment live 21 Oct. One Cowork paste on the Mac: key, request, certificate, six Vercel settings, redeploy, and a 200 from /api/passes. Move 2 waits on it; the lock-screen app is the job after', href: 'https://github.com/willgaze/turnup/blob/main/docs/cowork-apple-wallet.md' },
+  { label: 'Add the card to your own phone', step: 'The pass is signed (23 Oct). Open any live job page on your iPhone and press Add to Apple Wallet, so the first card lives on the phone the product is built for, not only in a Mac preview. The lock-screen app signing is the next Cowork paste, still being written', href: 'https://www.getturnup.com/dashboard' },
   { label: 'ServiceM8 developer account', step: 'Free. Puts every TurnUp event in the job diary and opens the add-on listing. Move 3', href: 'https://www.servicem8.com/developer-registration' },
 ]
 
@@ -130,7 +130,7 @@ export const PRODUCT = {
     { label: 'A household card per address', note: 'the plumber, the sofa, the parcels, from forwarded email; a home makes its own on /join' },
     { label: 'Email when no notification lands', note: 'set off, window missed, the day-before ask; through ServiceM8, from the trade’s own address, once per job' },
     { label: 'ServiceM8 sends the link', note: 'every booking followed; check-in moves the card to On site, completion to Job done' },
-    { label: 'Apple Wallet card', note: 'signing built, pending Apple' },
+    { label: 'Apple Wallet card', note: 'live 23 Oct 2026; shows the stage when added, moving on its own is next' },
     { label: 'Old links keep working', note: 'tradestatus.vercel.app still serves' },
   ],
   never: [
@@ -149,7 +149,7 @@ export const PRODUCT = {
 export const FLOW = {
   inputs: ['Trade taps a stage', 'ServiceM8 check-in or check-out', 'A forwarded delivery email', 'An enterprise scheduler, by API'],
   core: 'TurnUp',
-  outputs: ['The link, on any phone', 'The household card, beside the parcels', 'A buzz on the lock screen', 'The card in the wallet, once signed'],
+  outputs: ['The link, on any phone', 'The household card, beside the parcels', 'A buzz on the lock screen', 'The card in the wallet, on Apple'],
 }
 
 /** The wallet card: what exists, what is missing, and why it is the product. */
@@ -162,15 +162,15 @@ export const WALLET = {
   ],
   built: [
     { label: 'Pass design and signing', note: 'tested end to end with a stand-in certificate chain, v1.15.4' },
-    { label: 'Add to Apple Wallet button', note: 'appears on the customer page on an Apple device, once a pass can be signed' },
-    { label: 'Two-command certificate script', note: 'scripts/apple-wallet.sh: csr, then finish' },
+    { label: 'Add to Apple Wallet button', note: 'on the customer page on an Apple device; serving signed passes since 23 Oct 2026' },
+    { label: 'Two-command certificate script', note: 'scripts/apple-wallet.sh: csr, then finish; run on the owner’s Mac as a Cowork paste, 23 Oct 2026' },
+    { label: 'Apple Developer Programme', note: 'enrolled as an individual, 21 Oct 2026; the Pass Type ID certificate issued 23 Oct, good for a year' },
+    { label: 'A real pass in a real wallet', note: 'the first opened in Apple Wallet on 23 Oct 2026' },
     { label: 'Name and stage on the pass', note: 'from the trade profile; the logo itself is not on the pass yet' },
   ],
   missing: [
-    { label: 'Apple Developer Programme', note: 'the owner enrols as an individual, 79 pounds a year', who: 'owner' },
     { label: 'Pass update web service', note: '/api/passes/v1: device registration, what changed, APNs push, so the card updates itself. Today a pass shows the stage at the moment it was added', who: 'build' },
     { label: 'Google Wallet', note: 'issuer account, a pass class, and the same update loop on Android. Or a pass platform, if faster', who: 'build' },
-    { label: 'A real pass in a real wallet', note: 'nobody has held one yet. The first one is the test', who: 'owner' },
   ],
 }
 
@@ -253,7 +253,7 @@ export const CALC_DEFAULTS = { freeSenders: 50, newFree: 20, enterprises: 0, new
 /** Six moves, in order. Each opens when the gate before it is passed. */
 export const GTM_PHASES = [
   { phase: '1', label: 'Prove it on my own jobs', gate: 'Thirty days, four numbers', moves: ['ServiceM8 connected, the link in every booking text', 'Asked the day before: will someone be in? Built 11 Oct 2026', 'Links opened, “in?” answered, wasted trips, “when are you coming?” calls', 'If the first two stay low, the product is wrong, not the pitch'], when: 'Now', state: 'amber' },
-  { phase: '2', label: 'Sign the pass', gate: 'One card in one wallet', moves: ['Apple Developer, as an individual', 'First real pass, on the owner’s phone', 'The update loop so it moves'], when: 'Now', state: 'amber' },
+  { phase: '2', label: 'Sign the pass', gate: 'One card in one wallet', moves: ['Apple Developer, as an individual: done, 21 Oct 2026', 'First real pass, signed and opened in Wallet: done, 23 Oct 2026', 'The update loop so it moves: next'], when: 'Now', state: 'amber' },
   { phase: '3', label: 'Be ServiceM8’s card', gate: 'Ten ServiceM8 trades sending', moves: ['Connector live on customer zero: done, 9 Oct 2026', 'Add-on listing: written 17 Oct 2026; public release needs an account per trade and a support mailbox', 'Ask ten ServiceM8 trades, once, whether they would pay £9.99 a month: the research’s one cheap test, before any billing is built', 'An account per trade, so a second business can sign up', 'Stage vocabulary published'], when: 'Q4 2026', state: 'gray' },
   { phase: '4', label: 'Android, on a pass platform if faster', gate: 'Both wallets live', moves: ['Decide: PassKit or our own', 'Google Wallet pass class', 'Same update loop'], when: 'Q1 2027', state: 'gray' },
   { phase: '5', label: 'The household asks for it', gate: 'Household-requested cards outnumber trade-sent', moves: ['The household card exists, 12 Oct 2026; a home makes its own on /join since 18 Oct', 'Customer-invite: one screen', 'Remembered for the next trade'], when: '2027 H1', state: 'gray' },
@@ -279,7 +279,7 @@ export const RISKS = [
   { label: 'ServiceM8 ships a reopenable status page', likelihood: 'high', answer: 'Be their card first: the add-on in their store, the record they do not keep. Public standard', kind: 'estimate' },
   { label: 'Free for everyone earns nothing for a year', likelihood: 'high', answer: 'Hosting is pence a card. The Ltd and a raise decision come before the first enterprise', kind: 'estimate' },
   { label: 'The owner has no spare hours', likelihood: 'high', answer: 'The nightly build does the building', kind: 'estimate' },
-  { label: 'Apple never signs the pass', likelihood: 'low', answer: 'The link works without it. The card is the upgrade, not the floor', kind: 'estimate' },
+  { label: 'Apple revokes the pass certificate', likelihood: 'low', answer: 'The link works without it, as it did until 23 Oct 2026. The card is the upgrade, not the floor', kind: 'estimate' },
   { label: 'Name clash on TurnUp', likelihood: 'medium', answer: 'Trademark check before spending on the name', kind: 'estimate' },
   { label: 'Customer data on a public link', likelihood: 'low', answer: 'Stage only. Answers never leave the device', kind: 'estimate' },
   { label: 'The household card only reads email; carriers text', likelihood: 'high', answer: 'Read the shop’s dispatch email and say so. Never read SMS: that needs an app, which we promised never to need', kind: 'estimate' },
@@ -347,7 +347,7 @@ export const REVIEWER = {
     { id: 'toby:read', label: 'The share link has been opened on your own phone and read end to end' },
     { id: 'toby:updated', label: 'The plan’s “updated” date is inside the last week' },
   ],
-  notGatedOn: 'Not waiting for Apple. The pass being unsigned is a fact on the Wallet page, and he will understand it better than anyone.',
+  notGatedOn: 'Not waiting for the update service. The pass is signed and in a wallet; that it does not yet move on its own is a fact on the Wallet page, and he will understand it better than anyone.',
   message: `Toby, I'd like you to sign up to this. It's an idea I've had: one link per job that tells the customer when the plumber is actually coming, ending up as a card in their wallet. I've built it and I'm using it on my own jobs now.
 
 I'd really like your thoughts. If you think it's a good idea, tell me what's wrong with it. If you don't, tell me that.

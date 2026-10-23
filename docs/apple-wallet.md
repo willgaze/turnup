@@ -81,13 +81,13 @@ writes six `KEY=value` lines to `apple/turnup.env`. Paste them into
 (Production, Sensitive), then Redeploy. Or `bash scripts/apple-wallet.sh vercel`
 does the pasting if the Vercel CLI is signed in.
 
-## 5. What happens then
+## 5. What happened then (done 23 Oct 2026)
 
-- `/api/passes/<code>` starts returning a signed `.pkpass` instead of a 503.
-- **Add to Apple Wallet** appears on every live customer page, on Apple devices.
-- The homepage frame badge "Built · awaiting Apple" is still a static label in
-  `src/app/preview/posters/Posters.jsx`; change it when the first real card is
-  in a wallet.
+- `/api/passes/<code>` returns a signed `.pkpass`; the curl said 200.
+- **Add to Apple Wallet** is on every live customer page, on Apple devices.
+- The first pass opened in Apple Wallet on 23 Oct 2026. The badge that read
+  "Built · awaiting Apple" came off the homepage, the frame and the roadmap in
+  v1.72.0, and nothing was promoted to "updates itself", because it does not yet.
 
 ## What the pass does today, honestly
 

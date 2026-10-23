@@ -7,7 +7,9 @@ is this certificate. A Claude session cannot start Cowork, and must not make
 the key (it would die with the container, and the certificate with it); it
 hands over the prompt. On the Mac the key lives in a folder that stays.
 
-**Check first.** If `https://www.getturnup.com/api/passes/<any live code>`
+**Done, 23 Oct 2026.** The curl said 200 and the card opened in Wallet. This
+job is not run again until the certificate is due (a year on; it is in the
+owner's calendar). **Check first.** If `https://www.getturnup.com/api/passes/<any live code>`
 already answers 200, this job is done and must not be run again: a second
 certificate for the same pass type is a second key, and the one Vercel holds
 is the one that signs.
@@ -122,11 +124,8 @@ Rules:
 
 ## After it is in a wallet
 
-- `src/app/preview/posters/Posters.jsx` carries the badge "Built · awaiting
-  Apple" on the wallet frame; change it the day the first real card is in a
-  wallet.
-- The roadmap item `wallet-pass` in `src/lib/roadmap.js` moves to `live`, and
-  the plan's STATUS row goes green, in the same push.
+- Done in v1.72.0: the badge is off the homepage, the frame and the roadmap;
+  `wallet-pass` is `live`; the plan's STATUS row is green.
 - The pass does not yet update itself: that is the PassKit web service
   (`/api/passes/v1/...`) and an APNs push, the next build after this.
 - The lock-screen app is the other thing the membership unlocks; its own

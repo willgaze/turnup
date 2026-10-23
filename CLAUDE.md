@@ -1508,29 +1508,33 @@ calling it done; nothing scrolls sideways but a strip that means to.
 
 ## Not built yet
 
-**The wallet pass.** This is the premise of the product and it does not exist.
-Today the customer gets a web page; the idea is a card that sits in Apple
-Wallet and Google Wallet and updates itself. Both need credentials the
-repository does not have:
+**The wallet pass, half built.** This is the premise of the product. Since
+23 Oct 2026 the Apple half exists as a card that is added once; the idea is a
+card that sits in Apple Wallet and Google Wallet and updates itself:
 
 - **Apple Wallet (PassKit)** — an Apple Developer Program membership and a Pass
   Type ID certificate. Everything else is built and tested with a stand-in
   chain (v1.15.4): `bash scripts/apple-wallet.sh csr` makes the key and the
   request, `finish pass.cer` turns Apple's certificate into the six `PASSKIT_*`
   settings (`docs/apple-wallet.md`). The library wants **PEM, never a .p12**.
-  **The enrolment went through on 21 Oct 2026**, so the certificate is the
-  next thing, and it is a Cowork job on the owner's Mac
-  (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
-  never in a session container. The script falls back for macOS's LibreSSL,
-  which has no `-traditional` flag and writes PKCS#1 anyway.
-  Still to build once a real pass is in a wallet: the `/api/passes/v1` web
-  service (device registration, "what changed" and APNs pushes) so the card
-  updates itself; today a pass shows the stage at the moment it was added.
+  **Done: enrolled 21 Oct 2026, certificate issued and the first pass opened
+  in Apple Wallet on 23 Oct 2026 (v1.72.0).** The certificate was made on the
+  owner's Mac as one Cowork paste (`docs/cowork-apple-wallet.md`), because the
+  key has to be made where it survives, never in a session container. The
+  script falls back for macOS's LibreSSL, which has no `-traditional` flag and
+  writes PKCS#1 anyway. The six `PASSKIT_*` settings are in Vercel, Production.
+  The certificate expires a year on; re-running the same Cowork job renews it.
+  **Still to build: the `/api/passes/v1` web service** (device registration,
+  "what changed" and APNs pushes) so the card updates itself; today a pass
+  shows the stage at the moment it was added, and the badge on the homepage
+  says so rather than "updates itself".
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key.
 
-Until those exist, the honest position is that this is a link, not a card. Do
-not describe it as a wallet pass anywhere customer-facing.
+So the honest position since 23 Oct 2026: on an Apple device it is a card
+that does not yet move on its own; on Android it is still a link. Do not
+describe the card as updating itself anywhere customer-facing until the web
+service exists, and do not describe Android as having a card at all.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 
