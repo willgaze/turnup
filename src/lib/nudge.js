@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { pushTrade, notifyCustomer } from '@/lib/push'
+import { pushPassUpdate } from '@/lib/pass-service'
 import { TRADE_NAME } from '@/lib/trade'
 import { dayBeforeAskDue } from '@/lib/day-before'
 import { diaryFor } from '@/lib/sm8-oauth'
@@ -231,6 +232,7 @@ export async function runningLate(tracker, minutes) {
     ...(note ? { stageNote: note, events: { create: { stage: tracker.stage, note } } } : {}),
   } })
   if (m) notifyCustomer(updated, { title: 'Running late', body: `${TRADE_NAME} says about ${m} minutes late, and is sorry.` }).catch(() => {})
+  pushPassUpdate(updated.code).catch(() => {})
   if (m) diaryFor(updated, `Running about ${m} minutes late, customer told.`).catch(() => {})
   return updated
 }

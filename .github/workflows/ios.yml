@@ -65,22 +65,35 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k ci build.keychain
           mkdir -p ~/.appstoreconnect/private_keys
           echo "$ASC_KEY_P8" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8
+      # Automatic signing with the App Store Connect key makes the two App
+      # Store profiles itself. The team has to be named here because the
+      # Xcode project does not carry one (it is the owner's, not the repo's),
+      # and the archive is signed with the Distribution certificate from the
+      # keychain above rather than a Development one the runner does not have.
       - name: Archive
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' \
             -archivePath build/App.xcarchive -allowProvisioningUpdates \
             CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" CODE_SIGN_STYLE=Automatic CODE_SIGN_IDENTITY="Apple Distribution" \
             -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8 \
             -authenticationKeyID ${{ secrets.ASC_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }} \
             archive
       - name: Export and upload
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          cat > export.plist <<'PLIST'
+          cat > export.plist <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0"><dict>
             <key>method</key><string>app-store-connect</string>
             <key>destination</key><string>upload</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>teamID</key><string>$APPLE_TEAM_ID</string>
           </dict></plist>
           PLIST
           xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/out \

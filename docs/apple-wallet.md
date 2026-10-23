@@ -91,12 +91,17 @@ does the pasting if the Vercel CLI is signed in.
 
 ## What the pass does today, honestly
 
-It shows the stage at the moment it was added, with the QR code to the full
-page. It does **not yet update itself**: that needs the PassKit web service
-(`/api/passes/v1/...` for device registration and "what changed") and an APNs
-push with the same certificate, which is the next job after the first card is
-in a wallet. The pass JSON already advertises `webServiceURL`, so Wallet will
-start calling it the day the routes exist.
+It shows the stage, the step, the customer and the address, with the QR code to
+the full page. Since v1.73.0 (23 Oct 2026) it **can update itself**: the pass
+has always advertised `webServiceURL`, and that service now exists
+(`src/app/api/passes/v1/...`, `src/lib/pass-service.js`): Wallet registers
+the phone, every change to the job pokes APNs with the same certificate, and
+Wallet fetches the pass again. Proven end to end against a stand-in Apple on
+the local database (`node scripts/check-pass-service.mjs` for the pure half).
+**Not yet seen on a real phone.** The first card that moves on its own is the
+proof: open the job on the dashboard, tap a stage, and watch the card in
+Wallet. A pass added before the service existed registers the next time Wallet
+looks at it; if it never moves, remove it and add it again from the page.
 
 The certificate expires after a year. The `finish` command prints the date;
 put it in the diary.

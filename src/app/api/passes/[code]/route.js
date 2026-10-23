@@ -1,18 +1,11 @@
 import { NextResponse } from 'next/server'
-import { createHmac } from 'node:crypto'
 import { prisma } from '@/lib/prisma'
 import { publicShape } from '@/lib/trade-status'
 import { passkitConfigured, passkitMissing, buildSignedPass, buildPassJson } from '@/lib/passkit'
 import { rpFromRequest } from '@/lib/webauthn'
+import { passAuthToken } from '@/lib/pass-service'
 
 export const dynamic = 'force-dynamic'
-
-// The token Wallet sends back on every update call. Derived rather than stored,
-// so there is no extra column and no secret to leak from the database: it is
-// only reproducible by something holding JWT_SECRET.
-export function passAuthToken(code) {
-  return createHmac('sha256', process.env.JWT_SECRET || '').update(`pass:${code}`).digest('hex')
-}
 
 // Public, like the page it mirrors: the code in the URL is the credential.
 export async function GET(request, { params }) {

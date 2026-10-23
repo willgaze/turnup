@@ -19,9 +19,9 @@ import { STAGE_ORDER, stageOf } from '@/lib/trade-status'
  * the real pass is built from, so nothing here can drift from it.
  *
  * Honesty: the pass has been in a real wallet since 23 Oct 2026, so the
- * strip says so. What it does not do yet is move on its own: the card shows
- * the stage at the moment it was added, and updating itself in Wallet waits
- * on the pass web service. Nothing below says otherwise.
+ * strip says so. The update service is built (v1.73.0) and proven against a
+ * stand-in Apple, but no real card has yet been seen moving on its own, so
+ * nothing below says "updates itself" as a plain fact until one has.
  */
 const TRADE = 'Sam Hale Plumbing'
 const DEMO = {
@@ -312,7 +312,7 @@ function PassBack() {
 const LIKE = [
   ['One per job', 'like a ticket', <TickIcon key="t" size={20} />],
   ['Beside their bank card', 'where they already look', <WalletIcon key="w" size={20} />],
-  ['Will change as the job moves', 'once its update service is built: next', <BellIcon key="b" size={20} />],
+  ['Will change as the job moves', 'the update service is built; first seen moving: not yet', <BellIcon key="b" size={20} />],
   ['Scan it', 'the page opens', <PhoneIcon key="p" size={20} />],
 ]
 
@@ -336,7 +336,7 @@ export default function WalletStory() {
 
       <div>
         <H3>It will move with the job</H3>
-        <p className="mt-1 text-[15px] muted">Same card. The dot will move once its update service is built. Today the card shows the stage when it was added, and the page does the moving.</p>
+        <p className="mt-1 text-[15px] muted">Same card. The service that moves the dot is built; the first card seen moving on a real phone is the proof still to come. The page moves today either way.</p>
         <div className="mt-4"><Stages /></div>
       </div>
 

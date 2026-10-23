@@ -74,7 +74,7 @@ export const FRAMES = [
     'Your day,\nin order.', 'What you are on, what is next, what is finished. Nothing else on the screen.',
     { screen: '/home/trade-run.webp', alt: 'The dashboard: the day’s jobs in order' }),
   f('t-wallet', 'trade', 'live', INDIGO,
-    'In their\nwallet.', 'The same job as a card in Apple Wallet, since 23 October 2026. It shows the stage when it was added; moving on its own is next.',
+    'In their\nwallet.', 'The same job as a card in Apple Wallet, since 23 October 2026. Built to move with the job; the first one seen moving is the proof to come.',
     { wallet: true, alt: 'The job as a wallet card, lifted out of a stack of other cards' }),
 
   // ---- either end ---------------------------------------------------------------

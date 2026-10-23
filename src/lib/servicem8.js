@@ -23,6 +23,7 @@
  */
 import { prisma } from './prisma'
 import { notifyStage } from './push'
+import { pushPassUpdate } from '@/lib/pass-service'
 import { cleanText } from './clean-text'
 import { generateCode } from './trade-status'
 import { nudgeIfDue } from './nudge'
@@ -215,6 +216,7 @@ export async function syncTracker(tracker, { source = 'sync' } = {}) {
       notifyStage(updated, stage).catch(() => {})
       outcome = outcome === 'window' ? `moved:${stage}+window` : `moved:${stage}`
     }
+    if (outcome !== 'unchanged') pushPassUpdate(tracker.code).catch(() => {})
     await prisma.sm8Link.upsert({
       where: { tradeStatusId: tracker.id },
       create: { tradeStatusId: tracker.id, jobUuid, jobNumber: job.generated_job_id ? String(job.generated_job_id) : null, syncedAt: new Date(), lastStatus: job.status, lastOutcome: outcome },

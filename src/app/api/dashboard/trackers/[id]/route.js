@@ -10,6 +10,7 @@ import { isValidStage } from '@/lib/trade-status'
 import { dbReason } from '@/lib/db-errors'
 import { cleanText } from '@/lib/clean-text'
 import { notifyStage } from '@/lib/push'
+import { pushPassUpdate } from '@/lib/pass-service'
 import { syncTrackerToCards } from '@/lib/arrivals'
 import { proposeWindow, agreeWindow, clearWindow, revisionFor, dayMoveFor, windowHours, lastShown } from '@/lib/window'
 import { dayOnly } from '@/lib/when'
@@ -219,6 +220,11 @@ export async function PATCH(request, { params }) {
     syncTrackerToCards(tracker).catch((error) =>
       console.error('household card sync failed:', error?.message),
     )
+
+    // The Wallet pass on any phone that holds one. Same rule as the push: a
+    // nicety that must not slow or fail the tap. Every PATCH, not only a stage
+    // change, because the pass carries the note and the address too.
+    after(() => pushPassUpdate(tracker.code).catch(() => {}))
 
     return NextResponse.json({ tracker })
   } catch (error) {

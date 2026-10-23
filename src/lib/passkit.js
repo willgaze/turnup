@@ -89,8 +89,8 @@ export function buildPassJson(status, { origin, authToken }) {
     backgroundColor: NAVY,
     labelColor: 'rgb(157, 182, 205)',
 
-    // How the pass keeps itself up to date. Wallet calls this service, and a
-    // push tells it when to bother.
+    // How the pass keeps itself up to date (src/app/api/passes/v1/...).
+    // Wallet registers there, and pushPassUpdate() tells it when to bother.
     webServiceURL: `${origin}/api/passes/v1`,
     authenticationToken: authToken,
 
@@ -111,7 +111,12 @@ export function buildPassJson(status, { origin, authToken }) {
         ...(status.jobRef ? [{ key: 'job', label: 'JOB', value: `#${status.jobRef}` }] : []),
       ],
       primaryFields: [
-        { key: 'stage', label: 'STATUS', value: stage.label },
+        // The one field with a changeMessage. When the pass updates itself
+        // (src/lib/pass-service.js) Wallet puts this on the lock screen under
+        // the trade's name, so it is the stage and nothing else: the same rule
+        // as LINES in src/lib/push.js. Never add a changeMessage to the
+        // customer, address or note fields.
+        { key: 'stage', label: 'STATUS', value: stage.label, changeMessage: '%@' },
       ],
       secondaryFields: [
         ...(status.customerName

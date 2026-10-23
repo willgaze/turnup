@@ -1524,17 +1524,68 @@ card that sits in Apple Wallet and Google Wallet and updates itself:
   script falls back for macOS's LibreSSL, which has no `-traditional` flag and
   writes PKCS#1 anyway. The six `PASSKIT_*` settings are in Vercel, Production.
   The certificate expires a year on; re-running the same Cowork job renews it.
-  **Still to build: the `/api/passes/v1` web service** (device registration,
-  "what changed" and APNs pushes) so the card updates itself; today a pass
-  shows the stage at the moment it was added, and the badge on the homepage
-  says so rather than "updates itself".
+  **The `/api/passes/v1` web service exists since v1.73.0** (see *The pass
+  updates itself*, below); the first real card seen moving on its own is the
+  proof still owed, and until it is seen the homepage says "built", not
+  "updates itself".
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key.
 
 So the honest position since 23 Oct 2026: on an Apple device it is a card
-that does not yet move on its own; on Android it is still a link. Do not
-describe the card as updating itself anywhere customer-facing until the web
-service exists, and do not describe Android as having a card at all.
+with an update service behind it that has been proven against a stand-in
+Apple and not yet watched on a real phone; on Android it is still a link. Do
+not describe the card as updating itself as a plain fact anywhere
+customer-facing until one has been seen doing it, and do not describe Android
+as having a card at all.
+
+## The pass updates itself (`src/lib/pass-service.js`, v1.73.0)
+
+Apple's PassKit web service, the five calls Wallet makes and nothing more,
+under `src/app/api/passes/v1/`: register a device for a pass, unregister it,
+"which of my passes changed since this tag", the latest signed pass, and a
+log sink. The pure half (`src/lib/pass-update.js`: the `ApplePass` header,
+the since-tag, what changed, If-Modified-Since, what to do with APNs' answer)
+is proven by `node scripts/check-pass-service.mjs`, and the whole thing was
+run end to end on 23 Oct 2026 against the seeded local database with a
+stand-in certificate chain and a stand-in APNs on this box: 27 cases, the
+dead-phone cleanup and the client certificate included. **Not yet watched on
+a real phone.** Rules that must not drift:
+
+- **Every change to a job pokes Wallet, and none of them waits for it.**
+  `pushPassUpdate(code)` runs inside `after()` from the tracker PATCH (every
+  PATCH, not only a stage: the pass carries the note and the address too),
+  un-awaited from the ServiceM8 sync, the late figure and the wasted-trip
+  record. It never throws. Same rule as `notifyStage()`: a tap on a driveway
+  is never held up by Apple.
+- **The pass certificate is the APNs credential.** The same `PASSKIT_*` pair
+  that signs the pass is the TLS client certificate for `api.push.apple.com`,
+  over HTTP/2 from Node's own module, topic = the pass type, body `{}`, no
+  `apns-push-type` (it must match a payload, and an empty one matches none).
+  So the service is dark exactly when signing is: `passkitConfigured()`.
+- **A dead token is deleted, not retried.** 410, `BadDeviceToken` and
+  `DeviceTokenNotForTopic` delete the registration; 403 and a bad topic are
+  our certificate and are logged loudly; anything else waits for the next
+  change. `apnsVerdict()` is the one place that decides.
+- **The authentication token is derived, never stored.** `passAuthToken()`
+  is an HMAC of the code under `JWT_SECRET`, compared timing-safe, and fails
+  closed with no secret. The token in the pass Will added on 23 Oct was made
+  the same way, so that pass registers without being re-issued.
+- **The one lock-screen line is the stage.** Wallet shows a field's
+  `changeMessage` under the trade's name when the pass updates; only the
+  stage field has one (`'%@'`), by the same rule as `LINES` in
+  `src/lib/push.js`. Never add one to the customer, address or note fields.
+- **The device listing has no token, by Apple's design.** `GET
+  /v1/devices/<id>/registrations/<type>` answers with job codes, which are
+  credentials, to anyone who knows the device identifier: 32 random
+  characters the phone made up. It is the one route where a device id is
+  worth as much as a code; it returns serials and a tag and must never carry
+  more.
+- **`PassRegistration` is a new table**, so it fails soft, and `serial` is
+  the job code because that has been the pass's `serialNumber` since the
+  first one was signed. Changing it would orphan every pass in a wallet.
+- A customer who switched on *Tell me when they set off* and holds the pass
+  gets both: the web push and Wallet's own change notice. Known, accepted,
+  not yet seen in practice.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 

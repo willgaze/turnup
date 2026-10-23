@@ -14,7 +14,7 @@ export const PHASES = [
     blurb: 'Everything below is live on this app today.',
     items: [
       { key: 'wallet-pass', name: 'The card in Apple Wallet', state: 'live',
-        what: 'Add to Apple Wallet on every job page, on an Apple device. Live since 23 Oct 2026: the first signed pass opened in a real wallet. It shows the stage and the day at the moment it was added, with the code to the page; it does not yet update itself in Wallet, which is the next build.' },
+        what: 'Add to Apple Wallet on every job page, on an Apple device. Live since 23 Oct 2026: the first signed pass opened in a real wallet. The update service is built (v1.73.0): a stage tap tells Wallet to fetch the card again and the stage changes on the lock screen. Proven against a stand-in Apple; the first real card seen moving is the proof still to come.' },
       { key: 'next-job', name: 'Job done? On my way to the next one, offered', state: 'live',
         what: 'Tap Job done and the dashboard asks whether you are heading to the next job booked today, with their name and hours. One tap sends On my way, the same as the button on their card. Nothing goes until you tap, and it never offers tomorrow\u2019s job or a time.' },
       { key: 'ask-or-tell', name: 'Ask it or tell it', state: 'live',
@@ -105,7 +105,7 @@ export const PHASES = [
     items: [
       { key: 'native-app', name: 'Your job on your lock screen', state: 'ready',
         what: 'The iOS app: the dashboard in a native window, and the job you are on as a Live Activity — stage, time, note, and On site / Paused / Job done buttons on the lock screen and in the Dynamic Island. Written in native/; the Apple membership is live since 21 Oct 2026, so what is left is signing the app itself.',
-        needs: 'A distribution certificate and an App Store Connect key, as one Cowork job on the Mac; then it lands on TestFlight' },
+        needs: 'One Cowork paste on the Mac (docs/cowork-testflight.md): App IDs, a distribution certificate, an App Store Connect key, six GitHub secrets; then it lands on TestFlight' },
       { key: 'google-wallet', name: 'The same card on Android', state: 'idea',
         what: 'Google Wallet pass alongside the Apple one.',
         needs: 'Google Wallet issuer account, free' },

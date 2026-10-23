@@ -126,8 +126,7 @@ Rules:
 
 - Done in v1.72.0: the badge is off the homepage, the frame and the roadmap;
   `wallet-pass` is `live`; the plan's STATUS row is green.
-- The pass does not yet update itself: that is the PassKit web service
-  (`/api/passes/v1/...`) and an APNs push, the next build after this.
+- The pass updates itself since v1.73.0 (`src/lib/pass-service.js`); the
+  first card seen moving on a real phone is the proof still owed.
 - The lock-screen app is the other thing the membership unlocks; its own
-  Cowork job (App ID, App Group, distribution certificate, App Store Connect
-  key, GitHub secrets) is still to be written. See `native/README.md`.
+  Cowork job is `docs/cowork-testflight.md`.

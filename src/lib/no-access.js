@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { notifyCustomer, pushTrade } from '@/lib/push'
+import { pushPassUpdate } from '@/lib/pass-service'
 import { TRADE_NAME } from '@/lib/trade'
 import { diaryFor } from '@/lib/sm8-oauth'
 import { readTap } from '@/lib/tap'
@@ -71,6 +72,7 @@ export async function recordNoAccess(tracker, body) {
     events: { create: { stage: 'PAUSED', note, deviceAt: tap.deviceAt, offline: tap.offline } },
   } })
   notifyCustomer(updated, { title: 'Sorry we missed you', body: `${TRADE_NAME} was at the door and could not get in. Open the page to say when suits.` }).catch(() => {})
+  pushPassUpdate(updated.code).catch(() => {})
   diaryFor(updated, `No one home. At the door ${hhmm(startedAt)}, ${tried(attempts)}, waited ${waited} min${photo ? ', door photo taken' : ''}${fee ? `, GBP ${fee} as agreed` : ', nothing charged'}. Customer told and asked when suits.`).catch(() => {})
   return { row: { id: row.id, startedAt, leftAt, attempts, photoTaken: Boolean(photo), fee }, tracker: updated }
 }

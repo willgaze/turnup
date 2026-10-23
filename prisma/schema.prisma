@@ -380,6 +380,26 @@ model Sm8Link {
 /// settings and a redeploy did not happen three times running; a box on the
 /// phone does. The secret is sealed with the same key as the tokens below.
 /// SM8_APP_ID / SM8_APP_SECRET in the environment still win where set.
+/// A phone that holds a job's Wallet pass and wants telling when it changes.
+/// Wallet registers here (src/app/api/passes/v1/...), and pushPassUpdate() in
+/// src/lib/pass-service.js pokes APNs so Wallet fetches the pass again. A NEW
+/// TABLE, so it fails soft: every read sits in a try/catch and the pass is
+/// still added by hand without it. `serial` is the job code, because that is
+/// the pass's serialNumber and has been since the first pass was signed.
+model PassRegistration {
+  id         String   @id @default(cuid())
+  deviceId   String // Wallet's deviceLibraryIdentifier, opaque and unguessable
+  passTypeId String
+  serial     String // the job code
+  pushToken  String // APNs token for this pass on this device
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([deviceId, passTypeId, serial])
+  @@index([serial])
+  @@index([deviceId, passTypeId])
+}
+
 model Sm8App {
   id      String   @id @default("singleton")
   appId   String

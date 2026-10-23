@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.72.0'
+export const VERSION = '1.73.0'
 export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 54
+export const THEME_INDEX = 55
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.73.0', date: '2026-10-23', notes: [
+    'The wallet card can now update itself. Wallet registers the phone with the pass web service the pass has advertised since the first one was signed (/api/passes/v1: register, what changed, the latest pass, unregister, log), and every change to a job, a stage tap, a note, a ServiceM8 check-in, a late figure, a wasted trip, pokes Apple\'s push service with the pass certificate so Wallet fetches the card again. The stage field carries the one change message Wallet may put on the lock screen: the stage, under the trade\'s name, and nothing else, the same rule as every other notification here. Proven end to end against a stand-in Apple on the local database: 27 cases, the dead-phone cleanup and the client certificate included. Not yet seen on a real phone: the first card that moves on its own is the proof, and the homepage does not say "updates itself" until it has.',
+    'The lock-screen app\'s signing is one Cowork paste (docs/cowork-testflight.md): the App IDs and the App Group, a distribution certificate made by scripts/ios-signing.sh the way the wallet one was, an App Store Connect key, the app record, six GitHub secrets, Run workflow. The workflow now names the team and signs the archive with the distribution certificate it is given, and the app says it uses no encryption of its own so TestFlight never parks a build on that question.',
+  ] },
   { version: '1.72.0', date: '2026-10-23', notes: [
     'The card is in a wallet. The Apple Developer enrolment went through on 21 October, the Pass Type ID certificate was made on the owner\'s own Mac on 23 October as one Cowork paste (key, request, certificate, the six settings, a redeploy), /api/passes answered 200, and the first signed TurnUp pass opened in Apple Wallet. That is the premise of the product, held for the first time. Add to Apple Wallet is on every live job page on an Apple device.',
     'What it does, honestly: the pass shows the stage and the day at the moment it was added, with the code to the page. It does not yet update itself in Wallet; that is the pass web service and a push, the next build. The page, the push and the email still do the moving today. The homepage, the plan and the roadmap say exactly that: the badge that read Built, awaiting Apple is gone, and nothing has been promoted to moving on its own.',
