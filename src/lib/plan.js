@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '21 Oct 2026',
+  updated: '23 Oct 2026',
 }
 
 export const STAGES = [
@@ -68,7 +68,7 @@ export const MOATS = [
   {
     n: '3', name: 'One integration', line: 'Both wallets, the update loop, push, SMS fallback, the privacy rules. They would rather buy that than own it.',
     today: ['Apple pass signing: built, unsigned', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Email through ServiceM8 when push cannot reach a phone', 'Privacy rules: written and checked by script'],
-    missing: ['A signed pass in a real wallet', 'Google Wallet', 'The pass update web service', 'An API another firm can call'],
+    missing: ['A signed pass in a real wallet', 'Google Wallet', 'The pass update loop proven on a real phone', 'An API another firm can call'],
     gate: 'A firm that is not customer zero calls the API', pct: 40,
   },
 ]
@@ -165,10 +165,10 @@ export const WALLET = {
     { label: 'Add to Apple Wallet button', note: 'appears on the customer page on an Apple device, once a pass can be signed' },
     { label: 'Two-command certificate script', note: 'scripts/apple-wallet.sh: csr, then finish' },
     { label: 'Name and stage on the pass', note: 'from the trade profile; the logo itself is not on the pass yet' },
+    { label: 'Pass update web service', note: '/api/passes/v1: device registration, what changed, the latest pass, and an APNs push on every save, v1.70.2. Built and checked here; the first real test is a pass on a phone' },
   ],
   missing: [
     { label: 'Apple Developer Programme', note: 'the owner enrols as an individual, 79 pounds a year', who: 'owner' },
-    { label: 'Pass update web service', note: '/api/passes/v1: device registration, what changed, APNs push, so the card updates itself. Today a pass shows the stage at the moment it was added', who: 'build' },
     { label: 'Google Wallet', note: 'issuer account, a pass class, and the same update loop on Android. Or a pass platform, if faster', who: 'build' },
     { label: 'A real pass in a real wallet', note: 'nobody has held one yet. The first one is the test', who: 'owner' },
   ],

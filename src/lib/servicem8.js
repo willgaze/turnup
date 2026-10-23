@@ -23,6 +23,7 @@
  */
 import { prisma } from './prisma'
 import { notifyStage } from './push'
+import { pushPassUpdate } from './pass-service'
 import { cleanText } from './clean-text'
 import { generateCode } from './trade-status'
 import { nudgeIfDue } from './nudge'
@@ -213,6 +214,7 @@ export async function syncTracker(tracker, { source = 'sync' } = {}) {
       else if (stage === 'BOOKED') data.arrivingAt = null
       const updated = await prisma.tradeStatus.update({ where: { id: tracker.id }, data })
       notifyStage(updated, stage).catch(() => {})
+      pushPassUpdate(updated.code).catch(() => {})
       outcome = outcome === 'window' ? `moved:${stage}+window` : `moved:${stage}`
     }
     await prisma.sm8Link.upsert({

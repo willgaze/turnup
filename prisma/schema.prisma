@@ -583,3 +583,21 @@ model InboundSecret {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// A Wallet that holds a job's pass (v1.70.2). Apple's web service registers
+// each device here so a stage change can push the pass to update itself. A
+// new table, so it fails soft before `prisma db push` has made it. Holds an
+// opaque device id and push token from Apple, nothing about the customer;
+// the row goes when the pass is removed from Wallet or Apple answers 410.
+model PassRegistration {
+  id         String   @id @default(cuid())
+  deviceId   String   // Apple's deviceLibraryIdentifier
+  passTypeId String
+  serial     String   // TradeStatus.code
+  pushToken  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([deviceId, passTypeId, serial])
+  @@index([serial])
+}
