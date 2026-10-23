@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.72.1'
+export const VERSION = '1.72.2'
 export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 55
+export const THEME_INDEX = 56
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.72.2', date: '2026-10-23', notes: [
+    'The homepage is a third of the length. It was eighteen screens on a phone (the 19 October review); nobody scrolls eighteen screens. It keeps what works today: the headline, the phone, the four stage colours, four of the customer\'s rows, the two buttons the trade taps most, the live count, the house card and the ask. The wallet card\'s story, the poster strips for what is next and the four things it will never do have moved to /next, which the homepage links to twice. The whole day, every row and every button, was already /for-trades, and the homepage now says so under What you tap.',
+  ] },
   { version: '1.72.1', date: '2026-10-23', notes: [
     'The homepage leads with what works today. The headline is the owner\'s pick from the 19 October review, "Tap On my way. They stop ringing.", and the first picture is the customer\'s page from a text, which is live. The wallet card stays on the page, second, and says it is next: built, enrolment through on 21 October, certificate to come. "Android next" is gone, because Google Wallet is not started. "Thirty seconds", "live on every job" and "the tools you already use" are gone too: unmeasured, untrue for the things that need setup, and ServiceM8 is the only tool.',
     'The example job is an example all the way down. /demo said everything on it was invented and then showed the real business\'s name and a Call button that rang the real business. The customer\'s page now takes the trade from a provider (src/components/TradeProvider.jsx) that defaults to the environment, and the demo fixture wraps itself in an invented plumber with no phone. Every real page is unchanged.',
