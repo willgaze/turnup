@@ -159,11 +159,11 @@ button does. There is no `vercel deploy` or `vercel --prod` in the script.
 
 ## After it is in a wallet
 
-- `src/app/preview/posters/Posters.jsx` carries the badge "Built · awaiting
-  Apple" on the wallet frame; change it the day the first real card is in a
-  wallet.
-- The roadmap item `wallet-pass` in `src/lib/roadmap.js` moves to `live`, and
-  the plan's STATUS row goes green, in the same push.
+**The first real card went into the owner's wallet on 23 Oct 2026.** Done
+that day (v1.71.1): the "Built · awaiting Apple" badge is gone from the
+homepage and the wallet poster, `wallet-pass` in `src/lib/roadmap.js` is
+`live`, and the plan's STATUS row is green.
+
 - The pass does not yet update itself: that is the PassKit web service
   (`/api/passes/v1/...`) and an APNs push, the next build after this.
 - The lock-screen app is the other thing the membership unlocks; its own

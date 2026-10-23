@@ -22,7 +22,9 @@ const DEMO = {
   jobAddress: 'Church Lane, Burbage SN8', arrivingAt: '2026-10-01T07:00:00.000Z',
 }
 
-const BADGE = { ready: 'Built · awaiting Apple', next: 'Next' }
+// 'ready' carried "Built · awaiting Apple" until 23 Oct 2026, when the first
+// real card went into a wallet. A live poster carries no badge.
+const BADGE = { next: 'Next' }
 
 /* How much of the cab photograph a poster shows. Wider than the canvas, so
  * the screen is big enough to read, shifted right so the glass sits

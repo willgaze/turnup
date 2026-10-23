@@ -1508,38 +1508,39 @@ calling it done; nothing scrolls sideways but a strip that means to.
 
 ## Not built yet
 
-**The wallet pass.** This is the premise of the product and it does not exist.
-Today the customer gets a web page; the idea is a card that sits in Apple
-Wallet and Google Wallet and updates itself. Both need credentials the
-repository does not have:
+**The wallet pass.** The premise of the product, and since 23 Oct 2026 it
+exists on Apple: **Add to Apple Wallet** on a live job link puts a signed card
+in the wallet. The first real one went into the owner's own iPhone that day.
+What it does not yet do is move: a pass shows the stage from the moment it was
+added, because the PassKit web service (`/api/passes/v1`: device registration,
+"what changed", and an APNs push with the same certificate) is not built. The
+pass JSON already advertises `webServiceURL`, so Wallet will start calling it
+the day the routes exist. **Do not say anywhere customer-facing that the card
+updates itself** until it does; `WalletStory.jsx` says the page does this today
+and the card is next, and that stays true until the service ships.
 
-- **Apple Wallet (PassKit)** — an Apple Developer Program membership and a Pass
-  Type ID certificate. Everything else is built and tested with a stand-in
-  chain (v1.15.4): `bash scripts/apple-wallet.sh csr` makes the key and the
-  request, `finish pass.cer` turns Apple's certificate into the six `PASSKIT_*`
-  settings (`docs/apple-wallet.md`). The library wants **PEM, never a .p12**.
-  **The enrolment went through on 21 Oct 2026**, so the certificate is the
-  next thing, and it is a Cowork job on the owner's Mac
-  (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
-  never in a session container. The script falls back for macOS's LibreSSL,
-  which has no `-traditional` flag and writes PKCS#1 anyway.
+- **Apple Wallet (PassKit)**: live. The Apple Developer enrolment went through
+  on 21 Oct 2026 and the certificate (`pass.com.getturnup.job`, team
+  `WTS45T2YD3`, good until 20 Nov 2027, calendar reminder set) was made the
+  same day as a Cowork job on the owner's Mac (`docs/cowork-apple-wallet.md`),
+  because the key must be made where it survives, never in a session
+  container. `bash scripts/apple-wallet.sh csr` makes the key and the request,
+  `finish pass.cer` turns Apple's certificate into the six `PASSKIT_*`
+  settings (`docs/apple-wallet.md`), and `vercel` puts them in Vercel. The
+  library wants **PEM, never a .p12**. The script falls back for macOS's
+  LibreSSL, which has no `-traditional` flag and writes PKCS#1 anyway.
   **The `vercel` step never deploys from the key folder** (21 Oct 2026): it
   used to end in `vercel --prod --yes`, which run inside `~/TurnUp-Apple`
   uploads the folder, key and all, to a new project named after it. It now
   links to `turnup` by name, writes `.vercelignore` with `*`, and uses
   `vercel redeploy` on the live host. Keep `vercel deploy`/`--prod` out of it.
-  **The certificate is live since 21 Oct 2026**: `/api/passes/<code>` serves a
-  signed pass and the signature verifies against Apple's chain (checked from a
-  session the same day). The badge, the roadmap and the plan stay amber until
-  the first card is seen in a real wallet.
-  Still to build once a real pass is in a wallet: the `/api/passes/v1` web
-  service (device registration, "what changed" and APNs pushes) so the card
-  updates itself; today a pass shows the stage at the moment it was added.
-- **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
-  a service account key.
+  Checked from a session on 21 Oct: `/api/passes/<code>` serves a `.pkpass`
+  whose signature verifies against Apple's WWDR G4 chain.
+- **Google Wallet**: not built. A Google Cloud project, a Wallet API issuer
+  account, and a service account key.
 
-Until those exist, the honest position is that this is a link, not a card. Do
-not describe it as a wallet pass anywhere customer-facing.
+The honest position: on an iPhone it is a card, a still one; on Android it is
+a link. Say exactly that and no more.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 

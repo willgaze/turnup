@@ -129,7 +129,7 @@ export default function Home() {
               <span>The job, as a card in their wallet.</span>
               <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[12px] font-semibold"
                     style={{ color: 'var(--tint)', borderColor: 'color-mix(in srgb, var(--tint) 35%, transparent)', background: 'color-mix(in srgb, var(--tint) 10%, transparent)' }}>
-                Built · awaiting Apple
+                In Apple Wallet
               </span>
             </figcaption>
           </figure>
