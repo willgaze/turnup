@@ -313,7 +313,7 @@ function PassBack() {
 const LIKE = [
   ['One per job', 'like a ticket', <TickIcon key="t" size={20} />],
   ['Beside their bank card', 'where they already look', <WalletIcon key="w" size={20} />],
-  ['Will change as the job moves', 'once Apple signs it: not yet', <BellIcon key="b" size={20} />],
+  ['Changes as the job moves', 'the card updates itself', <BellIcon key="b" size={20} />],
   ['Scan it', 'the page opens', <PhoneIcon key="p" size={20} />],
 ]
 

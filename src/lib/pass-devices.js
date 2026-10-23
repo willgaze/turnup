@@ -7,7 +7,7 @@
  * added at — today's behaviour — rather than a stage tap erroring.
  */
 import { prisma } from '@/lib/prisma'
-import { pushToDevice, GONE, apnsConfigured } from '@/lib/apns'
+import { pushToDevice, GONE, apnsConfigured, apnsMissing } from '@/lib/apns'
 
 /**
  * Wallet registered, or re-registered. Apple re-sends this after a reinstall
@@ -85,9 +85,18 @@ export async function serialsChangedSince(deviceLibraryIdentifier, passTypeIdent
  */
 export async function notifyPassUpdated(code) {
   try {
-    if (!apnsConfigured() || !code) return { sent: 0, devices: 0 }
+    if (!code) return { sent: 0, devices: 0 }
     const rows = await prisma.passDevice.findMany({ where: { serialNumber: code } })
+    // Nobody holds this card. Not a problem, and not worth a line in the log.
     if (!rows.length) return { sent: 0, devices: 0 }
+
+    // Somebody DOES hold it and we cannot push: say why, by name. A card that
+    // silently stops moving is the whole failure this service exists to avoid,
+    // and "nothing in the log" is the hardest version of it to diagnose.
+    if (!apnsConfigured()) {
+      console.warn(`pass push not configured for ${rows.length} device(s): ${apnsMissing().map((m) => m.key).join(', ')}`)
+      return { sent: 0, devices: rows.length, blocked: true }
+    }
 
     let sent = 0
     const gone = []

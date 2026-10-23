@@ -23,16 +23,17 @@
  * the thing it is trying to fix. Same rule as `notifyStage()`.
  */
 import http2 from 'node:http2'
-import { pem } from '@/lib/passkit'
+import { pem, apnsConfigured, apnsMissing } from '@/lib/pass-auth'
+
+// Re-exported so the routes and pass-devices.js keep importing them from here,
+// where the push lives. The bodies are in pass-auth.js only because that file
+// is pure and a check can therefore load it; see the note there.
+export { apnsConfigured, apnsMissing }
 
 const HOST = 'https://api.push.apple.com'
 
 /** 410 means the device threw the pass away. The row goes; it is not retried. */
 export const GONE = 410
-
-export function apnsConfigured() {
-  return Boolean(process.env.PASSKIT_CERT_PEM && process.env.PASSKIT_KEY_PEM && process.env.PASSKIT_PASS_TYPE_ID)
-}
 
 /**
  * One ping to one device. Resolves `{ status }` and never rejects.

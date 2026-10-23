@@ -77,3 +77,55 @@ export function sinceFromTag(tag) {
   if (!tag || !Number.isFinite(n) || n < 0) return new Date(0)
   return new Date(n)
 }
+
+/**
+ * A PEM, whether it was pasted as text or as one line of base64.
+ *
+ * It lives here rather than in passkit.js because the two functions below are
+ * the only ones a check can reach: passkit.js pulls in passkit-generator and
+ * three aliased modules, so a bare node script cannot load it, which is how
+ * the bug below sat untested. passkit.js re-exports this, so nothing that
+ * imported it from there has changed.
+ */
+export function pem(value) {
+  const v = String(value || '').trim()
+  if (!v) return ''
+  if (v.includes('-----BEGIN')) return v.replace(/\\n/g, '\n')
+  const decoded = Buffer.from(v, 'base64').toString('utf8')
+  return decoded.includes('-----BEGIN') ? decoded : v
+}
+
+/**
+ * Can a pass update actually be pushed?
+ *
+ * Found by the audit on 23 Oct 2026, the day the first real card appeared:
+ * `scripts/apple-wallet.sh` writes the private key **AES-256 encrypted**, so
+ * APNs needs `PASSKIT_KEY_PASSWORD` as well as the certificate and the key.
+ * The gate did not look at it. With the passphrase missing it answered
+ * "configured", the TLS handshake failed, the error was swallowed — correctly,
+ * because a stage tap on a driveway must survive — and every card quietly
+ * stopped updating with nothing in the log to say why.
+ *
+ * A gate that reports itself ready and opens onto nothing is a mistake this
+ * product has shipped twice (the push row, the forwarding address). It says no
+ * instead, and `apnsMissing()` names what is wanted.
+ */
+export function apnsConfigured() {
+  if (!process.env.PASSKIT_CERT_PEM || !process.env.PASSKIT_KEY_PEM || !process.env.PASSKIT_PASS_TYPE_ID) return false
+  if (/ENCRYPTED/.test(pem(process.env.PASSKIT_KEY_PEM)) && !process.env.PASSKIT_KEY_PASSWORD) return false
+  return true
+}
+
+/** What is stopping a push, named, so a card that never moves is diagnosable. */
+export function apnsMissing() {
+  const out = []
+  for (const [key, what] of [
+    ['PASSKIT_CERT_PEM', 'the Pass Type ID certificate'],
+    ['PASSKIT_KEY_PEM', 'its private key'],
+    ['PASSKIT_PASS_TYPE_ID', 'the pass type, which is also the APNs topic'],
+  ]) if (!process.env[key]) out.push({ key, what })
+  if (/ENCRYPTED/.test(pem(process.env.PASSKIT_KEY_PEM)) && !process.env.PASSKIT_KEY_PASSWORD) {
+    out.push({ key: 'PASSKIT_KEY_PASSWORD', what: 'the passphrase on that key, which is encrypted' })
+  }
+  return out
+}

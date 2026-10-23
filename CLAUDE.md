@@ -1321,6 +1321,19 @@ the **same Pass Type ID certificate that signs the pass**, and never throws.
 A 410 means the pass was deleted from that wallet: the row goes and is never
 retried, the same rule the web-push subscriptions follow.
 
+**`apnsConfigured()` and `apnsMissing()` live in `src/lib/pass-auth.js`, not
+in `apns.js`**, and the reason is the bug they exist for. `apns.js` imports
+`passkit.js`, which pulls in `passkit-generator` and three aliased modules, so
+no bare node script can load it — and the gate that sat there went untested
+and was wrong: the private key `scripts/apple-wallet.sh` writes is **AES-256
+encrypted**, so a push needs `PASSKIT_KEY_PASSWORD` too, and the gate did not
+look at it. It answered "configured", the handshake failed, the error was
+swallowed, and a card quietly never updated. `pem()` moved across with them
+and `passkit.js` re-exports it. **If a push gate cannot be reached by a check,
+move the gate, not the check.** And when devices hold a card that cannot be
+pushed, `notifyPassUpdated()` logs the missing names: silence in the log is
+the one failure mode nobody can diagnose.
+
 `notifyPassUpdated()` is called **un-awaited, inside `after()`**, from the
 tracker PATCH and from `syncTracker()` — the two places a field the pass shows
 moves. Same rule as `notifyStage()`: the trade tapped a button on a driveway.
@@ -1331,7 +1344,7 @@ time Wallet asks, which it does, because the changed-serials route compares
 **Two checks, because one of them could not see a handler.**
 
 ```bash
-node scripts/check-pass-service.mjs        # 30 cases, no database, no server
+node scripts/check-pass-service.mjs        # 37 cases, no database, no server
 bash scripts/local-db.sh                   # then, for the other one:
 PASSKIT_PASS_TYPE_ID=pass.com.getturnup.job npm run build && npx next start
 node scripts/live-pass-service.mjs         # 24 cases, against the real routes
@@ -1601,29 +1614,34 @@ calling it done; nothing scrolls sideways but a strip that means to.
 
 ## Not built yet
 
-**The wallet pass.** This is the premise of the product and it does not exist.
-Today the customer gets a web page; the idea is a card that sits in Apple
-Wallet and Google Wallet and updates itself. Both need credentials the
-repository does not have:
+**The wallet pass was the premise of the product and the thing it did not have.
+Half of that is now untrue.**
 
-- **Apple Wallet (PassKit)** — an Apple Developer Program membership and a Pass
-  Type ID certificate. Everything else is built and tested with a stand-in
-  chain (v1.15.4): `bash scripts/apple-wallet.sh csr` makes the key and the
-  request, `finish pass.cer` turns Apple's certificate into the six `PASSKIT_*`
-  settings (`docs/apple-wallet.md`). The library wants **PEM, never a .p12**.
-  **The enrolment went through on 21 Oct 2026**, so the certificate is the
-  next thing, and it is a Cowork job on the owner's Mac
-  (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
-  never in a session container. The script falls back for macOS's LibreSSL,
-  which has no `-traditional` flag and writes PKCS#1 anyway.
-  The web service that keeps a pass current is **built** (v1.73.0, below);
-  what is missing is only the certificate, so the day it lands the card
-  updates itself rather than needing another build.
+**Apple Wallet is DONE, as of 23 Oct 2026.** A real signed pass is in a real
+wallet — job #2742, added from the customer's own page — and production has all
+six `PASSKIT_*` settings (`/api/passes/<code>?preview=1` answers
+`configured: true, missing: []`). The enrolment went through on 21 Oct and the
+certificate the day after; `bash scripts/apple-wallet.sh csr` then
+`finish pass.cer` is what made it, on the owner's Mac, because the key must be
+made where it survives. The library wants **PEM, never a .p12**, and the key
+the script writes is **AES-256 encrypted**, so `PASSKIT_KEY_PASSWORD` is a
+sixth setting that both signing and APNs need — `apnsConfigured()` checks it
+for that reason, rather than reporting itself ready and then failing into a
+swallowed error.
+
+So the honest line has moved, and this is the first day it may say *card*:
+**Apple Wallet is live and a card that updates itself ships with v1.73.0.**
+Google Wallet is not, and nothing customer-facing may suggest otherwise.
+
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
-  a service account key.
+  a service account key. None exists. Until it does, Android gets the link.
 
-Until those exist, the honest position is that this is a link, not a card. Do
-not describe it as a wallet pass anywhere customer-facing.
+**What a real card proved that no check could.** The first one was added while
+the update service was still in a branch, so it froze at the stage it was
+added: the card read *Booked in* with no note while the job had said *running
+about 30 minutes late* fourteen hours earlier. That is the gap this product
+exists to close, demonstrated on the owner's own phone, and it is the argument
+for why the update service is not optional polish.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 

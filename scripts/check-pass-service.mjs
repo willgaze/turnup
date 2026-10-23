@@ -89,5 +89,41 @@ check(sinceFromTag('nonsense').getTime() === 0, 'and so does a tag that is not a
 check(sinceFromTag('-5').getTime() === 0, 'and a negative one')
 check(sinceFromTag('0').getTime() === 0, 'zero is the beginning of time too')
 
-console.log(failed ? `\nFAILED — ${failed} check(s)` : '\nThe pass credential holds. The paths are proved by the first real card.')
+/* Whether a push can even be attempted ----------------------------------- */
+
+// The audit of 23 Oct 2026, the day the first real card appeared: the private
+// key scripts/apple-wallet.sh writes is AES-256 ENCRYPTED, so APNs needs
+// PASSKIT_KEY_PASSWORD as well. The gate did not look at it, so with the
+// passphrase missing it answered "configured", the TLS handshake failed, the
+// error was swallowed (correctly — a stage tap must survive) and every card
+// quietly stopped updating with nothing in the log. A gate that opens onto
+// nothing is the mistake this product has shipped twice.
+const { apnsConfigured, apnsMissing } = await import('../src/lib/pass-auth.js')
+
+const ENCRYPTED = '-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: AES-256-CBC,00\n\nabc\n-----END RSA PRIVATE KEY-----'
+const PLAIN = '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----'
+
+const apns = (key, password) => {
+  process.env.PASSKIT_CERT_PEM = '-----BEGIN CERTIFICATE-----\nabc\n-----END CERTIFICATE-----'
+  process.env.PASSKIT_PASS_TYPE_ID = 'pass.com.getturnup.job'
+  if (key === null) delete process.env.PASSKIT_KEY_PEM
+  else process.env.PASSKIT_KEY_PEM = key
+  if (password === null) delete process.env.PASSKIT_KEY_PASSWORD
+  else process.env.PASSKIT_KEY_PASSWORD = password
+  return apnsConfigured()
+}
+
+check(apns(PLAIN, null) === true, 'an unencrypted key needs no passphrase')
+check(apns(ENCRYPTED, 'hunter2') === true, 'an encrypted key with its passphrase is ready to push')
+check(apns(ENCRYPTED, null) === false,
+  'an encrypted key with NO passphrase is NOT ready, rather than ready and silently broken')
+check(apnsMissing().some((m) => m.key === 'PASSKIT_KEY_PASSWORD'),
+  'and it names the passphrase, so a card that never updates is diagnosable')
+check(apns(null, 'hunter2') === false, 'no key at all is not ready')
+check(apnsMissing().some((m) => m.key === 'PASSKIT_KEY_PEM'), 'and it names the key')
+
+delete process.env.PASSKIT_CERT_PEM
+check(apnsConfigured() === false, 'and no certificate is not ready')
+
+console.log(failed ? `\nFAILED — ${failed} check(s)` : '\nThe pass credential holds, and a push that cannot be sent says so.')
 process.exit(failed ? 1 : 0)
