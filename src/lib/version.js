@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.72.2'
+export const VERSION = '1.73.0'
 export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 56
+export const THEME_INDEX = 57
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.73.0', date: '2026-10-23', notes: [
+    'Every moment that matters now reaches a customer with no notifications on. Sorry we missed you, running late (your own figure, with when you said it) and paused join set off, window missed and the day-before ask: an email through ServiceM8 when no push landed, once each per job. That closes the rule that every customer-critical event has a fallback that is not a push.',
+    'Connect Gmail is parked, not pending. The panel and the paste exist; your own inbox already reaches the card through the Workspace forwarding rule; it comes back when other households can connect, which waits on Google. Nobody asks you about it again.',
+  ] },
   { version: '1.72.2', date: '2026-10-23', notes: [
     'The homepage is a third of the length. It was eighteen screens on a phone (the 19 October review); nobody scrolls eighteen screens. It keeps what works today: the headline, the phone, the four stage colours, four of the customer\'s rows, the two buttons the trade taps most, the live count, the house card and the ask. The wallet card\'s story, the poster strips for what is next and the four things it will never do have moved to /next, which the homepage links to twice. The whole day, every row and every button, was already /for-trades, and the homepage now says so under What you tap.',
   ] },

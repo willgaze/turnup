@@ -46,8 +46,8 @@ export { askNudgeDue, inQuietHours, askExpired, MAX_ASK_NUDGES, QUIET_FROM, QUIE
 
 // The email fallback when no push landed (src/lib/customer-email.js). Imported
 // at call time: customer-email needs servicem8, and servicem8 imports this file.
-async function emailCustomer(tracker, kind, pushed) {
-  try { return await (await import('@/lib/customer-email')).emailIfUnreached(tracker, kind, pushed) } catch { return { emailed: false } }
+async function emailCustomer(tracker, kind, pushed, extra = {}) {
+  try { return await (await import('@/lib/customer-email')).emailIfUnreached(tracker, kind, pushed, extra) } catch { return { emailed: false } }
 }
 const first = (t) => t.customerName ? t.customerName.split(' ')[0] : 'The customer'
 const hhmm = (d) => new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' })
@@ -230,7 +230,10 @@ export async function runningLate(tracker, minutes) {
     lateMinutes: m, lateAt: m ? now : null, askAnsweredAt: now,
     ...(note ? { stageNote: note, events: { create: { stage: tracker.stage, note } } } : {}),
   } })
-  if (m) notifyCustomer(updated, { title: 'Running late', body: `${TRADE_NAME} says about ${m} minutes late, and is sorry.` }).catch(() => {})
+  if (m) {
+    notifyCustomer(updated, { title: 'Running late', body: `${TRADE_NAME} says about ${m} minutes late, and is sorry.` })
+      .then((c) => emailCustomer(updated, 'RUNNING_LATE', c, { lateMinutes: m, saidAt: now })).catch(() => {})
+  }
   if (m) diaryFor(updated, `Running about ${m} minutes late, customer told.`).catch(() => {})
   return updated
 }

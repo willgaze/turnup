@@ -70,7 +70,11 @@ export async function recordNoAccess(tracker, body) {
     stage: 'PAUSED', stageNote: note, askAnsweredAt: tracker.askedAt && !tracker.askAnsweredAt ? new Date() : undefined,
     events: { create: { stage: 'PAUSED', note, deviceAt: tap.deviceAt, offline: tap.offline } },
   } })
-  notifyCustomer(updated, { title: 'Sorry we missed you', body: `${TRADE_NAME} was at the door and could not get in. Open the page to say when suits.` }).catch(() => {})
+  // By email too when no push landed (src/lib/customer-email.js, v1.73.0):
+  // the one customer who most needs to hear this is the one who was out.
+  notifyCustomer(updated, { title: 'Sorry we missed you', body: `${TRADE_NAME} was at the door and could not get in. Open the page to say when suits.` })
+    .then(async (c) => { try { await (await import('@/lib/customer-email')).emailIfUnreached(updated, 'NO_ACCESS', c) } catch { /* fails soft */ } })
+    .catch(() => {})
   diaryFor(updated, `No one home. At the door ${hhmm(startedAt)}, ${tried(attempts)}, waited ${waited} min${photo ? ', door photo taken' : ''}${fee ? `, GBP ${fee} as agreed` : ', nothing charged'}. Customer told and asked when suits.`).catch(() => {})
   return { row: { id: row.id, startedAt, leftAt, attempts, photoTaken: Boolean(photo), fee }, tracker: updated }
 }

@@ -42,7 +42,7 @@ async function whoIsComing() {
  *
  * @returns {Promise<{emailed: boolean, outcome: string}>}
  */
-export async function emailIfUnreached(tracker, kind, pushed) {
+export async function emailIfUnreached(tracker, kind, pushed, extra = {}) {
   try {
     const decision = emailDecision({
       kind,
@@ -68,7 +68,7 @@ export async function emailIfUnreached(tracker, kind, pushed) {
     const to = contact?.email ? String(contact.email).trim() : ''
     if (!validEmail(to)) { await done('no_email'); return { emailed: false, outcome: 'no_email' } }
 
-    const mail = emailFor({ kind, tradeName: TRADE_NAME, host: CANONICAL_HOST, code: tracker.code, who: kind === 'ON_MY_WAY' ? await whoIsComing() : {}, pushOn: pushConfigured() })
+    const mail = emailFor({ kind, tradeName: TRADE_NAME, host: CANONICAL_HOST, code: tracker.code, who: kind === 'ON_MY_WAY' ? await whoIsComing() : {}, pushOn: pushConfigured(), ...extra })
     try {
       const r = await sendEmail({ to, subject: mail.subject, text: mail.text, jobUuid: tracker.externalId })
       await done('sent', r.messageID)

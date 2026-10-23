@@ -79,11 +79,13 @@ export async function notifyStage(tracker, stage) {
   // no phone of theirs took the push, it goes by email (src/lib/customer-email.js,
   // switched on under ServiceM8 on the dashboard). Imported here rather than
   // at the top because customer-email needs servicem8, which needs this file.
-  if (stage === 'ON_MY_WAY') {
+  // Paused joined it in v1.73.0: a customer waiting in should know the job
+  // has stopped, and the reason is on the page, never in the email.
+  if (stage === 'ON_MY_WAY' || stage === 'PAUSED') {
     try {
       const { emailIfUnreached } = await import('@/lib/customer-email')
-      await emailIfUnreached(tracker, 'ON_MY_WAY', r)
-    } catch (error) { console.error('customer email after set-off failed:', error?.message) }
+      await emailIfUnreached(tracker, stage, r)
+    } catch (error) { console.error('customer email after stage change failed:', error?.message) }
   }
   return r
 }
