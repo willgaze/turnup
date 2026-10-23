@@ -1548,6 +1548,13 @@ ringing.", the first picture is the customer's page from a text, and the card
 sits second under a caption that says it is next. Keep it that way until a pass
 is in a wallet; then the card can lead again.
 
+**And it is short (v1.72.2).** Eighteen phone screens became about six. The
+wallet story (`WalletStory`), the poster strips (`byGroup('either')` and
+`byGroup('next')`) and the never-list live on **`/next`** (`src/app/next/page.js`),
+and the homepage shows four customer rows and two trade buttons, not eight and
+six: the whole day is `/for-trades`. Before adding a section to the homepage,
+ask which of these three pages it belongs on; the answer is rarely the homepage.
+
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 
 Several sessions build this app in a day, and the words that describe it fall
