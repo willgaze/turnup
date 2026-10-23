@@ -10,6 +10,7 @@ import { isValidStage } from '@/lib/trade-status'
 import { dbReason } from '@/lib/db-errors'
 import { cleanText } from '@/lib/clean-text'
 import { notifyStage } from '@/lib/push'
+import { pushPassUpdate } from '@/lib/pass-service'
 import { syncTrackerToCards } from '@/lib/arrivals'
 import { proposeWindow, agreeWindow, clearWindow, revisionFor, dayMoveFor, windowHours, lastShown } from '@/lib/window'
 import { dayOnly } from '@/lib/when'
@@ -211,6 +212,13 @@ export async function PATCH(request, { params }) {
         console.error('push: notify failed after stage change:', error?.message),
       ))
     }
+
+    // Any Apple Wallet holding this job's pass is told it changed, and asks
+    // the web service for the new one (v1.70.2). On every save, not only a
+    // stage change, because the back of the pass carries the note and the
+    // set-off time. pushPassUpdate() never throws; a job nobody added to
+    // Wallet costs one indexed query.
+    after(() => pushPassUpdate(tracker.code))
 
     // Any household card carrying this job moves with it. Un-awaited and
     // swallowed for the same reason as the push above: the household card is a

@@ -1458,8 +1458,9 @@ The wallet section (`src/components/WalletStory.jsx`) is drawn from
 `PassCard`, the same component the real pass is built from, so it cannot
 drift. It carries the same badges the posters do, and the lock screen shows
 the push notification (live) and not the Wallet card (not yet): see *Not built
-yet* below, and do not let that section say the card updates itself in Wallet
-until the pass web service exists.
+yet* below. The pass web service exists since v1.70.2, but do not let that
+section say the card updates itself in Wallet until it has been seen to on a
+real phone.
 
 ## Getting on the list (`/join`, v1.62.0)
 
@@ -1517,9 +1518,17 @@ repository does not have:
   (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
   never in a session container. The script falls back for macOS's LibreSSL,
   which has no `-traditional` flag and writes PKCS#1 anyway.
-  Still to build once a real pass is in a wallet: the `/api/passes/v1` web
-  service (device registration, "what changed" and APNs pushes) so the card
-  updates itself; today a pass shows the stage at the moment it was added.
+  **The pass web service is built (v1.70.2)**: `src/app/api/passes/v1/`,
+  `src/lib/pass-service.js` (database, APNs) and `src/lib/pass-service-words.js`
+  (pure rules; `node scripts/check-pass-service.mjs`). Every tracker save and
+  every ServiceM8 stage move calls `pushPassUpdate()` un-awaited, an empty
+  push with the Pass Type ID certificate, and Wallet fetches the pass afresh
+  through `publicShape()`, so an updated pass can carry nothing the first one
+  could not. Only the stage has a `changeMessage`; the check fails if any
+  other field gains one, because that field would then reach the lock screen.
+  Before it, a pass stayed on the stage it was added at (job #2742: Job done
+  on the dashboard, Booked in on the pass). A pass added before v1.70.2 never
+  registered and must be removed and added again.
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key.
 

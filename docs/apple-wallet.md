@@ -91,12 +91,30 @@ does the pasting if the Vercel CLI is signed in.
 
 ## What the pass does today, honestly
 
-It shows the stage at the moment it was added, with the QR code to the full
-page. It does **not yet update itself**: that needs the PassKit web service
-(`/api/passes/v1/...` for device registration and "what changed") and an APNs
-push with the same certificate, which is the next job after the first card is
-in a wallet. The pass JSON already advertises `webServiceURL`, so Wallet will
-start calling it the day the routes exist.
+It shows the job's stage with the QR code to the full page, and **since
+v1.70.2 it updates itself**. Until then it did not: job #2742 was Job done on
+the dashboard and its pass still said "Booked in, Step 1 of 4", because the
+pass named a `webServiceURL` nobody had built and Wallet got a 404.
+
+| Route | What Wallet uses it for |
+|---|---|
+| `POST/DELETE /api/passes/v1/devices/<device>/registrations/<type>/<code>` | a phone starts or stops following a pass |
+| `GET /api/passes/v1/devices/<device>/registrations/<type>?passesUpdatedSince=` | which passes changed |
+| `GET /api/passes/v1/passes/<type>/<code>` | the pass as it is now, built from the job |
+| `POST /api/passes/v1/log` | Wallet's own errors, into the Vercel log |
+
+Every save of a job (`/api/dashboard/trackers/<id>` PATCH, and a stage moved
+by ServiceM8) calls `pushPassUpdate()` in `src/lib/pass-service.js`: an empty
+push to APNs with the same Pass Type ID certificate, after which Wallet asks
+for the new pass. The rules are pure, in `src/lib/pass-service-words.js`, and
+`node scripts/check-pass-service.mjs` proves them. Registrations live in
+`PassRegistration` (a new table, so it fails soft). The stage field carries
+`changeMessage: 'Now: %@'`, so the lock screen shows the stage and nothing
+else.
+
+**A pass added before v1.70.2 never registered**, because the routes 404'd.
+Delete it from Wallet and add it again; the new one registers. A pull-down on
+the back of a pass also asks for the latest version, push or no push.
 
 The certificate expires after a year. The `finish` command prints the date;
 put it in the diary.

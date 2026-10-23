@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.70.0'
-export const BUILD_DATE = '2026-10-20'
+export const VERSION = '1.70.2'
+export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.70.2', date: '2026-10-23', notes: [
+    'The card in Apple Wallet now follows the job. Until today it showed the stage it was added at and never moved: job #2742 was Job done on the dashboard and its pass still said Booked in, Step 1 of 4, because the pass pointed Wallet at an update service that had never been built.',
+    'That service now exists, to Apple\'s own spec: a phone registers for a pass, every save of the job sends Wallet an empty push, and Wallet fetches the pass afresh, built from the job as it is now. A pull-down on the back of the pass does the same without a push.',
+    'The lock screen shows "Now: On my way" and nothing more: the stage is the only field that announces itself. A check fails if any other field ever does (node scripts/check-pass-service.mjs).',
+    'A pass added before today never registered. Remove it from Wallet and add it again. Built and checked here; the real test is your phone.',
+  ] },
   { version: '1.70.0', date: '2026-10-20', notes: [
     'Job done? On my way to the next one, offered. Tap Job done and a card at the top asks whether you are heading to the next job booked today, with their name, the job and the hours. One tap sends On my way, exactly as the button on their card would: push, the email fallback, the ServiceM8 diary. Not yet puts it away. If nothing else is booked today it says so. It never offers tomorrow\'s job and never names a time.',
   ] },

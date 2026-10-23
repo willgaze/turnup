@@ -90,7 +90,9 @@ export function buildPassJson(status, { origin, authToken }) {
     labelColor: 'rgb(157, 182, 205)',
 
     // How the pass keeps itself up to date. Wallet calls this service, and a
-    // push tells it when to bother.
+    // push tells it when to bother. Built in v1.70.2 (src/app/api/passes/v1/,
+    // src/lib/pass-service.js); before that the URL answered 404 and a pass
+    // stayed on whatever stage it was added at.
     webServiceURL: `${origin}/api/passes/v1`,
     authenticationToken: authToken,
 
@@ -111,7 +113,12 @@ export function buildPassJson(status, { origin, authToken }) {
         ...(status.jobRef ? [{ key: 'job', label: 'JOB', value: `#${status.jobRef}` }] : []),
       ],
       primaryFields: [
-        { key: 'stage', label: 'STATUS', value: stage.label },
+        // changeMessage is what Wallet puts on the lock screen when this
+        // field changes after an update (v1.70.2). The stage and nothing else:
+        // the lock-screen rule in CLAUDE.md, and Wallet adds the trade's name
+        // itself. No changeMessage on the note, the address or anything a
+        // customer said, so none of those can ever surface there.
+        { key: 'stage', label: 'STATUS', value: stage.label, changeMessage: 'Now: %@' },
       ],
       secondaryFields: [
         ...(status.customerName
