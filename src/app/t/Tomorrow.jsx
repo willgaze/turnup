@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { TRADE_NAME } from '@/lib/trade'
+import { useTrade } from '@/components/TradeProvider'
 import { CalendarIcon } from '@/components/icons'
 import { windowHours } from '@/lib/window'
 import { dayOnly, timeOnly } from '@/lib/when'
@@ -17,10 +17,10 @@ import { writeOwn } from './own-answers'
  * the trade, not a change to the booking: "Need to move it" asks, and the
  * new hours are agreed under When suits you? like any other window.
  */
-const first = TRADE_NAME.split(' ')[0]
 const REPLIES = [['OK', 'Still fine'], ['SOMEONE_ELSE', 'Someone else will be in'], ['MOVE', 'Need to move it']]
 
 export default function Tomorrow({ status, onReplied }) {
+  const first = useTrade().name.split(' ')[0]
   const [now, setNow] = useState(() => Date.now())
   const [busy, setBusy] = useState(false)
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 30_000); return () => clearInterval(t) }, [])

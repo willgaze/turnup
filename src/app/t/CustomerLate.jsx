@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { TRADE_NAME } from '@/lib/trade'
+import { useTrade } from '@/components/TradeProvider'
 import { writeOwn } from './own-answers'
 import { timeOnly } from '@/lib/when'
 
@@ -10,10 +10,10 @@ import { timeOnly } from '@/lib/when'
  * trade's phone buzzes with "expect them from about 10:20"; the minutes stay
  * on this device and with the trade, never on a forwarded link.
  */
-const first = TRADE_NAME.split(' ')[0]
 const CHOICES = [15, 30, 60]
 
 export default function CustomerLate({ status, own, onSaved }) {
+  const first = useTrade().name.split(' ')[0]
   const [busy, setBusy] = useState(null)
   const said = own?.customerLateMinutes || null
   const send = async (minutes) => {

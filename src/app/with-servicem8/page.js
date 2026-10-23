@@ -82,6 +82,12 @@ export default function WithServiceM8() {
             <span className="h-2.5 w-2.5 rounded-full" style={{ background: connected ? '#34c759' : '#ff9500' }} />
             {connected ? 'This TurnUp is connected to a ServiceM8 account' : 'This TurnUp is not connected to ServiceM8 yet'}
           </p>
+          {/* The 19 Oct review: the only button on this page's first screen was
+              Dashboard, which is a sign-in. A trade reading this is not signed in. */}
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link href="/join?as=trade" className="btn btn-filled !px-6">Get on the list</Link>
+            <Link href="/demo" className="btn btn-grey !px-6">See what they see</Link>
+          </div>
 
           <h2 className="mt-10 text-[24px] font-bold tracking-[-0.02em]">What you get</h2>
           <div className="mt-5 grid gap-6 sm:grid-cols-3">

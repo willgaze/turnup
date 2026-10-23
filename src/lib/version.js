@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.71.0'
-export const BUILD_DATE = '2026-10-22'
+export const VERSION = '1.71.1'
+export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 53
+export const THEME_INDEX = 54
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,11 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.71.1', date: '2026-10-23', notes: [
+    'The homepage leads with what works today. The headline is the owner\'s pick from the 19 October review, "Tap On my way. They stop ringing.", and the first picture is the customer\'s page from a text, which is live. The wallet card stays on the page, second, and says it is next: built, enrolment through on 21 October, certificate to come. "Android next" is gone, because Google Wallet is not started. "Thirty seconds", "live on every job" and "the tools you already use" are gone too: unmeasured, untrue for the things that need setup, and ServiceM8 is the only tool.',
+    'The example job is an example all the way down. /demo said everything on it was invented and then showed the real business\'s name and a Call button that rang the real business. The customer\'s page now takes the trade from a provider (src/components/TradeProvider.jsx) that defaults to the environment, and the demo fixture wraps itself in an invented plumber with no phone. Every real page is unchanged.',
+    'Words that had fallen behind: /for-homes said forwarding was being switched on (it is live); /join said the forwarding address comes when your place opens (it comes when the card is made); /with-servicem8 had no button on its first screen but Dashboard, which is a sign-in.',
+  ] },
   { version: '1.71.0', date: '2026-10-22', notes: [
     'The ServiceM8 add-on no longer needs Vercel. The App ID and App Secret from ServiceM8\'s Developer page are pasted into two boxes on the ServiceM8 panel and saved encrypted in your own database, and the Connect button appears straight away: no settings page, no redeploy. Two Vercel settings were asked for three times and never happened, so the ask changed. The panel now says the three steps with a link for each and a Copy button for the Return URL, instead of pointing at a file in the repository you could not tap.',
   ] },

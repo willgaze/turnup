@@ -57,6 +57,10 @@ NEXT_PUBLIC_TRADE_PHONE_TEL  "01264502027"
 
 Fitting this to a second trade must stay a configuration change, never a code
 change. `src/lib/trade.js` is the only place those are read.
+The customer's page components take the trade from `useTrade()` in
+`src/components/TradeProvider.jsx`, which defaults to those values; only `/preview`,
+and so `/demo`, overrides it, with an invented plumber and no phone (v1.71.1), because
+the demo said everything on it was invented and then rang the real business.
 
 ## What it is
 
@@ -1531,6 +1535,13 @@ repository does not have:
 
 Until those exist, the honest position is that this is a link, not a card. Do
 not describe it as a wallet pass anywhere customer-facing.
+
+**The homepage leads with the link (v1.71.1).** The 19 Oct review
+(`docs/review/2026-10-19.md`) found the first thing a stranger read was the one
+thing not built. The headline is the owner's pick, "Tap On my way. They stop
+ringing.", the first picture is the customer's page from a text, and the card
+sits second under a caption that says it is next. Keep it that way until a pass
+is in a wallet; then the card can lead again.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 

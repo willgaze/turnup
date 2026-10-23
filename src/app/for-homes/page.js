@@ -67,7 +67,7 @@ export default function ForHomes() {
         </div>
         <p className="mt-4 inline-flex items-center rounded-full border px-3 py-1 text-[13px] font-semibold"
            style={{ color: 'var(--tint)', borderColor: 'color-mix(in srgb, var(--tint) 35%, transparent)' }}>
-          Make one now · forwarding is being switched on
+          Make one now · forwarding is live
         </p>
       </section>
 
