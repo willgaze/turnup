@@ -19,6 +19,10 @@ export default function ServiceM8({ onChanged }) {
   const [note, setNote] = useState(null)
   const [testTo, setTestTo] = useState('')
   const [emailNote, setEmailNote] = useState(null)
+  const [appId, setAppId] = useState('')
+  const [appSecret, setAppSecret] = useState('')
+  const [appNote, setAppNote] = useState(null)
+  const [copied, setCopied] = useState(false)
 
   const load = useCallback(async () => {
     const r = await fetch('/api/dashboard/servicem8')
@@ -48,6 +52,27 @@ export default function ServiceM8({ onChanged }) {
       else setNote('Stopped listening.')
       await load(); onChanged?.()
     } finally { setBusy(null) }
+  }
+
+  // The two values from ServiceM8's Developer page, saved without a Vercel
+  // visit or a redeploy. The secret is never shown again once saved.
+  const saveApp = async () => {
+    setBusy('oauth_app_save'); setAppNote(null)
+    try {
+      const r = await fetch('/api/dashboard/servicem8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'oauth_app_save', appId, appSecret }) })
+      const j = await r.json().catch(() => ({}))
+      if (!r.ok) return setAppNote({ bad_app_id: 'That App ID does not look right: letters and numbers only, no spaces.', bad_app_secret: 'That App Secret does not look right: copy the whole thing, no spaces.' }[j.error] || `Did not save: ${j.error || r.status}`)
+      setAppId(''); setAppSecret('')
+      await load()
+    } finally { setBusy(null) }
+  }
+  const forgetApp = async () => {
+    setBusy('oauth_app_forget')
+    try { await fetch('/api/dashboard/servicem8', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'oauth_app_forget' }) }); await load() }
+    finally { setBusy(null) }
+  }
+  const copyReturn = async () => {
+    try { await navigator.clipboard.writeText(s?.oauth?.redirectUri || ''); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch { /* the address is on screen to copy by hand */ }
   }
 
   const live = s?.configured && (s?.subscriptions?.length || 0) > 0
@@ -162,12 +187,33 @@ export default function ServiceM8({ onChanged }) {
                   </>
                 ) : s.oauth?.configured ? (
                   <>
-                    <p className="mt-1 muted">The app details are in. One more step: authorise it on your ServiceM8 account.</p>
+                    <p className="mt-1 muted">App {s.oauth.appIdTail ? `ending ${s.oauth.appIdTail} ` : ''}is in. One more step: authorise it on your ServiceM8 account.</p>
                     <a href="/api/servicem8/oauth/start" className="btn accent-fill mt-2.5 !min-h-[44px] !px-4 !text-[14px]">Connect ServiceM8 as an add-on</a>
+                    {s.oauth.source === 'saved' && (
+                      <button type="button" onClick={forgetApp} disabled={busy} className="mt-2 block text-[13px] underline muted">Wrong app? Clear it and paste again</button>
+                    )}
                   </>
                 ) : (
                   <>
-                    <p className="mt-1 muted">Needs a free ServiceM8 developer account and two settings in Vercel (<code className="font-mono">SM8_APP_ID</code>, <code className="font-mono">SM8_APP_SECRET</code>). The steps are in <code className="font-mono">docs/servicem8-add-on.md</code>. Return URL for the app: <code className="font-mono break-all">{s.oauth?.redirectUri}</code></p>
+                    {/* Three steps, each with where to go. No Vercel, no redeploy:
+                        asked for three times, that step never happened. */}
+                    <ol className="mt-2 grid gap-2.5 text-[14px]">
+                      <li><span className="font-semibold">1. </span>Sign up free as a ServiceM8 developer, with your normal login:{' '}
+                        <a className="underline" href="https://www.servicem8.com/developer-registration" target="_blank" rel="noreferrer">servicem8.com/developer-registration</a></li>
+                      <li><span className="font-semibold">2. </span>In <a className="underline" href="https://go.servicem8.com" target="_blank" rel="noreferrer">ServiceM8</a>: menu, <span className="font-semibold">Developer</span>, <span className="font-semibold">Add Item</span>. Name it TurnUp, and pick the type that is <span className="font-semibold">not</span> Simple Function. Set its Return URL to:
+                        <span className="mt-1.5 flex items-center gap-2">
+                          <code className="font-mono break-all text-[12px]">{s.oauth?.redirectUri}</code>
+                          <button type="button" onClick={copyReturn} className="btn btn-grey shrink-0 !min-h-[34px] !px-3 !text-[12px]">{copied ? 'Copied' : 'Copy'}</button>
+                        </span></li>
+                      <li><span className="font-semibold">3. </span>Paste the App ID and App Secret it shows you here.</li>
+                    </ol>
+                    <div className="mt-2.5 grid gap-2">
+                      <input className="field" inputMode="text" autoComplete="off" autoCapitalize="off" spellCheck={false} placeholder="App ID" value={appId} onChange={(e) => setAppId(e.target.value)} />
+                      <input className="field" type="password" autoComplete="off" autoCapitalize="off" spellCheck={false} placeholder="App Secret" value={appSecret} onChange={(e) => setAppSecret(e.target.value)} />
+                      <button type="button" onClick={saveApp} disabled={busy || !appId.trim() || !appSecret.trim()} className="btn accent-fill !min-h-[44px] !px-4 !text-[14px]">{busy === 'oauth_app_save' ? 'Saving…' : 'Save'}</button>
+                    </div>
+                    {appNote && <p className="mt-2 text-[13px]">{appNote}</p>}
+                    <p className="mt-2 text-[12px] muted">Kept encrypted in your own database. Never shown again once saved.</p>
                   </>
                 )}
               </div>

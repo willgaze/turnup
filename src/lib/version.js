@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.70.1'
-export const BUILD_DATE = '2026-10-21'
+export const VERSION = '1.71.1'
+export const BUILD_DATE = '2026-10-23'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 53
+export const THEME_INDEX = 54
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,13 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.71.1', date: '2026-10-23', notes: [
+    'The card is in a wallet. The first real TurnUp pass was added to Apple Wallet on the owner\'s iPhone on 23 Oct 2026, from a live job link, signed with the certificate made two days before. The homepage badge "Built, awaiting Apple" is gone, the wallet poster is live, the roadmap says wallet pass is live, and the plan\'s row is green.',
+    'Said plainly, because the rule here is to say what is true: the card shows the stage from the moment it was added. It does not yet move when a stage is tapped. That is the pass update service, the next build, and nothing on the homepage or the plan says otherwise.',
+  ] },
+  { version: '1.71.0', date: '2026-10-22', notes: [
+    'The ServiceM8 add-on no longer needs Vercel. The App ID and App Secret from ServiceM8\'s Developer page are pasted into two boxes on the ServiceM8 panel and saved encrypted in your own database, and the Connect button appears straight away: no settings page, no redeploy. Two Vercel settings were asked for three times and never happened, so the ask changed. The panel now says the three steps with a link for each and a Copy button for the Return URL, instead of pointing at a file in the repository you could not tap.',
+  ] },
   { version: '1.70.1', date: '2026-10-21', notes: [
     'The Apple Wallet script can no longer publish its own private key. Its last step put the six signing settings into Vercel and then redeployed with a plain deploy command, run from the folder on the Mac that holds the key. From an unlinked folder that command makes a new project named after the folder and uploads everything in it, the key included. It did not happen, and now it cannot: the step names the turnup project, switches off every upload from that folder, and redeploys the build that is already live, the same as the Redeploy button. The Cowork paste and the guide say so.',
     'The certificate itself is live: a job link now serves a pass signed by Apple\'s chain, checked the same day. The card is still called "awaiting" until the first one is seen in a real wallet.',

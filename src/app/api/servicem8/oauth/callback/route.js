@@ -17,7 +17,7 @@ const origin = (request) => {
 export async function GET(request) {
   const operator = await requireOperator()
   if (operator !== true) return NextResponse.redirect(new URL('/login?then=/dashboard', origin(request)), 302)
-  if (!oauthConfigured()) return NextResponse.json({ error: 'sm8_app_not_configured' }, { status: 409 })
+  if (!(await oauthConfigured())) return NextResponse.json({ error: 'sm8_app_not_configured' }, { status: 409 })
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
   if (url.searchParams.get('error')) return NextResponse.redirect(new URL(`/dashboard?sm8=${encodeURIComponent(url.searchParams.get('error'))}#panel-servicem8`, origin(request)), 302)

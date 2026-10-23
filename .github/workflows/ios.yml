@@ -7,11 +7,37 @@ on:
   push:
     branches: [native, main]
     paths: ['native/**', '.github/workflows/ios.yml']
+  # Nightly (Will, 21 Oct 2026: "set up nightly and daily builds"). 03:07 UTC,
+  # after the web nightly build has landed on main. The gate job below skips
+  # the Mac unless the phone code changed in the last day, so a quiet night
+  # costs a few seconds of Linux, not a Mac build. Mondays always build, so a
+  # TestFlight build never reaches Apple's 90-day expiry.
+  schedule:
+    - cron: '7 3 * * *'
   workflow_dispatch:
 
 jobs:
-  build:
+  gate:
     if: ${{ vars.IOS_SIGNING_READY == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.check.outputs.go }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 100 }
+      - id: check
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "$(date -u +%u)" = "1" ]; then echo "go=true" >> "$GITHUB_OUTPUT"; echo "Monday: weekly build keeps TestFlight fresh"; exit 0; fi
+          if [ -n "$(git log --since='25 hours ago' --format=%H -- native .github/workflows/ios.yml)" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"; echo "Nothing new in native/ since yesterday: no build tonight"
+          fi
+
+  build:
+    needs: gate
+    if: ${{ needs.gate.outputs.go == 'true' }}
     runs-on: macos-15
     defaults:
       run:
@@ -43,6 +69,7 @@ jobs:
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
             -archivePath build/App.xcarchive -allowProvisioningUpdates \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
             -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8 \
             -authenticationKeyID ${{ secrets.ASC_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }} \
             archive

@@ -24,7 +24,6 @@ const API_BASE = (process.env.SM8_API_BASE || 'https://api.servicem8.com').repla
 export const SCOPES = ['publish_diary_items', 'vendor']
 const ID = 'singleton'
 
-export const oauthConfigured = () => Boolean(process.env.SM8_APP_ID && process.env.SM8_APP_SECRET && process.env.JWT_SECRET)
 
 const key = () => createHash('sha256').update(`${process.env.JWT_SECRET}:sm8-oauth`).digest()
 function seal(obj) {
@@ -38,6 +37,59 @@ function open(b64) {
   const d = createDecipheriv('aes-256-gcm', key(), buf.subarray(0, 12))
   d.setAuthTag(buf.subarray(12, 28))
   return JSON.parse(Buffer.concat([d.update(buf.subarray(28)), d.final()]).toString('utf8'))
+}
+
+/**
+ * The app's ID and secret: from the environment if both are set, otherwise
+ * from the row the ServiceM8 panel writes.
+ *
+ * WHY THE ROW. The first version needed SM8_APP_ID and SM8_APP_SECRET in
+ * Vercel plus a redeploy. Asked three times, by step list and by Cowork, it
+ * did not happen; the forwarding setup hit the same wall and was fixed the same
+ * way (src/lib/inbound-config.js). When an ask keeps not happening, change the
+ * ask: two boxes on the panel, on the phone, and no redeploy.
+ *
+ * The secret is sealed with the key the tokens already use. Every read is
+ * wrapped: Sm8App is a new table, so a missing table means "not configured",
+ * which is the safe direction.
+ */
+export async function appCredentials() {
+  if (!process.env.JWT_SECRET) return null
+  if (process.env.SM8_APP_ID && process.env.SM8_APP_SECRET) {
+    return { appId: process.env.SM8_APP_ID, secret: process.env.SM8_APP_SECRET, source: 'env' }
+  }
+  try {
+    const row = await prisma.sm8App.findUnique({ where: { id: ID } })
+    if (!row) return null
+    return { appId: row.appId, secret: open(row.cipher).secret, source: 'saved', savedAt: row.savedAt }
+  } catch { return null }
+}
+
+export const oauthConfigured = async () => Boolean(await appCredentials())
+
+// What ServiceM8 hands out: a numeric-ish App ID and a long hex secret. Checked
+// loosely on purpose; the real test is the Connect button, which says plainly
+// when ServiceM8 refuses them.
+export const validAppId = (v) => /^[A-Za-z0-9_-]{1,64}$/.test(String(v || ''))
+export const validAppSecret = (v) => /^\S{8,200}$/.test(String(v || ''))
+
+/** Save the pair from the panel. Replacing it drops any tokens made with the old app. */
+export async function saveApp(appId, secret) {
+  const prev = await prisma.sm8App.findUnique({ where: { id: ID } }).catch(() => null)
+  await prisma.sm8App.upsert({
+    where: { id: ID },
+    create: { id: ID, appId, cipher: seal({ secret }) },
+    update: { appId, cipher: seal({ secret }) },
+  })
+  if (prev && prev.appId !== appId) await prisma.sm8OAuth.deleteMany({ where: { id: ID } }).catch(() => {})
+  return true
+}
+
+/** Forget the saved pair and the tokens it made. The environment, if set, is untouched. */
+export async function forgetApp() {
+  await prisma.sm8OAuth.deleteMany({ where: { id: ID } }).catch(() => {})
+  await prisma.sm8App.deleteMany({ where: { id: ID } }).catch(() => {})
+  return true
 }
 
 /** A signed, short-lived state so the callback only accepts what we started. */
@@ -55,10 +107,12 @@ export function checkState(state) {
 
 export const redirectUri = (origin) => `${origin}/api/servicem8/oauth/callback`
 
-export function authorizeUrl(origin) {
+export async function authorizeUrl(origin) {
+  const app = await appCredentials()
+  if (!app) throw new Error('sm8_app_not_configured')
   const u = new URL(`${AUTH_BASE}/oauth/authorize`)
   u.searchParams.set('response_type', 'code')
-  u.searchParams.set('client_id', process.env.SM8_APP_ID)
+  u.searchParams.set('client_id', app.appId)
   u.searchParams.set('scope', SCOPES.join(' '))
   u.searchParams.set('redirect_uri', redirectUri(origin))
   u.searchParams.set('state', makeState())
@@ -66,9 +120,11 @@ export function authorizeUrl(origin) {
 }
 
 async function tokenCall(params) {
+  const app = await appCredentials()
+  if (!app) throw new Error('sm8_app_not_configured')
   const r = await fetch(`${AUTH_BASE}/oauth/access_token`, {
     method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'application/json' },
-    body: new URLSearchParams({ client_id: process.env.SM8_APP_ID, client_secret: process.env.SM8_APP_SECRET, ...params }),
+    body: new URLSearchParams({ client_id: app.appId, client_secret: app.secret, ...params }),
   })
   const text = await r.text()
   let j = null; try { j = JSON.parse(text) } catch { j = null }
@@ -104,11 +160,14 @@ export async function exchangeCode(code, origin) {
 }
 
 export async function oauthState() {
-  if (!oauthConfigured()) return { configured: false, connected: false }
+  const app = await appCredentials()
+  if (!app) return { configured: false, connected: false }
+  // Never the secret, and only the tail of the ID: enough to recognise it.
+  const base = { configured: true, source: app.source, appIdTail: String(app.appId).slice(-4) }
   try {
     const row = await prisma.sm8OAuth.findUnique({ where: { id: ID } })
-    return { configured: true, connected: Boolean(row), scope: row?.scope || null, connectedAt: row?.connectedAt || null, vendorName: row?.vendorName || null }
-  } catch { return { configured: true, connected: false, tablesMissing: true } }
+    return { ...base, connected: Boolean(row), scope: row?.scope || null, connectedAt: row?.connectedAt || null, vendorName: row?.vendorName || null }
+  } catch { return { ...base, connected: false, tablesMissing: true } }
 }
 export const oauthConnected = async () => (await oauthState()).connected === true
 export async function disconnect() { await prisma.sm8OAuth.deleteMany({ where: { id: ID } }) }
@@ -155,7 +214,7 @@ export async function publishDiary(jobUuid, content) {
  */
 export async function diaryFor(tracker, text) {
   try {
-    if (!tracker?.externalId || !oauthConfigured()) return null
+    if (!tracker?.externalId || !(await oauthConfigured())) return null
     if (!(await oauthConnected())) return null
     const stamp = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' })
     const r = await publishDiary(tracker.externalId, `TurnUp: ${text} (${stamp})`)
