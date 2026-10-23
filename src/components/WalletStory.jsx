@@ -367,7 +367,7 @@ export default function WalletStory() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-[14px] leading-snug muted">The card is built. It goes in wallets when Apple signs it. Android next.</p>
+          <p className="mt-4 text-[14px] leading-snug muted">The card is built. Apple's developer enrolment went through on 21 October; the signing certificate is the next step, and then it goes in wallets. Google Wallet is not started.</p>
         </div>
       </div>
     </div>

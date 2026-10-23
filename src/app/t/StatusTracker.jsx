@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { STAGE_ORDER, stageOf } from '@/lib/trade-status'
-import { TRADE_NAME, TRADE_PHONE, TRADE_PHONE_TEL } from '@/lib/trade'
+import { useTrade } from '@/components/TradeProvider'
 import AccessNotes from './AccessNotes'
 import Presence from './Presence'
 import Notify, { PUSH_CONFIGURED } from './Notify'
@@ -32,6 +32,7 @@ import { StageIcon, PhoneIcon, PinIcon, KeyIcon, HouseIcon, WaveIcon, VanIcon, C
 // locale data, which tore the page down mid-hydration.
 
 export default function StatusTracker({ initialStatus, initialProfile, initialBrand, initialTerms = null, initialTradeSeenAt = null, initialReviewUrl = null, walletReady = false }) {
+  const trade = useTrade()
   const [status, setStatus] = useState(initialStatus)
   const [profile, setProfile] = useState(initialProfile || null)
   const [brand, setBrand] = useState(initialBrand || null)
@@ -138,11 +139,11 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
         {brand?.logo ? (
           <div className="flex items-center gap-3">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={brand.logo} alt={TRADE_NAME} className="h-9 w-9 rounded-lg object-cover bg-white/60" onError={(e) => { e.currentTarget.style.display = 'none' }} />
-            <p className="text-[15px] font-semibold" style={{ color: 'var(--tint)' }}>{TRADE_NAME}</p>
+            <img src={brand.logo} alt={trade.name} className="h-9 w-9 rounded-lg object-cover bg-white/60" onError={(e) => { e.currentTarget.style.display = 'none' }} />
+            <p className="text-[15px] font-semibold" style={{ color: 'var(--tint)' }}>{trade.name}</p>
           </div>
         ) : (
-          <p className="text-[15px] font-semibold" style={{ color: 'var(--tint)' }}>{TRADE_NAME}</p>
+          <p className="text-[15px] font-semibold" style={{ color: 'var(--tint)' }}>{trade.name}</p>
         )}
         <h1 className="mt-2 text-[34px] font-bold leading-[1.1] tracking-[-0.02em]">
           {status.customerName ? `Hello ${status.customerName}` : 'Your job'}
@@ -193,7 +194,7 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
               <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full text-[20px] font-bold" style={{ color: 'var(--tint)', background: 'color-mix(in srgb, var(--tint) 14%, transparent)' }}>{(profile.engineerName || '?').trim()[0]?.toUpperCase()}</span>
             )}
             <div className="min-w-0 flex-1">
-              <p className="text-[17px] font-semibold leading-tight">{profile.engineerName || TRADE_NAME}{stage.key === 'ON_MY_WAY' ? ' is on the way' : ' is with you'}</p>
+              <p className="text-[17px] font-semibold leading-tight">{profile.engineerName || trade.name}{stage.key === 'ON_MY_WAY' ? ' is on the way' : ' is with you'}</p>
               {(profile.vehicle || profile.vehicleReg) && (
                 <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[14px] muted">
                   {profile.vehicle && <span>Look out for a {profile.vehicle}</span>}
@@ -213,7 +214,7 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
             the clock has passed it the page says so rather than keep promising. */}
         {isPaused && status.pausedAt && (() => {
           void tick
-          const who = TRADE_NAME.split(' ')[0]
+          const who = trade.name.split(' ')[0]
           const line = pauseBackLine(status.pauseBack, status.pauseBackAt, { who })
           const due = pauseBackDue(status.pauseBack, status.pauseBackAt)
           const overdue = due && Date.now() > due.getTime()
@@ -243,7 +244,7 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
           if (quiet < 15 * 60_000) return null
           return (
             <p className="mt-2 text-[14px] muted">
-              {TRADE_NAME.split(' ')[0]}’s phone last reached us at {timeOnly(tradeSeenAt)}. Out of signal, most likely; anything tapped since catches up when it is back.
+              {trade.name.split(' ')[0]}’s phone last reached us at {timeOnly(tradeSeenAt)}. Out of signal, most likely; anything tapped since catches up when it is back.
             </p>
           )
         })()}
@@ -545,13 +546,13 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
       </div>
 
       {/* the one action that is never hidden */}
-      {TRADE_PHONE && (
-        <a href={`tel:${TRADE_PHONE_TEL}`} className="btn btn-filled animate-rise mt-5 w-full"
+      {trade.phone && (
+        <a href={`tel:${trade.tel}`} className="btn btn-filled animate-rise mt-5 w-full"
            style={{ animationDelay: '270ms' }}>
           <PhoneIcon size={19} className="shrink-0" />
           {/* The number is kept whole: split across two lines it stops being a
               phone number and becomes two half-numbers. */}
-          <span>Call {TRADE_NAME.split(' ')[0]} · <span className="whitespace-nowrap">{TRADE_PHONE}</span></span>
+          <span>Call {trade.name.split(' ')[0]} · <span className="whitespace-nowrap">{trade.phone}</span></span>
         </a>
       )}
 
