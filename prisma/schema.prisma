@@ -54,7 +54,7 @@ model TradeStatus {
   windowFirstEnd   DateTime?
   windowFirstAt    DateTime?
   windowRevisedAt  DateTime? // the latest change to published hours, or their withdrawal
-  windowRevisedBy  String?   // TRADE | CUSTOMER — whose hours now stand (CUSTOMER: a counter the trade agreed)
+  windowRevisedBy  String? // TRADE | CUSTOMER — whose hours now stand (CUSTOMER: a counter the trade agreed)
   windowRevisions  Int       @default(0)
   // The hours the customer could last see, written with every publish, so a
   // customer's counter the trade then agrees is compared with what stood
@@ -81,31 +81,31 @@ model TradeStatus {
   // (src/lib/pause.js), never a time the product worked out, shown with the
   // time it was said. Cleared the moment the job leaves Paused.
   pausedAt    DateTime?
-  pauseBack   String?   // MIN_30 | HOUR_1 | HOUR_2 | AFTER_LUNCH | LATER_TODAY | TOMORROW | ANOTHER_DAY
+  pauseBack   String? // MIN_30 | HOUR_1 | HOUR_2 | AFTER_LUNCH | LATER_TODAY | TOMORROW | ANOTHER_DAY
   pauseBackAt DateTime?
 
-  askedAt        DateTime?
-  askAnsweredAt  DateTime?
+  askedAt             DateTime?
+  askAnsweredAt       DateTime?
   // How many times the trade has been buzzed about THIS ask, counting the one
   // ask() sends itself. Capped at MAX_ASK_NUDGES in src/lib/nudge.js. Before
   // it, nothing counted: an unanswered ask repeated every ten minutes for
   // ever, and an ask made at 15:34 on 18 Oct 2026 buzzed the owner's phone
   // all night. Reset to 0 whenever a new ask opens.
-  askNudges      Int       @default(0)
-  lateMinutes    Int?
-  lateAt         DateTime?
+  askNudges           Int       @default(0)
+  lateMinutes         Int?
+  lateAt              DateTime?
   // Nudges to the trade: 1 after the window started with the card still
   // Booked in, 2 after it ended with nobody On site. nudgedAt also paces the
   // reminder for an unanswered question.
-  nudgeLevel     Int       @default(0)
-  nudgedAt       DateTime?
+  nudgeLevel          Int       @default(0)
+  nudgedAt            DateTime?
   // The window was missed and the customer was told: when, and what they
   // chose — WAIT, LATER (today) or REBOOK (another day). The choice is a
   // request; the trade still proposes the new window, because the product
   // never invents a time.
-  missedAt       DateTime?
-  missedChoice   String?
-  missedChoiceAt DateTime?
+  missedAt            DateTime?
+  missedChoice        String?
+  missedChoiceAt      DateTime?
   // The customer saying THEY are running late: minutes they chose, and when
   // they said it. Their own answer, so only the time is public; the minutes
   // go to the trade and stay on the device that said them.
@@ -114,15 +114,15 @@ model TradeStatus {
   // After Job done: when the review ask was pushed, when the Google button
   // was tapped, and a note the customer sent to the trade instead or as well.
   // The note is theirs to the trade: never public.
-  reviewAskedAt   DateTime?
-  reviewClickedAt DateTime?
-  feedbackText    String?
-  feedbackAt      DateTime?
+  reviewAskedAt       DateTime?
+  reviewClickedAt     DateTime?
+  feedbackText        String?
+  feedbackAt          DateTime?
   // The customer's one-tap reply to the day-before ask (presenceAskedAt,
   // below): OK, SOMEONE_ELSE (will let you in) or MOVE (wants different
   // hours). A reply is a message to the trade; MOVE moves nothing by itself.
-  reminderReply   String?
-  reminderReplyAt DateTime?
+  reminderReply       String?
+  reminderReplyAt     DateTime?
 
   // The booking terms, agreed from the customer's phone: when, and the exact
   // words they read (notice period, short-notice charge, the 14-day right).
@@ -132,14 +132,14 @@ model TradeStatus {
   termsAgreed   Json?
   // When TurnUp itself texted the link (through ServiceM8), or noticed that
   // ServiceM8 already had. Set once; the auto-follow sweep never sends twice.
-  linkSentAt DateTime?
+  linkSentAt    DateTime?
   // The hours the customer was last TOLD by text, so a booking that moves in
   // ServiceM8 afterwards gets one more text with the new time. Compared with
   // the booking, never with the window: the window follows the move at once,
   // the message only once the move has settled.
-  toldStart DateTime?
-  toldEnd   DateTime?
-  toldAt    DateTime?
+  toldStart     DateTime?
+  toldEnd       DateTime?
+  toldAt        DateTime?
 
   // What the CUSTOMER tells the trade, from their own page. The first
   // two-way thing in this product: until now the link only ever reported.
@@ -158,18 +158,18 @@ model TradeStatus {
   // Will someone be in? The question every trade and every courier asks
   // blind, and the one the customer can answer in two seconds. Costs a
   // wasted visit when it goes unasked.
-  presence     String? // IN | OUT | BACK_SOON | SOMEONE_ELSE
-  presenceNote String? // "bottom of the garden, ring twice"
-  presenceAt   DateTime? // stale after a while; say when it was said
+  presence        String? // IN | OUT | BACK_SOON | SOMEONE_ELSE
+  presenceNote    String? // "bottom of the garden, ring twice"
+  presenceAt      DateTime? // stale after a while; say when it was said
   // The afternoon before the job, the customer is asked this once
   // (src/lib/day-before.js). Set before anything is sent, so it fires once.
   presenceAskedAt DateTime?
-  arrivingAt   DateTime? // when they set off — a record, never a promise
-  isActive     Boolean   @default(true)
-  viewCount    Int       @default(0)
-  lastViewedAt DateTime?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  arrivingAt      DateTime? // when they set off — a record, never a promise
+  isActive        Boolean   @default(true)
+  viewCount       Int       @default(0)
+  lastViewedAt    DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   events   TradeStatusEvent[]
   noAccess NoAccess[]
@@ -181,25 +181,25 @@ model TradeStatus {
 
 /// Every stage change, so the customer reads a timeline rather than one word.
 model TradeStatusEvent {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   tradeStatusId String
   stage         String
   note          String?
-  createdAt     DateTime @default(now())
+  createdAt     DateTime  @default(now())
   // A tap made with no signal and sent later: when the phone says it was
   // tapped, and the fix it had. createdAt stays the server's time, so the two
   // are never confused. fixValidated: the fix was fresh and tight enough to
   // stand as "where the phone was when it was tapped".
-  deviceAt     DateTime?
-  offline      Boolean   @default(false)
-  lat          Float?
-  lng          Float?
-  accuracy     Float?
-  fixValidated Boolean?
+  deviceAt      DateTime?
+  offline       Boolean   @default(false)
+  lat           Float?
+  lng           Float?
+  accuracy      Float?
+  fixValidated  Boolean?
   // The queue's own id for the tap. A flush interrupted by a page change after
   // the request went but before the item was deleted replays it; the same id
   // twice is one event, not two.
-  tapId        String?
+  tapId         String?
 
   tradeStatus TradeStatus @relation(fields: [tradeStatusId], references: [id], onDelete: Cascade)
 
@@ -226,15 +226,15 @@ model Passkey {
 ///
 /// One row. There is one operator, and multi-tenancy is a different product.
 model TradeProfile {
-  id            String  @id @default("singleton")
-  engineerName  String? // "Will" — a first name is enough
-  engineerPhoto String? // a URL; the face at the door
+  id                String    @id @default("singleton")
+  engineerName      String? // "Will" — a first name is enough
+  engineerPhoto     String? // a URL; the face at the door
   // Or the photo itself, taken on the phone from the dashboard: a JPEG no
   // bigger than 450 KB, served at /api/profile/photo. Public once the trade
   // sets off — it is the face at the door, which is the point of it.
   engineerPhotoData Bytes?
   engineerPhotoAt   DateTime?
-  aboutLine     String? // "G3 qualified, 22 years"
+  aboutLine         String? // "G3 qualified, 22 years"
 
   vehicleReg    String? // looked up, then cached below
   vehicleMake   String? // "Ford"
@@ -381,10 +381,10 @@ model Sm8Link {
 /// phone does. The secret is sealed with the same key as the tokens below.
 /// SM8_APP_ID / SM8_APP_SECRET in the environment still win where set.
 model Sm8App {
-  id      String   @id @default("singleton")
-  appId   String
-  cipher  String // AES-256-GCM of the App Secret, key from JWT_SECRET
-  savedAt DateTime @default(now())
+  id        String   @id @default("singleton")
+  appId     String
+  cipher    String // AES-256-GCM of the App Secret, key from JWT_SECRET
+  savedAt   DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
@@ -420,15 +420,15 @@ model CustomerEmail {
 /// any route. `lastSeenAt` is the newest message already read, so a sweep
 /// asks Gmail only for what came after it.
 model GmailLink {
-  id          String    @id @default("singleton")
-  cipher      String // AES-256-GCM of { access, refresh, expiresAt }
-  email       String?
-  placeCode   String? // the household card this inbox feeds
-  lastSeenAt  DateTime?
+  id            String    @id @default("singleton")
+  cipher        String // AES-256-GCM of { access, refresh, expiresAt }
+  email         String?
+  placeCode     String? // the household card this inbox feeds
+  lastSeenAt    DateTime?
   lastCheckedAt DateTime?
-  lastOutcome String?
-  connectedAt DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  lastOutcome   String?
+  connectedAt   DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 model Sm8Event {
@@ -528,7 +528,7 @@ model Place {
 /// sending three updates, becoming three rows. Carrier plus reference where
 /// there is one; sender plus subject where there is not.
 model Arrival {
-  id        String  @id @default(cuid())
+  id        String @id @default(cuid())
   placeId   String
   dedupeKey String
 
@@ -578,9 +578,9 @@ model Arrival {
 /// prefers its secrets in one place can keep them there.
 model InboundSecret {
   /// Always "singleton". One letterbox per deployment.
-  id        String   @id @default("singleton")
-  token     String   @unique
-  host      String?
+  id    String  @id @default("singleton")
+  token String  @unique
+  host  String?
 
   /// The last time ANYTHING reached the inbound route, and what became of it.
   ///
@@ -595,4 +595,43 @@ model InboundSecret {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+/// A phone that holds a wallet pass and wants to be told when it changes.
+///
+/// Wallet registers itself after the pass is added, and from then on the card
+/// in somebody's pocket is only as current as this table. A row is one device
+/// holding one job's pass; a household with two phones is two rows.
+///
+/// A NEW TABLE on purpose (see CLAUDE.md on migrations): every read sits in a
+/// try/catch, so if the migration has not run the pass still downloads and
+/// still shows the stage it was added at — which is exactly what happens today
+/// — rather than taking every tracking link down.
+model PassDevice {
+  id String @id @default(cuid())
+
+  /// Apple's identifier for the device's pass library. Opaque, and not a
+  /// phone, a person or anything that outlives the pass being deleted.
+  deviceLibraryIdentifier String
+
+  /// Where the "something changed" ping goes. Wallet replaces it freely, so
+  /// it is updated on every registration rather than written once.
+  pushToken String
+
+  /// The job's code: the pass's serialNumber, and the tracking link's.
+  serialNumber String
+
+  /// Carried because Apple sends it on every call and a mismatch means the
+  /// request is for a different pass type, not ours.
+  passTypeIdentifier String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /// One row per device per pass. Wallet re-registers after a reinstall and
+  /// after a token changes, and both must update rather than pile up.
+  @@unique([deviceLibraryIdentifier, serialNumber])
+  /// The "what changed for this device" query, and the push fan-out.
+  @@index([serialNumber])
+  @@index([deviceLibraryIdentifier, passTypeIdentifier])
 }

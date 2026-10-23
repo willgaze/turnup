@@ -1259,6 +1259,94 @@ runs from the cron two hours after the last DONE event, pushes once per job
 note (`feedbackText`/`feedbackAt`); the note goes to the trade's phone, the
 card and the diary, and `publicShape` carries only the two times.
 
+## The wallet card keeps itself current (`src/app/api/passes/v1/`)
+
+v1.72.0. A pass without an update service is a screenshot: it shows the stage
+at the moment it was added and nothing ever moves it. Apple's answer is five
+calls Wallet makes to the `webServiceURL` baked into the pass, and all of them
+are built now, so the only thing between this product and a card that moves is
+the certificate (see *Not built yet*).
+
+| Wallet calls | We answer |
+|---|---|
+| `POST   /devices/<d>/registrations/<type>/<serial>` | 201 new, 200 again, 401 wrong token, 404 revoked |
+| `DELETE /devices/<d>/registrations/<type>/<serial>` | always 200 |
+| `GET    /devices/<d>/registrations/<type>?passesUpdatedSince=<tag>` | the serials that moved, or **204** |
+| `GET    /passes/<type>/<serial>` | the signed pass, 304 if unmoved, **401 if revoked** |
+| `POST   /log` | Wallet's own complaints, capped and logged |
+
+**The token is derived, never stored.** `passAuthToken()` in
+`src/lib/pass-auth.js` is an HMAC of the code under `JWT_SECRET`, baked into
+the pass and sent back as `Authorization: ApplePass <token>`. So there is no
+column to add, nothing extra to leak if the database is read, one job's pass
+cannot ask about another's, and it fails closed: **no `JWT_SECRET` means
+nobody is authorised**, the same way `requireOperator()` does. The compare is
+`timingSafeEqual`, because `===` on a secret leaks its prefix.
+
+Rules in here that each cost something to get wrong:
+
+- **204, not an empty 200**, when nothing has changed. Wallet reads an empty
+  list in a 200 as "these changed" and re-downloads every pass it holds, on a
+  timer.
+- **No tag means the beginning of time, not now.** A device that has never
+  asked sends nothing; reading that as "nothing changed" is a reinstalled
+  phone whose card never updates again.
+- **A revoked link answers 401 on the pass itself**, which is how Wallet is
+  told the card is no longer theirs and takes it off the phone. The
+  registration routes answer 404 for the same row, because there the token was
+  right and the card simply is not a thing any more. `serialsChangedSince()`
+  deliberately reports a dead code as *changed*, so the card is allowed to
+  find out it is dead.
+- **The changed-serials route carries no Authorization**, by Apple's design:
+  the device library identifier is the credential and it only ever yields
+  serials that device itself registered. It must never widen into a list of
+  jobs.
+- **Only the registration routes need the database.** If `PassDevice` has not
+  migrated, every read answers "no devices" — a new table, so it fails soft
+  (see *Shipping a schema change*), and the pass still downloads.
+
+**The push carries nothing, and that is why there is no vocabulary here.**
+Apple's pass push is an empty `{}` with `apns-topic` set to the pass type: no
+words, no sound, nothing on a lock screen. It only tells Wallet to come back
+and ask. So the lock-screen rule has nothing to bind — there is no field to
+leak. `src/lib/apns.js` opens an HTTP/2 session per call (a pool is a
+long-lived socket inside a function that may be frozen between invocations,
+which is a handle that looks open and delivers nothing), authenticates with
+the **same Pass Type ID certificate that signs the pass**, and never throws.
+A 410 means the pass was deleted from that wallet: the row goes and is never
+retried, the same rule the web-push subscriptions follow.
+
+`notifyPassUpdated()` is called **un-awaited, inside `after()`**, from the
+tracker PATCH and from `syncTracker()` — the two places a field the pass shows
+moves. Same rule as `notifyStage()`: the trade tapped a button on a driveway.
+Everything is swallowed, and the worst case is a card that catches up the next
+time Wallet asks, which it does, because the changed-serials route compares
+`updatedAt` and so catches every write whether or not it was pushed.
+
+**Two checks, because one of them could not see a handler.**
+
+```bash
+node scripts/check-pass-service.mjs        # 30 cases, no database, no server
+bash scripts/local-db.sh                   # then, for the other one:
+PASSKIT_PASS_TYPE_ID=pass.com.getturnup.job npm run build && npx next start
+node scripts/live-pass-service.mjs         # 24 cases, against the real routes
+```
+
+The first proves the credential and nothing else. **It passed while a revoked
+card was answered 503 instead of 401**: the certificate gate sat above the row
+lookup, so a card whose link had been switched off was told "come back later"
+rather than being taken off the phone. The live run found it on its first
+pass. Whether a link is revoked is a fact about the card; whether we can sign
+a pass is a fact about this deployment, and the card's fact comes first.
+
+What **neither** can prove is that Apple's paths are the paths Wallet calls.
+Apple's documentation renders in JavaScript and would not fetch from the
+container this was written in, so the routes are built from the long-stable
+public spec. Every one of them logs a line for exactly that reason: **if a
+card is added and the Vercel log stays silent, the paths are the first thing
+to check.** Do not let that gap go unsaid, and do not describe the card as
+self-updating to a customer until a real pass has been seen to move.
+
 ## The native shell (`native/`): the job on the trade's own lock screen
 
 iOS shows buttons and a live card on the lock screen only through a **Live
@@ -1523,9 +1611,9 @@ repository does not have:
   (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
   never in a session container. The script falls back for macOS's LibreSSL,
   which has no `-traditional` flag and writes PKCS#1 anyway.
-  Still to build once a real pass is in a wallet: the `/api/passes/v1` web
-  service (device registration, "what changed" and APNs pushes) so the card
-  updates itself; today a pass shows the stage at the moment it was added.
+  The web service that keeps a pass current is **built** (v1.72.0, below);
+  what is missing is only the certificate, so the day it lands the card
+  updates itself rather than needing another build.
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key.
 
