@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.70.0'
-export const BUILD_DATE = '2026-10-20'
+export const VERSION = '1.71.0'
+export const BUILD_DATE = '2026-10-22'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 52
+export const THEME_INDEX = 53
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.71.0', date: '2026-10-22', notes: [
+    'The ServiceM8 add-on no longer needs Vercel. The App ID and App Secret from ServiceM8\'s Developer page are pasted into two boxes on the ServiceM8 panel and saved encrypted in your own database, and the Connect button appears straight away: no settings page, no redeploy. Two Vercel settings were asked for three times and never happened, so the ask changed. The panel now says the three steps with a link for each and a Copy button for the Return URL, instead of pointing at a file in the repository you could not tap.',
+  ] },
   { version: '1.70.0', date: '2026-10-20', notes: [
     'Job done? On my way to the next one, offered. Tap Job done and a card at the top asks whether you are heading to the next job booked today, with their name, the job and the hours. One tap sends On my way, exactly as the button on their card would: push, the email fallback, the ServiceM8 diary. Not yet puts it away. If nothing else is booked today it says so. It never offers tomorrow\'s job and never names a time.',
   ] },

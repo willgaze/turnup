@@ -649,7 +649,13 @@ in the job's SMS history with `regardingJobUUID`), which is what **Send the link
 via ServiceM8** does. What it **cannot** do: write to the job diary (403) or
 notify staff. Those are the add-on's: `src/lib/sm8-oauth.js` (OAuth, encrypted
 tokens in `Sm8OAuth`, `publishDiary()`, `diaryFor()`), steps for the owner in
-`docs/servicem8-add-on.md`. `diaryFor()` is fire-and-forget wherever it is
+`docs/servicem8-add-on.md`. **The App ID and App Secret are pasted into the
+ServiceM8 panel** and sealed into `Sm8App` (a new table, so it fails soft),
+not set in Vercel: two Vercel settings and a redeploy were asked for three
+times, by step list and twice by Cowork, and never happened. Same lesson and
+same shape as the letterbox password. `appCredentials()` prefers
+`SM8_APP_ID`/`SM8_APP_SECRET` where both are set; the panel only ever sees the
+last four of the ID, never the secret. `diaryFor()` is fire-and-forget wherever it is
 called and a no-op until the add-on is authorised. Texts go through
 `src/lib/sm8-words.js` and stay plain ASCII.
 

@@ -375,6 +375,19 @@ model Sm8Link {
 
 /// TurnUp as a ServiceM8 add-on: the OAuth tokens, encrypted, one row. Only
 /// the diary and staff notifications need this; everything else is the key.
+/// The add-on's App ID and App Secret, pasted into the ServiceM8 panel on the
+/// dashboard (src/lib/sm8-oauth.js). Exists because asking for two Vercel
+/// settings and a redeploy did not happen three times running; a box on the
+/// phone does. The secret is sealed with the same key as the tokens below.
+/// SM8_APP_ID / SM8_APP_SECRET in the environment still win where set.
+model Sm8App {
+  id      String   @id @default("singleton")
+  appId   String
+  cipher  String // AES-256-GCM of the App Secret, key from JWT_SECRET
+  savedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Sm8OAuth {
   id          String   @id @default("singleton")
   cipher      String // AES-256-GCM of { access, refresh, expiresAt }, key from JWT_SECRET
