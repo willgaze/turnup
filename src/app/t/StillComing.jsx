@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { timeOnly } from '@/lib/when'
-import { TRADE_NAME } from '@/lib/trade'
+import { useTrade } from '@/components/TradeProvider'
 import { BellIcon } from '@/components/icons'
 
 /**
@@ -15,9 +15,9 @@ import { BellIcon } from '@/components/icons'
  * the time it was given. Nothing on this page invents a time; it only
  * notices that one has passed.
  */
-const first = TRADE_NAME.split(' ')[0]
 
 export default function StillComing({ status, onAsked }) {
+  const first = useTrade().name.split(' ')[0]
   const [now, setNow] = useState(() => Date.now())
   const [busy, setBusy] = useState(false)
   // Every hook above the first `return null`. This one sat below them until

@@ -14,7 +14,7 @@ const check = (ok, what) => { console.log(`${ok ? '  ok  ' : '  FAIL'} ${what}`)
 
 const base = { tradeName: 'Sam Hale Plumbing', host: 'www.getturnup.com', code: 'K7M4PQRT' }
 const who = { name: 'Sam', vehicle: 'White Ford Transit Custom', reg: 'AB12CDE' }
-const mails = Object.fromEntries(EMAIL_KINDS.map((kind) => [kind, emailFor({ ...base, kind, who, pushOn: true })]))
+const mails = Object.fromEntries(EMAIL_KINDS.map((kind) => [kind, emailFor({ ...base, kind, who, pushOn: true, lateMinutes: 30, saidAt: '2026-10-23T09:12:00Z' })]))
 
 // What each one says
 check(mails.ON_MY_WAY.subject === 'Sam from Sam Hale Plumbing is on the way', 'set off: subject names who is coming')
@@ -24,11 +24,15 @@ check(!/Look out/.test(emailFor({ ...base, kind: 'ON_MY_WAY', who: { name: 'Sam'
 check(/wait, later today, or another day/.test(mails.MISSED.text) && /is sorry/.test(mails.MISSED.text), 'missed: the apology and the three choices')
 check(/still fine, and will someone be in\?/i.test(mails.DAY_BEFORE.text), 'day before: the same two questions as the page')
 for (const k of EMAIL_KINDS) check(mails[k].text.includes('https://www.getturnup.com/t/K7M4PQRT'), `${k}: carries the link`)
-check(emailFor({ ...base, kind: 'RUNNING_LATE' }) === null, 'an unknown kind sends nothing')
+check(emailFor({ ...base, kind: 'JOB_DONE' }) === null, 'an unknown kind sends nothing')
 
 // What none of them may say
 const all = EMAIL_KINDS.map((k) => `${mails[k].subject}\n${mails[k].text}`)
-check(all.every((t) => !/\b\d{1,2}[:.]\d{2}\b|\bminutes?\b|\b(arriv(e|ing) (at|by|in)|within|eta)\b/i.test(t)), 'no time, no minutes, no arrival promise in any of them')
+check(EMAIL_KINDS.filter((k) => k !== 'RUNNING_LATE').every((k) => !/\b\d{1,2}[:.]\d{2}\b|\bminutes?\b|\b(arriv(e|ing) (at|by|in)|within|eta)\b/i.test(`${mails[k].subject}\n${mails[k].text}`)), 'no time, no minutes, no arrival promise in any of them (running late aside)')
+check(/says about 30 minutes late \(said at 10:12\)/.test(mails.RUNNING_LATE.text), 'running late: the trade\'s own figure, with when it was said, in London time')
+check(!/arriv|will be there|eta/i.test(mails.RUNNING_LATE.text), 'running late never turns the figure into an arrival time')
+check(/could not get in/.test(mails.NO_ACCESS.text) && !/£|fee|charge/i.test(mails.NO_ACCESS.text), 'no one home: the fact, never the fee')
+check(/paused the job/.test(mails.PAUSED.text) && !/reason:|waiting on|back by/i.test(mails.PAUSED.text), 'paused: that it is paused, never the reason or a return time')
 check(all.every((t) => !/K7M4PQRT/.test(t.split('\n')[0])), 'the code is not in a subject (a mail preview is a lock screen)')
 check(all.every((t) => !/[^\x00-\x7F]/.test(t)), 'plain ASCII, so no mail client mangles a dash')
 check(all.every((t) => !/Rosebourne/i.test(t)), 'no other business named')
@@ -44,7 +48,8 @@ check(emailDecision({ ...go, pushed: 1 }) === 'skip:pushed', 'a push landed: the
 check(emailDecision({ ...go, on: false }) === 'skip:off', 'switched off: nothing')
 check(emailDecision({ ...go, sm8: false }) === 'skip:no_servicem8', 'no ServiceM8 key: nothing')
 check(emailDecision({ ...go, jobUuid: null }) === 'skip:not_linked', 'a card made by hand: no address to send to')
-check(emailDecision({ ...go, kind: 'DONE' }) === 'skip:kind', 'Job done is not one of the three')
+check(emailDecision({ ...go, kind: 'DONE' }) === 'skip:kind', 'Job done is not one of the six')
+check(['NO_ACCESS', 'RUNNING_LATE', 'PAUSED'].every((kind) => emailDecision({ ...go, kind }) === 'send'), 'no one home, running late and paused all send when no push landed')
 
 // Addresses
 check(validEmail('sarah.jones@example.co.uk') && validEmail('  a@b.com '), 'an ordinary address passes, spaces trimmed')

@@ -20,7 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
-| [v1.73.0](./v1.73.0/) | 2026-10-23 | Ochre — the wallet card can update itself: the service Wallet calls, built and tested end to end |
+| [v1.73.0](./v1.73.0/) | 2026-10-23 | Moss — every customer event has an email fallback; Connect Gmail parked on Will's rule |
 | [v1.72.0](./v1.72.0/) | 2026-10-23 | Plum — Connect Gmail is two boxes on the phone, not Vercel |
 | [v1.71.0](./v1.71.0/) | 2026-10-22 | Teal — the ServiceM8 add-on is two boxes on the phone, not two Vercel settings and a redeploy |
 | [v1.70.0](./v1.70.0/) | 2026-10-20 | Indigo — Job done? On my way to the next one, offered |

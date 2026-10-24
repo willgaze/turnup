@@ -145,7 +145,7 @@ export default function ServiceM8({ onChanged }) {
                   notification reached the customer (src/lib/customer-email.js). */}
               <div className="r-inner mt-4 px-4 py-3.5 text-[14px]" style={{ background: s.emailFallback ? 'color-mix(in srgb, var(--stage-done) 12%, transparent)' : 'rgb(var(--glass-line) / 0.07)' }}>
                 <p className="font-semibold">Email when notifications are off {s.emailFallback ? '· on' : '· off'}</p>
-                <p className="mt-1 muted">A customer without notifications switched on gets an email instead, from your ServiceM8 address, to the email on the ServiceM8 job: when you set off, if a window is missed, and the day-before ask. Once each per job, never a time, and it shows in the job diary. Not SMS, so no credits.</p>
+                <p className="mt-1 muted">A customer without notifications switched on gets an email instead, from your ServiceM8 address, to the email on the ServiceM8 job: when you set off, if a window is missed, the day-before ask, no one home, running late and paused. Once each per job, never a time, and it shows in the job diary. Not SMS, so no credits.</p>
                 <button type="button" disabled={busy} onClick={async () => { setBusy('email'); try { await fetch('/api/dashboard/profile', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emailFallback: !s.emailFallback }) }); await load() } finally { setBusy(null) } }}
                         className={`btn mt-2.5 !min-h-[42px] !px-4 !text-[14px] ${s.emailFallback ? 'btn-grey' : 'accent-fill'}`}>
                   {busy === 'email' ? '…' : s.emailFallback ? 'Switch off' : 'Switch on'}

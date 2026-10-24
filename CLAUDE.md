@@ -20,9 +20,20 @@ are written down:
    for him; it hands over the prompt.
 
 
+5. **Never wait on Will. Will, 23 Oct 2026: "Please do it yourself or build
+   something else. Don't wait for me."** When a build needs something only he
+   can do (an account, a console sign-in, a passkey, a secret into Vercel),
+   park it: one line on the board under Your moves with the paste, no reminder
+   in chat, no "your one thing" that is the same thing as last time. Then build
+   the next item that needs nothing from him. A session that ends on an ask it
+   has already made is a session that did nothing. The ServiceM8 add-on
+   (`Sm8App`) and Connect Gmail (`GoogleApp`) both moved their secrets onto the
+   phone for this reason; when a setting can live in a row the dashboard
+   writes, it should, so the ask shrinks to a paste on his phone or vanishes.
+
 4. **Link to the panel, not the page.** `/dashboard?open=<panel>` opens Setup
    and settings at that panel (v1.65.2): `doors` (Household cards), `servicem8`,
-   `profile` (Who to expect), `inbound` (Turn on forwarding), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
+   `profile` (Who to expect), `inbound` (Turn on forwarding), `sources` (Where the card hears from), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
    `waitlist`, `roadmap`. A household's own card link is private and lives in
    two places only: the phone that made it on `/join`, and
    `/dashboard?open=doors`, where each card shows its link and its forwarding
@@ -57,6 +68,10 @@ NEXT_PUBLIC_TRADE_PHONE_TEL  "01264502027"
 
 Fitting this to a second trade must stay a configuration change, never a code
 change. `src/lib/trade.js` is the only place those are read.
+The customer's page components take the trade from `useTrade()` in
+`src/components/TradeProvider.jsx`, which defaults to those values; only `/preview`,
+and so `/demo`, overrides it, with an invented plumber and no phone (v1.72.1), because
+the demo said everything on it was invented and then rang the real business.
 
 ## What it is
 
@@ -1001,7 +1016,10 @@ happened by the 23rd, the same wall `Sm8App` was built for the day before;
 when an ask keeps not happening, the ask is the thing to change. The Google
 project, the Internal consent screen and the client are still the owner's to
 make, in their Workspace (`docs/connect-gmail.md`). **No session creates an
-OAuth app.** Other households are stages 2
+OAuth app.** Parked on 23 Oct 2026 under rule 5 above: the panel and the
+paste exist, Will's own inbox already reaches the card through the Workspace
+forwarding rule, and nobody asks him again. It comes back when other
+households can connect, which is Google's review. Other households are stages 2
 and 3 of `docs/research/inbox-connect.md` and wait on Google's review.
 
 **Tracking by number** (`src/lib/ship24.js`, pure parts in
@@ -1175,9 +1193,14 @@ reached no phone of theirs, they get an email instead.
   email is two more round trips than a serverless function promises once its
   response has gone). The sweep awaits it.
 
-The day-before nudge to the trade says when the ask went by email. Running late
-and Job done are not emailed yet: the first is a figure the trade typed, which
-the page shows with when it was said; the second is not urgent.
+The day-before nudge to the trade says when the ask went by email. Since
+v1.73.0 three more go by email when no push landed: **no one home** (sorry we
+missed you, from `recordNoAccess()`), **running late** (the trade's own
+figure with when it was said, from `runningLate()`), and **paused** (from
+`notifyStage`). Each is once per job per kind, so a second "running late" in
+one visit is the page's job, not another email. Job done is not emailed: it
+is not urgent. That closes rule 1 of `docs/design/when-things-go-wrong.md`
+for every customer-critical event the product has.
 
 ## No hook after an early return (`node scripts/check-hook-order.mjs`)
 
@@ -1642,6 +1665,20 @@ added: the card read *Booked in* with no note while the job had said *running
 about 30 minutes late* fourteen hours earlier. That is the gap this product
 exists to close, demonstrated on the owner's own phone, and it is the argument
 for why the update service is not optional polish.
+
+**The homepage leads with the link (v1.72.1).** The 19 Oct review
+(`docs/review/2026-10-19.md`) found the first thing a stranger read was the one
+thing not built. The headline is the owner's pick, "Tap On my way. They stop
+ringing.", the first picture is the customer's page from a text, and the card
+sits second under a caption that says it is next. Keep it that way until a pass
+is in a wallet; then the card can lead again.
+
+**And it is short (v1.72.2).** Eighteen phone screens became about six. The
+wallet story (`WalletStory`), the poster strips (`byGroup('either')` and
+`byGroup('next')`) and the never-list live on **`/next`** (`src/app/next/page.js`),
+and the homepage shows four customer rows and two trade buttons, not eight and
+six: the whole day is `/for-trades`. Before adding a section to the homepage,
+ask which of these three pages it belongs on; the answer is rarely the homepage.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 

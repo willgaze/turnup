@@ -1,6 +1,7 @@
 'use client'
 
 import StatusTracker from '../t/StatusTracker'
+import { TradeProvider } from '@/components/TradeProvider'
 
 /**
  * The customer's page, drawn from a fixture.
@@ -30,6 +31,10 @@ export default function Preview({ stage }) {
   const fresh = at === 'BOOKED'
 
   return (
+    /* An invented trade, whatever the environment says: this page is the
+       demo and the diary, and both say nothing on them is real. No phone,
+       so there is no Call button that rings a real business. */
+    <TradeProvider name="Sam Hale Plumbing">
     <StatusTracker
       initialProfile={{
         engineerName: 'Sam Hale',
@@ -63,5 +68,6 @@ export default function Preview({ stage }) {
           ],
       }}
     />
+    </TradeProvider>
   )
 }

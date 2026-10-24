@@ -31,7 +31,7 @@ export default function DemoPage() {
         <div className="glass r-outer mx-auto mt-3 max-w-md p-4 text-center" style={{ '--tint': 'var(--mts-accent)' }}>
           <p className="text-[15px] font-semibold">This is an example</p>
           <p className="mt-1 text-[14px] leading-snug muted">
-            A made-up job, so you can see what your customer gets. Everything on it is invented.
+            A made-up job for a made-up plumber, so you can see what your customer gets. The names, the address and the times are all invented.
           </p>
           <Link href="/" className="mt-3 inline-flex min-h-[44px] items-center text-[15px] font-medium"
                 style={{ color: 'var(--mts-accent)' }}>

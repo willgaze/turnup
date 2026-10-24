@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.73.0'
-export const BUILD_DATE = '2026-10-23'
+export const VERSION = '1.74.0'
+export const BUILD_DATE = '2026-10-24'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 55
+export const THEME_INDEX = 58
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,7 +48,7 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
-  { version: '1.73.0', date: '2026-10-23', notes: [
+  { version: '1.74.0', date: '2026-10-24', notes: [
     'The wallet card can now update itself. Until tonight a pass showed the stage it was added at and nothing moved it again, which is the difference between a card and a screenshot. The four service calls Wallet makes are built: it registers a phone against a job, it asks what has changed since it last looked, it fetches the current card, and it reports back when something went wrong. A stage tap on the dashboard, or a booking moving in ServiceM8, now tells every phone holding that card to come and look.',
     'The push that does it carries no words at all — Apple’s pass push is an empty body that only says "ask me again", so there is nothing on a lock screen to get wrong and no vocabulary to guard. Everything the card says still comes from the same builder as the download, so the card in a pocket and the page on the link cannot say different things.',
     'A revoked link takes the card with it. Switch a job’s link off and the next time Wallet asks it is told the pass is no longer theirs, and it comes off the phone. The token a pass sends back is worked out from the job code and your own secret rather than stored, so there is no new column, nothing extra to leak, and one job’s pass cannot ask about another’s.',
@@ -56,6 +56,18 @@ export const CHANGELOG = [
     'Apple Wallet is live. The certificate landed and the first real card went into a real wallet on 23 October — job #2742, added straight from the customer’s page. It is the premise of this whole product and it had never actually existed before today. Everything that described it as pending (the plan, the roadmap, the homepage badge, the instructions) now says what is true.',
     'And the first real card immediately proved why the half above matters: added while the update service was still in a branch, it froze at Booked in with no note, while the job itself had said running about thirty minutes late fourteen hours earlier. A card that cannot move is a screenshot of a moment.',
     'One thing the audit caught that nothing would have reported: the private key is AES-256 encrypted, so the push needs its passphrase as well — and the check that said whether pushing was switched on did not look at it. It would have answered yes, failed inside a swallowed error and left every card quietly not updating. It now says no, and names what is missing, and a card nobody can push says so in the log instead of nothing at all.',
+  ] },
+  { version: '1.73.0', date: '2026-10-23', notes: [
+    'Every moment that matters now reaches a customer with no notifications on. Sorry we missed you, running late (your own figure, with when you said it) and paused join set off, window missed and the day-before ask: an email through ServiceM8 when no push landed, once each per job. That closes the rule that every customer-critical event has a fallback that is not a push.',
+    'Connect Gmail is parked, not pending. The panel and the paste exist; your own inbox already reaches the card through the Workspace forwarding rule; it comes back when other households can connect, which waits on Google. Nobody asks you about it again.',
+  ] },
+  { version: '1.72.2', date: '2026-10-23', notes: [
+    'The homepage is a third of the length. It was eighteen screens on a phone (the 19 October review); nobody scrolls eighteen screens. It keeps what works today: the headline, the phone, the four stage colours, four of the customer\'s rows, the two buttons the trade taps most, the live count, the house card and the ask. The wallet card\'s story, the poster strips for what is next and the four things it will never do have moved to /next, which the homepage links to twice. The whole day, every row and every button, was already /for-trades, and the homepage now says so under What you tap.',
+  ] },
+  { version: '1.72.1', date: '2026-10-23', notes: [
+    'The homepage leads with what works today. The headline is the owner\'s pick from the 19 October review, "Tap On my way. They stop ringing.", and the first picture is the customer\'s page from a text, which is live. The wallet card stays on the page, second, and says it is next: built, enrolment through on 21 October, certificate to come. "Android next" is gone, because Google Wallet is not started. "Thirty seconds", "live on every job" and "the tools you already use" are gone too: unmeasured, untrue for the things that need setup, and ServiceM8 is the only tool.',
+    'The example job is an example all the way down. /demo said everything on it was invented and then showed the real business\'s name and a Call button that rang the real business. The customer\'s page now takes the trade from a provider (src/components/TradeProvider.jsx) that defaults to the environment, and the demo fixture wraps itself in an invented plumber with no phone. Every real page is unchanged.',
+    'Words that had fallen behind: /for-homes said forwarding was being switched on (it is live); /join said the forwarding address comes when your place opens (it comes when the card is made); /with-servicem8 had no button on its first screen but Dashboard, which is a sign-in.',
   ] },
   { version: '1.72.0', date: '2026-10-23', notes: [
     'Connect Gmail is two boxes on the phone, not Vercel. The Google Client ID and secret are pasted into the panel under Where the card hears from, sealed before they are stored, and Connect Gmail appears straight away: no settings page, no redeploy. The three Google steps are links you can tap. Same fix the ServiceM8 add-on got the day before, for the same reason.',
