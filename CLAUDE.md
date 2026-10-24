@@ -1289,7 +1289,7 @@ card and the diary, and `publicShape` carries only the two times.
 
 ## The wallet card keeps itself current (`src/app/api/passes/v1/`)
 
-v1.73.0. A pass without an update service is a screenshot: it shows the stage
+v1.74.0. A pass without an update service is a screenshot: it shows the stage
 at the moment it was added and nothing ever moves it. Apple's answer is five
 calls Wallet makes to the `webServiceURL` baked into the pass, and all of them
 are built now, so the only thing between this product and a card that moves is
@@ -1653,7 +1653,7 @@ for that reason, rather than reporting itself ready and then failing into a
 swallowed error.
 
 So the honest line has moved, and this is the first day it may say *card*:
-**Apple Wallet is live and a card that updates itself ships with v1.73.0.**
+**Apple Wallet is live and a card that updates itself ships with v1.74.0.**
 Google Wallet is not, and nothing customer-facing may suggest otherwise.
 
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and

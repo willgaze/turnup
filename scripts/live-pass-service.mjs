@@ -73,6 +73,17 @@ try {
   process.exit(1)
 }
 
+// The running server must know the same pass type, or passTypeMatches() refuses
+// every call and all twenty-four checks fail as a wall of 404s that says
+// nothing. scripts/local-db.sh REWRITES .env.local, so this is lost every time
+// that is re-run -- which is exactly how this was met. Say it in one line.
+if (!/^PASSKIT_PASS_TYPE_ID=/m.test(env)) {
+  console.error(`No PASSKIT_PASS_TYPE_ID in .env.local, so every route will 404.`)
+  console.error(`Add it (scripts/local-db.sh rewrites .env.local and drops it), rebuild, restart:`)
+  console.error(`  echo 'PASSKIT_PASS_TYPE_ID="${TYPE}"' >> .env.local`)
+  process.exit(1)
+}
+
 /* Registering ----------------------------------------------------------- */
 
 is((await post(reg(CODE), { pushToken: 'aa'.repeat(32) }, auth(CODE))).status, 201,

@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '23 Oct 2026',
+  updated: '24 Oct 2026',
 }
 
 export const STAGES = [
@@ -67,7 +67,7 @@ export const MOATS = [
   },
   {
     n: '3', name: 'One integration', line: 'Both wallets, the update loop, push, SMS fallback, the privacy rules. They would rather buy that than own it.',
-    today: ['Apple pass signing: LIVE, a real signed pass in a real wallet', 'The pass update loop: built and tested end to end, ships with v1.73.0', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Email through ServiceM8 when push cannot reach a phone', 'Privacy rules: written and checked by script'],
+    today: ['Apple pass signing: LIVE, a real signed pass in a real wallet', 'The pass update loop: built and tested end to end, ships with v1.74.0', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Email through ServiceM8 when push cannot reach a phone', 'Privacy rules: written and checked by script'],
     missing: ['Google Wallet', 'An API another firm can call'],
     gate: 'A firm that is not customer zero calls the API', pct: 40,
   },
@@ -88,7 +88,7 @@ export const STATUS = [
   { item: 'Privacy policy', state: 'green', note: 'a public page, getturnup.com/privacy, since 17 Oct 2026' },
   { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },
   { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is next' },
-  { item: 'Apple Wallet card', state: 'green', note: 'a real signed pass is in a real wallet, 23 Oct 2026; the certificate is live in production and the update loop ships with v1.73.0' },
+  { item: 'Apple Wallet card', state: 'green', note: 'a real signed pass is in a real wallet, 23 Oct 2026; the certificate is live in production and the update loop ships with v1.74.0' },
   { item: 'Google Wallet card', state: 'red', note: 'not built; decide whether to build on a pass platform' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
   { item: 'Pricing', state: 'amber', note: 'free for every sender, enterprise per card, decided 9 Oct 2026' },
@@ -165,7 +165,7 @@ export const WALLET = {
     { label: 'Add to Apple Wallet button', note: 'appears on the customer page on an Apple device, once a pass can be signed' },
     { label: 'Two-command certificate script', note: 'scripts/apple-wallet.sh: csr, then finish' },
     { label: 'Name and stage on the pass', note: 'from the trade profile; the logo itself is not on the pass yet' },
-    { label: 'The update service', note: '/api/passes/v1: a phone registers, asks what changed, fetches the current card; a stage tap pushes it. Tested against the real routes, v1.73.0. A revoked link takes the card off the phone' },
+    { label: 'The update service', note: '/api/passes/v1: a phone registers, asks what changed, fetches the current card; a stage tap pushes it. Tested against the real routes, v1.74.0. A revoked link takes the card off the phone' },
     { label: 'The certificate, and a real pass', note: 'Apple Developer enrolled 21 Oct 2026, Pass Type ID certificate live in production, first real card added 23 Oct' },
   ],
   missing: [
@@ -252,7 +252,7 @@ export const CALC_DEFAULTS = { freeSenders: 50, newFree: 20, enterprises: 0, new
 /** Six moves, in order. Each opens when the gate before it is passed. */
 export const GTM_PHASES = [
   { phase: '1', label: 'Prove it on my own jobs', gate: 'Thirty days, four numbers', moves: ['ServiceM8 connected, the link in every booking text', 'Asked the day before: will someone be in? Built 11 Oct 2026', 'Links opened, “in?” answered, wasted trips, “when are you coming?” calls', 'If the first two stay low, the product is wrong, not the pitch'], when: 'Now', state: 'amber' },
-  { phase: '2', label: 'Sign the pass', gate: 'One card in one wallet', moves: ['Apple Developer: done, 21 Oct', 'The certificate: done, 22 Oct', 'First real pass on the owner’s phone: done, 23 Oct', 'The update loop so it moves: v1.73.0'], when: 'Done', state: 'green' },
+  { phase: '2', label: 'Sign the pass', gate: 'One card in one wallet', moves: ['Apple Developer: done, 21 Oct', 'The certificate: done, 22 Oct', 'First real pass on the owner’s phone: done, 23 Oct', 'The update loop so it moves: v1.74.0'], when: 'Done', state: 'green' },
   { phase: '3', label: 'Be ServiceM8’s card', gate: 'Ten ServiceM8 trades sending', moves: ['Connector live on customer zero: done, 9 Oct 2026', 'Add-on listing: written 17 Oct 2026; public release needs an account per trade and a support mailbox', 'Ask ten ServiceM8 trades, once, whether they would pay £9.99 a month: the research’s one cheap test, before any billing is built', 'An account per trade, so a second business can sign up', 'Stage vocabulary published'], when: 'Q4 2026', state: 'gray' },
   { phase: '4', label: 'Android, on a pass platform if faster', gate: 'Both wallets live', moves: ['Decide: PassKit or our own', 'Google Wallet pass class', 'Same update loop'], when: 'Q1 2027', state: 'gray' },
   { phase: '5', label: 'The household asks for it', gate: 'Household-requested cards outnumber trade-sent', moves: ['The household card exists, 12 Oct 2026; a home makes its own on /join since 18 Oct', 'Customer-invite: one screen', 'Remembered for the next trade'], when: '2027 H1', state: 'gray' },
