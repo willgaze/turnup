@@ -11,6 +11,7 @@ import { dbReason } from '@/lib/db-errors'
 import { cleanText } from '@/lib/clean-text'
 import { notifyStage } from '@/lib/push'
 import { syncTrackerToCards } from '@/lib/arrivals'
+import { notifyPassUpdated } from '@/lib/pass-devices'
 import { proposeWindow, agreeWindow, clearWindow, revisionFor, dayMoveFor, windowHours, lastShown } from '@/lib/window'
 import { dayOnly } from '@/lib/when'
 import { normaliseW3w, normaliseMapPin, normalisePhotoUrl } from '@/lib/places'
@@ -211,6 +212,19 @@ export async function PATCH(request, { params }) {
         console.error('push: notify failed after stage change:', error?.message),
       ))
     }
+
+    // The wallet card in the customer's pocket, told to come back and look.
+    // Every write here, not just a stage change: hours moving or a pause note
+    // is exactly the kind of thing somebody opens the card for, and the push
+    // carries no words anyway — it only says "ask me again" (src/lib/apns.js).
+    //
+    // after() for the same reason as the push above: this is a round trip to
+    // Apple per registered phone, after the response has gone. Swallowed
+    // whole, so a card that does not update is a card showing the stage it
+    // was added at, which is where the product was before this existed.
+    after(() => notifyPassUpdated(tracker.code).catch((error) =>
+      console.warn('wallet pass push failed:', error?.message),
+    ))
 
     // Any household card carrying this job moves with it. Un-awaited and
     // swallowed for the same reason as the push above: the household card is a

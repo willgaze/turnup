@@ -23,6 +23,7 @@
  */
 import { prisma } from './prisma'
 import { notifyStage } from './push'
+import { notifyPassUpdated } from './pass-devices'
 import { cleanText } from './clean-text'
 import { generateCode } from './trade-status'
 import { nudgeIfDue } from './nudge'
@@ -215,6 +216,12 @@ export async function syncTracker(tracker, { source = 'sync' } = {}) {
       notifyStage(updated, stage).catch(() => {})
       outcome = outcome === 'window' ? `moved:${stage}+window` : `moved:${stage}`
     }
+    // The wallet card follows a ServiceM8 move as well. This is the one place
+    // a field the pass shows changes without anybody tapping the dashboard, so
+    // without it a booking moved in ServiceM8 would sit in somebody's wallet
+    // until Wallet next asked of its own accord. Un-awaited and swallowed, the
+    // same rule as notifyStage above: a sync must not fail on Apple.
+    if (outcome !== 'unchanged') notifyPassUpdated(tracker.code).catch(() => {})
     await prisma.sm8Link.upsert({
       where: { tradeStatusId: tracker.id },
       create: { tradeStatusId: tracker.id, jobUuid, jobNumber: job.generated_job_id ? String(job.generated_job_id) : null, syncedAt: new Date(), lastStatus: job.status, lastOutcome: outcome },

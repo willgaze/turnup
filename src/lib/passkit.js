@@ -48,14 +48,9 @@ export function passkitMissing() {
   return REQUIRED.filter(([key]) => !process.env[key]).map(([key, what]) => ({ key, what }))
 }
 
-// A PEM, whether it was pasted as text or as one line of base64.
-export function pem(value) {
-  const v = String(value || '').trim()
-  if (!v) return ''
-  if (v.includes('-----BEGIN')) return v.replace(/\\n/g, '\n')
-  const decoded = Buffer.from(v, 'base64').toString('utf8')
-  return decoded.includes('-----BEGIN') ? decoded : v
-}
+// A PEM, whether pasted as text or as one line of base64. It lives in
+// pass-auth.js so a check with no bundler can reach the APNs gate beside it.
+export { pem } from '@/lib/pass-auth'
 
 // Wallet wants #rrggbb or rgb(). Keep them here so the pass and the web page
 // cannot drift apart.
