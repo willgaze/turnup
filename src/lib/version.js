@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.74.1'
+export const VERSION = '1.74.2'
 export const BUILD_DATE = '2026-10-25'
 
 export const THEMES = [
@@ -48,6 +48,11 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.74.2', date: '2026-10-25', notes: [
+    'The wallet card was never being asked about, and now it will be. The pass told Apple where to find us and the address had one word too many in it \u2014 Apple adds the version to the end itself, so every request went to a page that does not exist. Nothing in the log, because it never got as far as our code; it looked exactly like a phone that had never registered. Two days of a card that could not have moved whatever we did.',
+    'You will need to remove the card from Wallet and add it once more. The wrong address is sealed inside the card you have; a pass cannot be told a new one. This is the last time.',
+    'The check now walks from the address in the pass to the actual files, so the two cannot drift apart again: put the extra word back and it fails five times over and prints the doubled address. And a refused request writes a line now \u2014 before, an empty log meant either nobody called or we turned them away, and not being able to tell those apart is what cost the two days.',
+  ] },
   { version: '1.74.1', date: '2026-10-25', notes: [
     'Add to Apple Wallet is working again. Last night\u2019s build moved one helper into another file and left behind a re-export instead of an import \u2014 which hands the function to everyone else and leaves nothing behind for the file itself. So the pass could not be signed, and the button answered an error for about an hour. Found in the live log, which named it in one line.',
     'A check for that exact shape now runs with the others: a name a file passes on AND calls itself, with no import of its own. Run against last night\u2019s file it fails; run against the two other files that pass names on the same way, correctly, it stays quiet. Nothing caught this before because signing a pass is the one path that needs a real Apple certificate, and no check in this repo has one.',

@@ -1378,7 +1378,7 @@ time Wallet asks, which it does, because the changed-serials route compares
 **Two checks, because one of them could not see a handler.**
 
 ```bash
-node scripts/check-pass-service.mjs        # 48 cases, no database, no server
+node scripts/check-pass-service.mjs        # 54 cases, no database, no server
 bash scripts/local-db.sh                   # then, for the other one:
 PASSKIT_PASS_TYPE_ID=pass.com.getturnup.job npm run build && npx next start
 node scripts/live-pass-service.mjs         # 24 cases, against the real routes
@@ -1391,13 +1391,30 @@ rather than being taken off the phone. The live run found it on its first
 pass. Whether a link is revoked is a fact about the card; whether we can sign
 a pass is a fact about this deployment, and the card's fact comes first.
 
-What **neither** can prove is that Apple's paths are the paths Wallet calls.
-Apple's documentation renders in JavaScript and would not fetch from the
-container this was written in, so the routes are built from the long-stable
-public spec. Every one of them logs a line for exactly that reason: **if a
-card is added and the Vercel log stays silent, the paths are the first thing
-to check.** Do not let that gap go unsaid, and do not describe the card as
-self-updating to a customer until a real pass has been seen to move.
+**The gap was real and it bit (25 Oct 2026).** `webServiceURL` is the **BASE**
+of the service and **Wallet appends `/v1/...` to it itself**. It read
+`${origin}/api/passes/v1`, so Wallet asked for
+`/api/passes/v1/v1/devices/...`, Next answered 404 in the router before any
+handler ran, and the log stayed **silent** — which read like "Wallet never
+called" rather than "we gave it the wrong address". Two days, and the first
+real card never stood a chance. It is `${origin}/api/passes` now, with the
+`/v1` folder under it, and `check-pass-service.mjs` walks from the URL in the
+pass to the four route files on disk: put the `/v1` back and it fails five
+ways, naming the doubled path.
+
+**A pass cannot be told a new address.** Every card added before that fix has
+the wrong base sealed inside it, so it has to be removed from Wallet and added
+again. There is no migration for a pass in somebody's pocket.
+
+**Silence in a log must mean one thing.** It meant two here, and that is what
+cost the time: every route logged on success and nothing on refusal, so an
+empty log could not tell "never called" from "called and turned away". The
+refusal paths log now. **Any route whose absence of output is used as evidence
+has to log when it says no.**
+
+What still cannot be proved from a container is a real pass moving in a real
+wallet. Do not describe the card as self-updating to a customer until one has
+been seen to do it.
 
 ## The native shell (`native/`): the job on the trade's own lock screen
 

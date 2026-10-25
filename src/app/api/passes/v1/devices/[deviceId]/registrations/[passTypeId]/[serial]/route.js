@@ -24,8 +24,19 @@ export async function POST(request, { params }) {
   const { deviceId, passTypeId, serial } = await params
   const code = String(serial || '').toUpperCase()
 
-  if (!passTypeMatches(passTypeId)) return new NextResponse(null, { status: 404 })
-  if (!checkPassAuth(request.headers.get('authorization'), code)) return new NextResponse(null, { status: 401 })
+  // A refusal logs too. Silence in the log used to mean either "Wallet never
+  // called" or "Wallet called and we turned it away", and on 25 Oct 2026 that
+  // ambiguity cost two days: the pass carried the wrong base URL, every call
+  // 404ed in the router before reaching here, and an empty log read like a
+  // phone that had never registered. A refused call must leave a trace.
+  if (!passTypeMatches(passTypeId)) {
+    console.log(`pass register refused: pass type ${passTypeId} is not ours`)
+    return new NextResponse(null, { status: 404 })
+  }
+  if (!checkPassAuth(request.headers.get('authorization'), code)) {
+    console.log(`pass register refused: bad or missing token for ${code}`)
+    return new NextResponse(null, { status: 401 })
+  }
 
   try {
     const row = await prisma.tradeStatus.findUnique({ where: { code }, select: { isActive: true } })
