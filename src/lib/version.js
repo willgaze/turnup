@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.73.1'
+export const VERSION = '1.74.0'
 export const BUILD_DATE = '2026-10-25'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 57
+export const THEME_INDEX = 58
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,18 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.74.0', date: '2026-10-25', notes: [
+    'The wallet card can now update itself. Until tonight a pass showed the stage it was added at and nothing moved it again, which is the difference between a card and a screenshot. The four service calls Wallet makes are built: it registers a phone against a job, it asks what has changed since it last looked, it fetches the current card, and it reports back when something went wrong. A stage tap on the dashboard, or a booking moving in ServiceM8, now tells every phone holding that card to come and look.',
+    'The push that does it carries no words at all — Apple’s pass push is an empty body that only says "ask me again", so there is nothing on a lock screen to get wrong and no vocabulary to guard. Everything the card says still comes from the same builder as the download, so the card in a pocket and the page on the link cannot say different things.',
+    'A revoked link takes the card with it. Switch a job’s link off and the next time Wallet asks it is told the pass is no longer theirs, and it comes off the phone. The token a pass sends back is worked out from the job code and your own secret rather than stored, so there is no new column, nothing extra to leak, and one job’s pass cannot ask about another’s.',
+    'Still waiting on one thing, and it is not code: the Pass Type ID certificate from Apple. The enrolment went through on 21 October, so that is the next job, and this half is ready for the day it lands. Two checks on it, and the second one earned its keep immediately: run against a real server it found that a card whose link had been switched off was told \u201ccome back later\u201d instead of being removed from the phone. The paths Wallet itself calls are the one thing left to a real card, and every route logs a line so the log says whether it found them.',
+    'Apple Wallet is live. The certificate landed and the first real card went into a real wallet on 23 October — job #2742, added straight from the customer’s page. It is the premise of this whole product and it had never actually existed before today. Everything that described it as pending (the plan, the roadmap, the homepage badge, the instructions) now says what is true.',
+    'And the first real card immediately proved why the half above matters: added while the update service was still in a branch, it froze at Booked in with no note, while the job itself had said running about thirty minutes late fourteen hours earlier. A card that cannot move is a screenshot of a moment.',
+    'One thing the audit caught that nothing would have reported: the private key is AES-256 encrypted, so the push needs its passphrase as well — and the check that said whether pushing was switched on did not look at it. It would have answered yes, failed inside a swallowed error and left every card quietly not updating. It now says no, and names what is missing, and a card nobody can push says so in the log instead of nothing at all.',
+    'One more from the audit, found the hard way: scripts/local-db.sh rewrites .env.local, which silently drops the pass type, after which every one of the twenty-four live checks fails as a 404 that explains nothing. The check now says that in one line instead. A check that fails confusingly is only slightly better than one that cannot fail.',
+    'The card tells you it has changed. A pass that updates silently is a pass nobody looks at, so the stage is the one field that announces itself: when the job moves, the lock screen reads Now: On my way, and Wallet puts your business name beside it. Nothing else on the card may do that — not the note, not the address, not the customer’s name — and the check names all eight of them, because the risk was never the field that has one today.',
+    'Said out loud on the privacy page too: what a Wallet registration holds (an anonymous device identifier and a token from Apple), how long it is kept, and that the push itself carries no words at all. A change to what is stored or sent is a change to that page; when the two disagree, the page is the defect.',
+  ] },
   { version: '1.73.1', date: '2026-10-25', notes: [
     'The Apple Wallet script can no longer publish its own private key. Its last step used to redeploy with a plain deploy command, run from the folder on the Mac that holds the key, and on 21 Oct that uploaded the folder, key included. Now every Vercel command in it goes through one gate that only allows commands which upload nothing, run from an empty temporary folder, and the redeploy re-runs the build that is already live and promotes it.',
     'Making a key now stops if one already exists, so the certificate Apple issued is never orphaned by accident, and a new rotate command retires an exposed key (kept in a dated folder, never deleted) and starts a fresh one, with the steps to revoke the old certificate once the new one works.',

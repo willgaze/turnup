@@ -48,14 +48,9 @@ export function passkitMissing() {
   return REQUIRED.filter(([key]) => !process.env[key]).map(([key, what]) => ({ key, what }))
 }
 
-// A PEM, whether it was pasted as text or as one line of base64.
-export function pem(value) {
-  const v = String(value || '').trim()
-  if (!v) return ''
-  if (v.includes('-----BEGIN')) return v.replace(/\\n/g, '\n')
-  const decoded = Buffer.from(v, 'base64').toString('utf8')
-  return decoded.includes('-----BEGIN') ? decoded : v
-}
+// A PEM, whether pasted as text or as one line of base64. It lives in
+// pass-auth.js so a check with no bundler can reach the APNs gate beside it.
+export { pem } from '@/lib/pass-auth'
 
 // Wallet wants #rrggbb or rgb(). Keep them here so the pass and the web page
 // cannot drift apart.
@@ -111,7 +106,16 @@ export function buildPassJson(status, { origin, authToken }) {
         ...(status.jobRef ? [{ key: 'job', label: 'JOB', value: `#${status.jobRef}` }] : []),
       ],
       primaryFields: [
-        { key: 'stage', label: 'STATUS', value: stage.label },
+        // changeMessage is the whole point of an updating card: without it
+        // Wallet swaps the pass silently and the customer never looks. With
+        // it, the stage change itself is the notification.
+        //
+        // It is also a lock screen, so the lock-screen rule binds it: the
+        // stage and nothing else. `%@` is the field's new value, Wallet adds
+        // the trade's name itself, and NO other field carries a
+        // changeMessage -- not the note, not the address, not the customer's
+        // name -- so none of them can ever reach a lock screen this way.
+        { key: 'stage', label: 'STATUS', value: stage.label, changeMessage: 'Now: %@' },
       ],
       secondaryFields: [
         ...(status.customerName

@@ -109,6 +109,7 @@ export default function Privacy() {
             ['Answers the customer gives: will someone be in, door and access notes, a private note after the job', 'So the trade knows what to expect at the door', 'With the job'],
             ['A map pin, where one is dropped', 'Turn-by-turn to the right gate rather than near it', 'With the job'],
             ['Push notification subscriptions', 'To send “has set off” to a phone', 'Until the browser discards it or notifications are switched off'],
+            ['An Apple Wallet registration, where a job’s card is added to Wallet: an anonymous device identifier and a push token from Apple', 'So the card in Wallet moves itself when the job does, instead of showing the stage it was added at', 'Until the card is removed from Wallet, or Apple says that phone no longer wants it'],
             ['The trade’s own details: business name, photo, van and plate', 'Shown to the customer from “on my way”, so they know who is at the door', 'Until changed or deleted'],
             ['ServiceM8 bookings, where a trade connects ServiceM8', 'So the card follows the job without anything being retyped', 'With the job'],
             ['The waiting list (/join): name, email, trade or “a home”, and the first half of a postcode', 'To email you once, when there is a place', 'Until you ask for it to be removed'],
@@ -147,6 +148,9 @@ export default function Privacy() {
           Notifications are the least private surface here, because they are read by whoever picks
           the phone up. One carries the trade’s name and the stage, and nothing else — never the
           address, never the job reference, never the customer’s name, never a free-text note.
+          A Wallet card obeys the same rule: when it changes, the lock screen shows the
+          new stage and nothing else, because the stage is the only field on that card
+          allowed to announce itself.
         </P>
 
         <H2>Who it is shared with</H2>
@@ -162,7 +166,7 @@ export default function Privacy() {
             ['Vercel (hosting)', 'Requests to the site, in the EU and US'],
             ['Neon (database)', 'Everything in the table above, at rest'],
             ['ServiceM8', 'Only where a trade connects their own account: the bookings TurnUp reads and the texts and diary lines it writes'],
-            ['Apple and Google push services', 'An anonymous subscription and the notification text'],
+            ['Apple and Google push services', 'An anonymous subscription and the notification text. For a Wallet card it is an empty message that carries no words at all — it only tells Wallet to come back and fetch the card'],
             ['Cloudflare', 'Where a household card uses email forwarding: the forwarded message, in transit'],
             ['Anthropic', 'Only when the trade uses the Ask box on their own dashboard: that trade’s job list, with every phone number taken out'],
             ['DVSA and DVLA', 'Only when a trade looks up their own van: the number plate'],

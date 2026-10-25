@@ -1287,6 +1287,118 @@ runs from the cron two hours after the last DONE event, pushes once per job
 note (`feedbackText`/`feedbackAt`); the note goes to the trade's phone, the
 card and the diary, and `publicShape` carries only the two times.
 
+## The wallet card keeps itself current (`src/app/api/passes/v1/`)
+
+v1.74.0. A pass without an update service is a screenshot: it shows the stage
+at the moment it was added and nothing ever moves it. Apple's answer is five
+calls Wallet makes to the `webServiceURL` baked into the pass, and all of them
+are built now, so the only thing between this product and a card that moves is
+the certificate (see *Not built yet*).
+
+| Wallet calls | We answer |
+|---|---|
+| `POST   /devices/<d>/registrations/<type>/<serial>` | 201 new, 200 again, 401 wrong token, 404 revoked |
+| `DELETE /devices/<d>/registrations/<type>/<serial>` | always 200 |
+| `GET    /devices/<d>/registrations/<type>?passesUpdatedSince=<tag>` | the serials that moved, or **204** |
+| `GET    /passes/<type>/<serial>` | the signed pass, 304 if unmoved, **401 if revoked** |
+| `POST   /log` | Wallet's own complaints, capped and logged |
+
+**The token is derived, never stored.** `passAuthToken()` in
+`src/lib/pass-auth.js` is an HMAC of the code under `JWT_SECRET`, baked into
+the pass and sent back as `Authorization: ApplePass <token>`. So there is no
+column to add, nothing extra to leak if the database is read, one job's pass
+cannot ask about another's, and it fails closed: **no `JWT_SECRET` means
+nobody is authorised**, the same way `requireOperator()` does. The compare is
+`timingSafeEqual`, because `===` on a secret leaks its prefix.
+
+Rules in here that each cost something to get wrong:
+
+- **204, not an empty 200**, when nothing has changed. Wallet reads an empty
+  list in a 200 as "these changed" and re-downloads every pass it holds, on a
+  timer.
+- **No tag means the beginning of time, not now.** A device that has never
+  asked sends nothing; reading that as "nothing changed" is a reinstalled
+  phone whose card never updates again.
+- **A revoked link answers 401 on the pass itself**, which is how Wallet is
+  told the card is no longer theirs and takes it off the phone. The
+  registration routes answer 404 for the same row, because there the token was
+  right and the card simply is not a thing any more. `serialsChangedSince()`
+  deliberately reports a dead code as *changed*, so the card is allowed to
+  find out it is dead.
+- **The changed-serials route carries no Authorization**, by Apple's design:
+  the device library identifier is the credential and it only ever yields
+  serials that device itself registered. It must never widen into a list of
+  jobs.
+- **Only the registration routes need the database.** If `PassDevice` has not
+  migrated, every read answers "no devices" — a new table, so it fails soft
+  (see *Shipping a schema change*), and the pass still downloads.
+
+**The push carries nothing, but the CARD does, and that is the part to get
+right.** Apple's pass push is an empty `{}` with `apns-topic` set to the pass
+type: no words, no sound. It only tells Wallet to come back and ask. But a
+card that changes silently is a card nobody looks at, so the **stage field
+carries `changeMessage: 'Now: %@'`** and Wallet itself puts *Now: On my way*
+on the lock screen when the pass updates.
+
+That makes the pass a lock-screen surface, and **the lock-screen rule binds it
+exactly as it binds push**: the stage and nothing else. Wallet adds the
+trade's name itself. The danger is not the field that has one today — it is
+the field somebody gives one to later. A `changeMessage` on the note would put
+`stageNote` on a lock screen, which is the leak this product has already
+shipped once (v1.69.0). So `check-pass-service.mjs` reads `passkit.js` as
+source and allows **exactly one**, on `stage`, saying exactly `Now: %@`, and
+names the eight other fields individually. Adding a `changeMessage` anywhere
+else fails the check four ways. `src/lib/apns.js` opens an HTTP/2 session per call (a pool is a
+long-lived socket inside a function that may be frozen between invocations,
+which is a handle that looks open and delivers nothing), authenticates with
+the **same Pass Type ID certificate that signs the pass**, and never throws.
+A 410 means the pass was deleted from that wallet: the row goes and is never
+retried, the same rule the web-push subscriptions follow.
+
+**`apnsConfigured()` and `apnsMissing()` live in `src/lib/pass-auth.js`, not
+in `apns.js`**, and the reason is the bug they exist for. `apns.js` imports
+`passkit.js`, which pulls in `passkit-generator` and three aliased modules, so
+no bare node script can load it — and the gate that sat there went untested
+and was wrong: the private key `scripts/apple-wallet.sh` writes is **AES-256
+encrypted**, so a push needs `PASSKIT_KEY_PASSWORD` too, and the gate did not
+look at it. It answered "configured", the handshake failed, the error was
+swallowed, and a card quietly never updated. `pem()` moved across with them
+and `passkit.js` re-exports it. **If a push gate cannot be reached by a check,
+move the gate, not the check.** And when devices hold a card that cannot be
+pushed, `notifyPassUpdated()` logs the missing names: silence in the log is
+the one failure mode nobody can diagnose.
+
+`notifyPassUpdated()` is called **un-awaited, inside `after()`**, from the
+tracker PATCH and from `syncTracker()` — the two places a field the pass shows
+moves. Same rule as `notifyStage()`: the trade tapped a button on a driveway.
+Everything is swallowed, and the worst case is a card that catches up the next
+time Wallet asks, which it does, because the changed-serials route compares
+`updatedAt` and so catches every write whether or not it was pushed.
+
+**Two checks, because one of them could not see a handler.**
+
+```bash
+node scripts/check-pass-service.mjs        # 48 cases, no database, no server
+bash scripts/local-db.sh                   # then, for the other one:
+PASSKIT_PASS_TYPE_ID=pass.com.getturnup.job npm run build && npx next start
+node scripts/live-pass-service.mjs         # 24 cases, against the real routes
+```
+
+The first proves the credential and nothing else. **It passed while a revoked
+card was answered 503 instead of 401**: the certificate gate sat above the row
+lookup, so a card whose link had been switched off was told "come back later"
+rather than being taken off the phone. The live run found it on its first
+pass. Whether a link is revoked is a fact about the card; whether we can sign
+a pass is a fact about this deployment, and the card's fact comes first.
+
+What **neither** can prove is that Apple's paths are the paths Wallet calls.
+Apple's documentation renders in JavaScript and would not fetch from the
+container this was written in, so the routes are built from the long-stable
+public spec. Every one of them logs a line for exactly that reason: **if a
+card is added and the Vercel log stays silent, the paths are the first thing
+to check.** Do not let that gap go unsaid, and do not describe the card as
+self-updating to a customer until a real pass has been seen to move.
+
 ## The native shell (`native/`): the job on the trade's own lock screen
 
 iOS shows buttons and a live card on the lock screen only through a **Live
@@ -1536,49 +1648,56 @@ calling it done; nothing scrolls sideways but a strip that means to.
 
 ## Not built yet
 
-**The wallet pass.** This is the premise of the product and it does not exist.
-Today the customer gets a web page; the idea is a card that sits in Apple
-Wallet and Google Wallet and updates itself. Both need credentials the
-repository does not have:
+**The wallet pass was the premise of the product and the thing it did not have.
+Half of that is now untrue.**
 
-- **Apple Wallet (PassKit)** — an Apple Developer Program membership and a Pass
-  Type ID certificate. Everything else is built and tested with a stand-in
-  chain (v1.15.4): `bash scripts/apple-wallet.sh csr` makes the key and the
-  request, `finish pass.cer` turns Apple's certificate into the six `PASSKIT_*`
-  settings (`docs/apple-wallet.md`). The library wants **PEM, never a .p12**.
-  **The enrolment went through on 21 Oct 2026**, so the certificate is the
-  next thing, and it is a Cowork job on the owner's Mac
-  (`docs/cowork-apple-wallet.md`): the key must be made where it survives,
-  never in a session container. The script falls back for macOS's LibreSSL,
-  which has no `-traditional` flag and writes PKCS#1 anyway.
-  **The `vercel` step can never upload the key folder (v1.73.1).** On 21 Oct
-  2026 its last line, `vercel --prod --yes` run inside `~/TurnUp-Apple`, put
-  that folder, `pass.key` included, on a production deployment. Every Vercel
-  command in the script now goes through `vc()`, which allows only
-  `whoami`/`link`/`env`/`redeploy`/`promote`/`inspect` and only from an empty
-  temporary folder linked to `turnup` by name; the redeploy re-runs what is
-  live on the host and promotes it. **Keep `vercel deploy` and `--prod` out of
-  it for good.** `csr` stops if a key exists; `rotate` retires the old one to
-  `apple/old-<time>/` and starts again. The fix sat unmerged on a branch for
-  three days while the dangerous line stayed on `main`; a security fix that is
-  only on a branch is not a fix.
-  **`bash scripts/check-wallet-script.sh` proves it** rather than trusting the
-  comment: it lifts `vc()` out of the real script at runtime (so it cannot
-  drift from what it checks, and says so loudly if it can no longer find it),
-  runs it against a stub `vercel` that shouts if it is ever reached, and
-  refuses seven ways of uploading a folder while letting the six harmless
-  commands through. Run against the version that leaked the key, it fails on
-  all three counts. It strips comments and quoted strings first, because the
-  script contains a *warning* with the words `vercel --prod` in it and a check
-  that cannot tell a warning from a command gets ignored.
-  Still to build once a real pass is in a wallet: the `/api/passes/v1` web
-  service (device registration, "what changed" and APNs pushes) so the card
-  updates itself; today a pass shows the stage at the moment it was added.
+**Apple Wallet is DONE, as of 23 Oct 2026.** A real signed pass is in a real
+wallet — job #2742, added from the customer's own page — and production has all
+six `PASSKIT_*` settings (`/api/passes/<code>?preview=1` answers
+`configured: true, missing: []`). The enrolment went through on 21 Oct and the
+certificate the day after; `bash scripts/apple-wallet.sh csr` then
+`finish pass.cer` is what made it, on the owner's Mac, because the key must be
+made where it survives. The library wants **PEM, never a .p12**, and the key
+the script writes is **AES-256 encrypted**, so `PASSKIT_KEY_PASSWORD` is a
+sixth setting that both signing and APNs need — `apnsConfigured()` checks it
+for that reason, rather than reporting itself ready and then failing into a
+swallowed error.
+
+So the honest line has moved, and this is the first day it may say *card*:
+**Apple Wallet is live and a card that updates itself ships with v1.74.0.**
+Google Wallet is not, and nothing customer-facing may suggest otherwise.
+
+**The `vercel` step can never upload the key folder (v1.73.1).** On 21 Oct
+2026 its last line, `vercel --prod --yes` run inside `~/TurnUp-Apple`, put
+that folder, `pass.key` included, on a production deployment. Every Vercel
+command in `scripts/apple-wallet.sh` now goes through `vc()`, which allows
+only `whoami`/`link`/`env`/`redeploy`/`promote`/`inspect` and only from an
+empty temporary folder linked to `turnup` by name; the redeploy re-runs what
+is live on the host and promotes it. **Keep `vercel deploy` and `--prod` out
+of it for good.** `csr` stops if a key exists; `rotate` retires the old one to
+`apple/old-<time>/` and starts again. The fix sat unmerged on a branch for
+three days while the dangerous line stayed on `main`; a security fix that is
+only on a branch is not a fix.
+
+**`bash scripts/check-wallet-script.sh` proves it** rather than trusting the
+comment: it lifts `vc()` out of the real script at runtime (so it cannot drift
+from what it checks, and says so loudly if it can no longer find it), runs it
+against a stub `vercel` that shouts if it is ever reached, and refuses seven
+ways of uploading a folder while letting the six harmless commands through.
+Run against the version that leaked the key, it fails on all three counts. It
+strips comments and quoted strings first, because the script contains a
+*warning* with the words `vercel --prod` in it and a check that cannot tell a
+warning from a command gets ignored.
+
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
-  a service account key.
+  a service account key. None exists. Until it does, Android gets the link.
 
-Until those exist, the honest position is that this is a link, not a card. Do
-not describe it as a wallet pass anywhere customer-facing.
+**What a real card proved that no check could.** The first one was added while
+the update service was still in a branch, so it froze at the stage it was
+added: the card read *Booked in* with no note while the job had said *running
+about 30 minutes late* fourteen hours earlier. That is the gap this product
+exists to close, demonstrated on the owner's own phone, and it is the argument
+for why the update service is not optional polish.
 
 **The homepage leads with the link (v1.72.1).** The 19 Oct review
 (`docs/review/2026-10-19.md`) found the first thing a stranger read was the one
