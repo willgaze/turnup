@@ -324,7 +324,7 @@ export default function WalletStory() {
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <H3>Where it lives</H3>
-          <Badge>Built · awaiting Apple</Badge>
+          <Badge>In Apple Wallet</Badge>
         </div>
         <p className="mt-1 text-[15px] muted">The buzz on the lock screen is live today.</p>
         <div className="mt-4"><Journey /></div>
@@ -336,8 +336,8 @@ export default function WalletStory() {
       </div>
 
       <div>
-        <H3>It will move with the job</H3>
-        <p className="mt-1 text-[15px] muted">Same card. The dot moves, once the pass is signed and its update service is built. Today the page does this; the card is next.</p>
+        <H3>It moves with the job</H3>
+        <p className="mt-1 text-[15px] muted">Same card. Tap a stage and every phone holding it is woken and fetches the new card. Seen working on 25 Oct 2026: On site tapped on the dashboard, the card changed in a pocket, Wallet never opened.</p>
         <div className="mt-4"><Stages /></div>
       </div>
 
@@ -367,7 +367,7 @@ export default function WalletStory() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-[14px] leading-snug muted">The card is built. Apple's developer enrolment went through on 21 October; the signing certificate is the next step, and then it goes in wallets. Google Wallet is not started.</p>
+          <p className="mt-4 text-[14px] leading-snug muted">The card is live. Apple's developer enrolment went through on 21 October, the certificate on the 22nd, the first real card went into a wallet on the 23rd and moved itself on the 25th. Google Wallet is not started.</p>
         </div>
       </div>
     </div>
