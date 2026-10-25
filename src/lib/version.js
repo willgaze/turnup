@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.74.2'
+export const VERSION = '1.74.3'
 export const BUILD_DATE = '2026-10-25'
 
 export const THEMES = [
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.74.3', date: '2026-10-25', notes: [
+    'A card in a wallet moved on its own, for the first time. 21:51 tonight: the card was added, the phone signed up for updates, and three seconds later it was showing On my way without being touched. That is the whole idea of this product and until tonight it had never actually happened.',
+    'So the words say it now rather than hedging: the roadmap marks the wallet card live, and the plan says a real card in a real wallet, moving itself. What is still not proved is the buzz that wakes a card already in your pocket \u2014 those three seconds were the phone checking in as it added the card. The next stage you tap on a card you are already holding is the one that shows it.',
+  ] },
   { version: '1.74.2', date: '2026-10-25', notes: [
     'The wallet card was never being asked about, and now it will be. The pass told Apple where to find us and the address had one word too many in it \u2014 Apple adds the version to the end itself, so every request went to a page that does not exist. Nothing in the log, because it never got as far as our code; it looked exactly like a phone that had never registered. Two days of a card that could not have moved whatever we did.',
     'You will need to remove the card from Wallet and add it once more. The wrong address is sealed inside the card you have; a pass cannot be told a new one. This is the last time.',

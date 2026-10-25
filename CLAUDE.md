@@ -1412,9 +1412,23 @@ empty log could not tell "never called" from "called and turned away". The
 refusal paths log now. **Any route whose absence of output is used as evidence
 has to log when it says no.**
 
-What still cannot be proved from a container is a real pass moving in a real
-wallet. Do not describe the card as self-updating to a customer until one has
-been seen to do it.
+**A real pass has now been seen to move (25 Oct 2026, 21:51).** The whole
+handshake is in the production log, from the owner's own phone:
+
+```
+21:51:16  pass register  code=CUTH4PGX device=8ee5291b new
+21:51:17  pass changed   device=8ee5291b n=1
+21:51:18  pass served    code=CUTH4PGX stage=ON_MY_WAY
+```
+
+Registered, asked what had changed, took the new card: three seconds. That is
+the premise of this product working for the first time, and the card may now
+be described as updating itself.
+
+**What that run does NOT yet prove is the APNs push.** Those three lines are
+Wallet's own sync at the moment a pass is added, not a phone being woken. The
+push is the next stage tap on a card already in a wallet; until one has been
+seen, say the card updates itself and do not claim it is instant.
 
 ## The native shell (`native/`): the job on the trade's own lock screen
 
