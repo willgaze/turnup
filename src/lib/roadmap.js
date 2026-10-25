@@ -107,9 +107,9 @@ export const PHASES = [
       { key: 'wallet-pass', name: 'The card in Apple Wallet', state: 'live',
         what: 'A card that sits in Wallet and moves itself. Seen doing it on 25 Oct 2026, both halves: added and showing On my way three seconds later, then twelve minutes on, a tap of On site reached it with Wallet never opened — the card was simply right next time it was looked at. Switch a job’s link off and the card comes off the phone.',
         needs: 'Nothing. It works' },
-      { key: 'google-wallet', name: 'The same card on Android', state: 'idea',
-        what: 'Google Wallet pass alongside the Apple one.',
-        needs: 'Google Wallet issuer account, free' },
+      { key: 'google-wallet', name: 'The same card on Android', state: 'ready',
+        what: 'The same card for Android customers: Save to Google Wallet on their page, and it moves on a stage tap exactly as the Apple one does. Built and checked (v1.75.0); dark until the three Google values are pasted on the dashboard, which is one Cowork job on the Mac.',
+        needs: 'A Google Wallet issuer account, free. Then a paste on your phone. Google reviews the account before a card may go to a customer' },
     ],
   },
   {

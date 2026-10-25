@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.74.5'
-export const BUILD_DATE = '2026-10-25'
+export const VERSION = '1.75.0'
+export const BUILD_DATE = '2026-10-26'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 58
+export const THEME_INDEX = 59
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.75.0', date: '2026-10-26', notes: [
+    'The same card, for Android. Save to Google Wallet appears on the customer\u2019s page on an Android phone, and the card moves on a stage tap exactly as the Apple one does. Everything is built and checked; it stays invisible until three values from Google are pasted on the dashboard, which is one Cowork job on your Mac and then a paste on your phone \u2014 not settings in Vercel, which have been asked for three times and never happened.',
+    'Saving those three ends in a demonstration rather than a claim: it makes the pass template at Google there and then, which is the first thing that uses all three together, so Saved means they actually work. The key is sealed before it is stored, never shown again and never reaches a browser.',
+    'The check found a real fault before any of it shipped. Google silently truncates a save link over 1,800 characters, which is a button that looks right and does nothing \u2014 and a real card came out at 2,094. The template no longer rides inside every link, and the name and address on the card are trimmed to what is readable at a glance, so the longest card that can possibly exist is 1,760. That is proved by building one with every field overlong, not by measuring one card and hoping.',
+    'Still Google\u2019s to give: a new issuer account can only send a card to your own phone until they review it. The steps say which part can be done today and which waits.',
+  ] },
   { version: '1.74.5', date: '2026-10-25', notes: [
     'The last three places that said the wallet card was waiting on Apple now say it is in Apple Wallet: the badge under the card on the homepage, the wallet poster, and the wallet story on /next, which said the card would move "once the pass is signed". It has been signed since 22 October and it moved in a pocket on the 25th. The poster frame is re-shot so the old badge is not baked into the picture.',
     'The plan catches up with the owner: the Apple certificate comes off the list of things only he can move, the pilot count is recorded as started on 20 October and ending 19 November, the ServiceM8 developer step points at the panel rather than Vercel, and the Product page lists "Job done? On my way to the next one". The guides say the certificate job ran and when to run it again.',

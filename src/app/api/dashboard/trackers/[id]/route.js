@@ -12,6 +12,8 @@ import { cleanText } from '@/lib/clean-text'
 import { notifyStage } from '@/lib/push'
 import { syncTrackerToCards } from '@/lib/arrivals'
 import { notifyPassUpdated } from '@/lib/pass-devices'
+import { updateGoogleCard } from '@/lib/google-wallet'
+import { stageOf, STAGE_ORDER } from '@/lib/trade-status'
 import { proposeWindow, agreeWindow, clearWindow, revisionFor, dayMoveFor, windowHours, lastShown } from '@/lib/window'
 import { dayOnly } from '@/lib/when'
 import { normaliseW3w, normaliseMapPin, normalisePhotoUrl } from '@/lib/places'
@@ -225,6 +227,17 @@ export async function PATCH(request, { params }) {
     after(() => notifyPassUpdated(tracker.code).catch((error) =>
       console.warn('wallet pass push failed:', error?.message),
     ))
+
+    // The Android card, moved the same way and under the same rule: inside
+    // after(), un-awaited, everything swallowed. A Google card nobody added
+    // is a 404 from Google and costs one round trip; it is not an error.
+    after(() => {
+      const st = stageOf(tracker.stage)
+      const step = STAGE_ORDER.indexOf(st.key)
+      return updateGoogleCard(tracker, {
+        stage: { ...st, position: step >= 0 ? `${step + 1} of ${STAGE_ORDER.length}` : null },
+      }).catch((error) => console.warn('google wallet update failed:', error?.message))
+    })
 
     // Any household card carrying this job moves with it. Un-awaited and
     // swallowed for the same reason as the push above: the household card is a
