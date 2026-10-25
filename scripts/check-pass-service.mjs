@@ -154,5 +154,45 @@ for (const field of ['note', 'customer', 'where', 'what', 'setoff', 'phone', 'jo
   check(!re.test(code), `the ${field} field carries no changeMessage, so it can never reach a lock screen`)
 }
 
+/* The address the pass gives Wallet ------------------------------------- */
+
+// The bug that made the whole service unreachable for two days, and the one
+// thing no check here could see: `webServiceURL` is the BASE of the service
+// and **Wallet appends `/v1/...` to it itself**. Ours ended in `/v1`, so
+// Wallet asked for /api/passes/v1/v1/devices/... , Next answered 404 before
+// any handler ran, and the log stayed silent -- which read like "Wallet never
+// called us" rather than "we gave it the wrong address".
+//
+// So this builds the real pass and walks from the URL in it to the files on
+// disk. It is the only check that joins the two halves: what the pass claims
+// and where the routes actually are.
+const { existsSync } = await import('node:fs')
+const { buildPassJson } = await import('../src/lib/passkit.js').catch(() => ({}))
+
+if (!buildPassJson) {
+  // passkit.js pulls in passkit-generator and aliased modules, so a bare node
+  // script may not load it. Read the source instead rather than skip silently.
+  const src = (await import('node:fs')).readFileSync(
+    new URL('../src/lib/passkit.js', import.meta.url), 'utf8')
+  const m = /webServiceURL:\s*`\$\{origin\}([^`]*)`/.exec(
+    src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, ''))
+  check(Boolean(m), 'the pass names a webServiceURL built from the origin')
+  const base = m ? m[1] : ''
+  check(!/\/v1\/?$/.test(base),
+    `webServiceURL ends in '${base}', not '/v1' -- Wallet appends the version itself`)
+
+  // Walk from that base to the route files Wallet will actually ask for.
+  const root = new URL(`../src/app${base}/v1/`, import.meta.url)
+  for (const [where, what] of [
+    ['devices/[deviceId]/registrations/[passTypeId]/[serial]/route.js', 'register and forget a device'],
+    ['devices/[deviceId]/registrations/[passTypeId]/route.js', 'ask what changed'],
+    ['passes/[passTypeId]/[serial]/route.js', 'fetch the current card'],
+    ['log/route.js', "take Wallet's complaints"],
+  ]) {
+    check(existsSync(new URL(where, root)),
+      `${base}/v1/${where.replace('/route.js', '')} exists, to ${what}`)
+  }
+}
+
 console.log(failed ? `\nFAILED — ${failed} check(s)` : '\nThe pass credential holds, the push that cannot be sent says so, and only the stage reaches a lock screen.')
 process.exit(failed ? 1 : 0)

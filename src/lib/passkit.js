@@ -94,7 +94,15 @@ export function buildPassJson(status, { origin, authToken }) {
 
     // How the pass keeps itself up to date. Wallet calls this service, and a
     // push tells it when to bother.
-    webServiceURL: `${origin}/api/passes/v1`,
+    // The BASE of the service, with NO /v1 on it. Wallet appends the version
+    // itself: it calls `${webServiceURL}/v1/devices/...`. With `/v1` here it
+    // asked for /api/passes/v1/v1/devices/... , which is not a route, so Next
+    // answered 404 before any handler ran -- and the log stayed silent, which
+    // read like "Wallet never called" rather than "we told it the wrong
+    // address". Every card added before 25 Oct 2026 has the wrong base baked
+    // into it and must be removed from Wallet and added again; a pass cannot
+    // be told a new URL. scripts/check-pass-service.mjs pins this.
+    webServiceURL: `${origin}/api/passes`,
     authenticationToken: authToken,
 
     // Tapping the barcode area opens the full page. The pass is the glance;

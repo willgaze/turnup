@@ -24,8 +24,15 @@ export async function GET(request, { params }) {
   const { passTypeId, serial } = await params
   const code = String(serial || '').toUpperCase()
 
-  if (!passTypeMatches(passTypeId)) return new NextResponse(null, { status: 404 })
-  if (!checkPassAuth(request.headers.get('authorization'), code)) return new NextResponse(null, { status: 401 })
+  // Refusals log, for the reason in the registration route beside this one.
+  if (!passTypeMatches(passTypeId)) {
+    console.log(`pass serve refused: pass type ${passTypeId} is not ours`)
+    return new NextResponse(null, { status: 404 })
+  }
+  if (!checkPassAuth(request.headers.get('authorization'), code)) {
+    console.log(`pass serve refused: bad or missing token for ${code}`)
+    return new NextResponse(null, { status: 401 })
+  }
 
   try {
     const row = await prisma.tradeStatus.findUnique({
