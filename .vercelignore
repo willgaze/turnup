@@ -1,0 +1,18 @@
+# Never upload these, whatever folder a vercel command is run from.
+# 21 Oct 2026: `vercel --prod` in ~/TurnUp-Apple uploaded pass.key, key.password
+# and turnup.env to production. scripts/apple-wallet.sh can no longer deploy
+# (v1.73.1); this is the belt to that braces. See docs/launch/known-issues.md.
+apple/
+apple-*/
+**/apple/
+*.key
+*.p12
+*.pfx
+*.cer
+*.csr
+*.pem
+turnup.env
+key.password
+.env
+.env.*
+!.env.example

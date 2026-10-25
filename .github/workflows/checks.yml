@@ -1,0 +1,49 @@
+# Every check in CLAUDE.md, on every push and PR, so a branch cannot reach
+# main having skipped them. Added at go-to-market stop 1 (after the 21 Oct 2026
+# key leak): the secrets check runs twice, once on the repo and once on the
+# build output, and fails the run naming the file.
+name: checks
+
+on:
+  push:
+    branches: [main, plan]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+
+      - name: No key in the repo
+        run: node scripts/check-no-secrets.mjs
+
+      - name: The wallet script cannot upload a folder
+        run: bash scripts/check-wallet-script.sh
+
+      - name: Every pure check
+        run: |
+          set -e
+          for f in scripts/check-*.mjs; do
+            case "$f" in scripts/check-current.mjs|scripts/check-no-secrets.mjs) continue ;; esac
+            echo "::group::$f"; node "$f"; echo "::endgroup::"
+          done
+
+      - name: The words keep up with the app (Rule 24)
+        run: node scripts/check-current.mjs
+
+      # No DATABASE_URL here on purpose: `prisma db push` is allowed to fail in
+      # the build script, and nothing at build time reads the database. The
+      # build script ends with check-no-secrets.mjs .next, so a key that lands
+      # in the build output fails this step (and the Vercel deploy).
+      - name: Build, then scan what would be served
+        run: npx prisma generate && npx next build && node scripts/check-no-secrets.mjs .next

@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.75.0'
+export const VERSION = '1.76.0'
 export const BUILD_DATE = '2026-10-26'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 59
+export const THEME_INDEX = 60
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.76.0', date: '2026-10-26', notes: [
+    'Safe to show another trade, the first stop on the way to a beta. Once the van is there, or the job is done, a late figure from this morning and an open \u201cAre you still coming?\u201d no longer show, on the customer\u2019s page or on your card. Job #2742 said \u201crunning about 30 minutes late\u201d after Job done; it will not again.',
+    'No key ever ships. After the 21 Oct leak the whole repository, every commit in its history, every deployment since 13 Oct and the live site were checked: clean. Now a build that would serve a key, a password file or an environment file fails and does not deploy, and every push runs all the checks on GitHub, not only when a session remembers to.',
+    'The reminders fix from 19 Oct was confirmed live: three buzzes at most, none between 21:00 and 07:00, gone at the end of the job\u2019s day, a Stop reminders button, and no customer name on your lock screen.',
+    'One thing left that only you can do: revoke the old Apple certificate. The steps now point at the right page, the pass type, which is where Revoke actually lives.',
+  ] },
   { version: '1.75.0', date: '2026-10-26', notes: [
     'The same card, for Android. Save to Google Wallet appears on the customer\u2019s page on an Android phone, and the card moves on a stage tap exactly as the Apple one does. Everything is built and checked; it stays invisible until three values from Google are pasted on the dashboard, which is one Cowork job on your Mac and then a paste on your phone \u2014 not settings in Vercel, which have been asked for three times and never happened.',
     'Saving those three ends in a demonstration rather than a claim: it makes the pass template at Google there and then, which is the first thing that uses all three together, so Saved means they actually work. The key is sealed before it is stored, never shown again and never reaches a browser.',

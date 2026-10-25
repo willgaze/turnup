@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.76.0](./v1.76.0/) | 2026-10-26 | Indigo — safe to show another trade: late notices go once the van is there, no key can ship (CI and build check), reminders confirmed capped |
 | [v1.75.0](./v1.75.0/) | 2026-10-26 | Clay — the same card on Android: Save to Google Wallet, and it moves on a stage tap |
 | [v1.74.0](./v1.74.0/) | 2026-10-24 | Slate — the wallet card can update itself: the service Wallet calls, built and tested end to end |
 | [v1.74.0](./v1.74.0/) | 2026-10-24 | Slate — the wallet card can update itself: the service Wallet calls, built and tested end to end (v1.74.5, 25 Oct: the words say the card is in Apple Wallet; no screen changed but a badge) |

@@ -1045,7 +1045,13 @@ nobody On site); pressing it sets `askedAt` and pushes every `TradeDevice`
 answers from the card: a stage change, or **15 / 30 / 60 min late**, which
 writes `lateMinutes`/`lateAt`, a note with the time, and pushes the customer.
 Unasked nudges go to the trade at window start (`nudgeLevel` 1) and window
-end (2); an unanswered ask repeats every ten minutes. `nudgeIfDue` runs on
+end (2). An unanswered ask is reminded every ten minutes, **three buzzes at
+most, none between 21:00 and 07:00 in the trade's zone (one summary at 07:00
+if it was left open overnight), and never after the end of the job's day**;
+**Stop reminders** on the card answers it without moving the stage. All three
+locks are `src/lib/ask-reminder.js`, pure, proved by
+`node scripts/check-nudge-ask.mjs`. Before them an ask made at 15:34 on
+18 Oct 2026 buzzed the owner's phone through the night. `nudgeIfDue` runs on
 the customer's 30-second poll, after every ServiceM8 sync, and from
 `GET /api/cron/nudge`, which **Vercel Cron calls every five minutes**
 (`vercel.json`), with `.github/workflows/nudge.yml` as a half-hourly backup.
@@ -1801,6 +1807,25 @@ Run against the version that leaked the key, it fails on all three counts. It
 strips comments and quoted strings first, because the script contains a
 *warning* with the words `vercel --prod` in it and a check that cannot tell a
 warning from a command gets ignored.
+
+**No key ever ships (v1.76.0, go-to-market stop 1).** The script fix is
+one lock; the second looks at what would be *served*.
+`node scripts/check-no-secrets.mjs` fails, naming the file and never the
+value, on a key-shaped path (`apple/`, `*.key`, `*.p12`, `*.cer`, `*.csr`,
+`*.pem`, `turnup.env`, `key.password`, any `.env` but `.env.example`) or a
+key-shaped body (a PEM private key with a real body, an Anthropic, GitHub,
+AWS or Stripe live key, a Postgres URL with a real password). With no
+argument it reads the tracked files; with `.next` it reads the build output,
+and **`npm run build` ends with that, so a Vercel build that would serve a
+key fails and does not deploy.** `.vercelignore` drops the same names from
+any upload. `.github/workflows/checks.yml` runs it, the wallet-script check,
+every pure check, `check-current` and the build on every push to `main` and
+`plan` and every PR. The sweep that found the repo, its history, every
+deployment from 13 to 25 Oct and the live site clean is
+`docs/launch/security-sweep-2026-10-25.md`; what a second trade would still
+hit is `docs/launch/known-issues.md`. The old certificate is still to be
+revoked, on the **Pass Type ID page** (Revoke is there, not on the
+Certificates list), by the owner.
 
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key. None exists. Until it does, Android gets the link.

@@ -90,6 +90,7 @@ export const STATUS = [
   { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is next' },
   { item: 'Apple Wallet card', state: 'green', note: 'a real card in a real wallet, moving itself: seen on 25 Oct 2026, registered and showing the new stage three seconds after it was added' },
   { item: 'Google Wallet card', state: 'amber', note: 'built and checked (v1.75.0); needs a Google issuer account, then a paste on the phone, then Google’s review before it may reach a customer' },
+  { item: 'Safe to show another trade', state: 'amber', note: 'go-to-market stop 1, 25 Oct 2026: reminders capped, late notices gone once the van is there, no key in the repo or any deployment, CI fails if one appears. One step left, the owner revoking the old Apple certificate. The ranked list a second trade would hit is docs/launch/known-issues.md' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
   { item: 'Pricing', state: 'amber', note: 'free for every sender, enterprise per card, decided 9 Oct 2026' },
   { item: 'Legal entity', state: 'amber', note: 'a new Ltd, decided 9 Oct 2026, not yet formed' },
@@ -97,6 +98,7 @@ export const STATUS = [
 
 /** The things only the owner can move, each with the link and the step. */
 export const WAITING_ON_OWNER = [
+  { label: 'Revoke the old Apple certificate', step: 'The one that is NOT named TurnUp NEW 20261021, on the pass type page (Revoke is there, not on the Certificates list). Its key leaked for three minutes on 21 Oct; nothing uses it, but it signs until revoked. Greyed out? Apple Developer Support', href: 'https://developer.apple.com/account/resources/identifiers/list/passTypeId' },
   { label: 'ServiceM8 developer account', step: 'Free. Then the App ID and App Secret go into two boxes on the ServiceM8 panel, no Vercel. Every TurnUp event into the job diary; opens the add-on listing. Move 3', href: 'https://www.getturnup.com/dashboard?open=servicem8' },
 ]
 
