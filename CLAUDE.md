@@ -1822,6 +1822,28 @@ until it is bad.
 one so the app visibly changes colour, add a changelog entry naming what
 actually changed, and set the build date.
 
+**Take the number at merge time, from main, never at the start of the branch.**
+Several sessions build this app in parallel, and a branch that picks its number
+on day one collides: on 23 and 24 Oct 2026 two branches each shipped a v1.72.0
+and a v1.73.0, `claude/wallet-update-service` was renumbered twice, and the
+wallet script fix sat unmergeable for three days over a `VERSION` line. So a
+branch is built under its own name and gets no number until it is about to go
+in. Just before the PR merges:
+
+```bash
+git fetch origin main
+git show origin/main:src/lib/version.js | grep -E "VERSION|THEME_INDEX"
+```
+
+Take the next number from **that**: the next minor for anything the trade or
+the customer can see, the next patch (`x.y.1`) for a script, docs or
+words-only change, which shares the minor's diary folder and only adds a note
+to its row in `docs/diary/README.md`. Put the changelog entry and the diary
+row on top of main's, never over them, and advance `THEME_INDEX` from main's
+value. If main moves again before the merge, do it again; `node
+scripts/check-current.mjs` must pass on the merged tree. A PR that already
+carries a number main has since used is renumbered, not merged.
+
 **Never invent a colour.** `THEMES` is a curated list of background/accent
 pairs. Add one if the list is running short, checking white text on the accent
 and dark text on the background for contrast. Generating one at runtime to be
