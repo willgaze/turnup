@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.74.0'
+export const VERSION = '1.74.1'
 export const BUILD_DATE = '2026-10-25'
 
 export const THEMES = [
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.74.1', date: '2026-10-25', notes: [
+    'Add to Apple Wallet is working again. Last night\u2019s build moved one helper into another file and left behind a re-export instead of an import \u2014 which hands the function to everyone else and leaves nothing behind for the file itself. So the pass could not be signed, and the button answered an error for about an hour. Found in the live log, which named it in one line.',
+    'A check for that exact shape now runs with the others: a name a file passes on AND calls itself, with no import of its own. Run against last night\u2019s file it fails; run against the two other files that pass names on the same way, correctly, it stays quiet. Nothing caught this before because signing a pass is the one path that needs a real Apple certificate, and no check in this repo has one.',
+  ] },
   { version: '1.74.0', date: '2026-10-25', notes: [
     'The wallet card can now update itself. Until tonight a pass showed the stage it was added at and nothing moved it again, which is the difference between a card and a screenshot. The four service calls Wallet makes are built: it registers a phone against a job, it asks what has changed since it last looked, it fetches the current card, and it reports back when something went wrong. A stage tap on the dashboard, or a booking moving in ServiceM8, now tells every phone holding that card to come and look.',
     'The push that does it carries no words at all — Apple’s pass push is an empty body that only says "ask me again", so there is nothing on a lock screen to get wrong and no vocabulary to guard. Everything the card says still comes from the same builder as the download, so the card in a pocket and the page on the link cannot say different things.',

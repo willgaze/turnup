@@ -2,6 +2,7 @@ import { PKPass } from 'passkit-generator'
 import { STAGES, STAGE_ORDER, stageOf } from '@/lib/trade-status'
 import { TRADE_NAME, TRADE_PHONE } from '@/lib/trade'
 import { passImages } from '@/lib/pass-images'
+import { pem } from '@/lib/pass-auth'
 
 /**
  * Apple Wallet passes.
@@ -50,7 +51,14 @@ export function passkitMissing() {
 
 // A PEM, whether pasted as text or as one line of base64. It lives in
 // pass-auth.js so a check with no bundler can reach the APNs gate beside it.
-export { pem } from '@/lib/pass-auth'
+//
+// IMPORTED and then re-exported, not `export { pem } from '...'`. That form is
+// a re-export: it forwards the binding to importers and creates NO local one,
+// so buildSignedPass() below called an undefined `pem` and every Add to Apple
+// Wallet answered 503 (v1.74.0, live for an hour on 25 Oct). Nothing caught it
+// because signing is the one path that needs a real certificate, which no
+// check here has.
+export { pem }
 
 // Wallet wants #rrggbb or rgb(). Keep them here so the pass and the web page
 // cannot drift apart.
