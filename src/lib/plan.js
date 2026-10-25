@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '25 Oct 2026',
+  updated: '26 Oct 2026',
 }
 
 export const STAGES = [
@@ -68,7 +68,7 @@ export const MOATS = [
   {
     n: '3', name: 'One integration', line: 'Both wallets, the update loop, push, SMS fallback, the privacy rules. They would rather buy that than own it.',
     today: ['Apple pass signing: LIVE, a real signed pass in a real wallet', 'The pass update loop: LIVE, a real card seen moving itself on 25 Oct 2026', 'Push: live, a real buzz on a real phone', 'ServiceM8: connected, reads every booking, texts the link, follows a move', 'The email letterbox: a Cloudflare Worker, receiving since 18 Oct', 'Email through ServiceM8 when push cannot reach a phone', 'Privacy rules: written and checked by script'],
-    missing: ['Google Wallet', 'An API another firm can call'],
+    missing: ['Google Wallet in a real wallet — built, waiting on the issuer account', 'An API another firm can call'],
     gate: 'A firm that is not customer zero calls the API', pct: 40,
   },
 ]
@@ -89,7 +89,7 @@ export const STATUS = [
   { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },
   { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is next' },
   { item: 'Apple Wallet card', state: 'green', note: 'a real card in a real wallet, moving itself: seen on 25 Oct 2026, registered and showing the new stage three seconds after it was added' },
-  { item: 'Google Wallet card', state: 'red', note: 'not built; decide whether to build on a pass platform' },
+  { item: 'Google Wallet card', state: 'amber', note: 'built and checked (v1.75.0); needs a Google issuer account, then a paste on the phone, then Google’s review before it may reach a customer' },
   { item: 'Paying customers', state: 'red', note: `none, ${TRADE_NAME} is customer zero` },
   { item: 'Pricing', state: 'amber', note: 'free for every sender, enterprise per card, decided 9 Oct 2026' },
   { item: 'Legal entity', state: 'amber', note: 'a new Ltd, decided 9 Oct 2026, not yet formed' },
@@ -169,7 +169,7 @@ export const WALLET = {
     { label: 'The certificate, and a real pass', note: 'Apple Developer enrolled 21 Oct 2026, Pass Type ID certificate live in production, first real card added 23 Oct' },
   ],
   missing: [
-    { label: 'Google Wallet', note: 'issuer account, a pass class, and the same update loop on Android. Or a pass platform, if faster', who: 'build' },
+    { label: 'Google Wallet', note: 'built: the save link, the class, and the same update loop on Android. What is left is the issuer account and Google’s review, which are the owner’s (docs/cowork-google-wallet.md)', who: 'owner' },
   ],
 }
 

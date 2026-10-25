@@ -424,6 +424,19 @@ model CustomerEmail {
 /// a redeploy were asked for and did not happen in two days; a box on the
 /// phone does. The secret is sealed with the key the tokens use.
 /// GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET in the environment still win.
+// The Google Wallet issuer credentials, pasted on the phone rather than set in
+// Vercel -- three rounds of environment variables were asked for and never
+// happened (CLAUDE.md rule 5). A new table, so it fails soft until the
+// migration runs: no row means the button does not render and nothing sends.
+model GoogleWalletApp {
+  id             String   @id @default("singleton")
+  issuerId       String
+  serviceAccount String
+  cipher         String // AES-256-GCM of the private key, key from JWT_SECRET
+  savedAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 model GoogleApp {
   id        String   @id @default("singleton")
   clientId  String

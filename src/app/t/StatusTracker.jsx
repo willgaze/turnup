@@ -8,6 +8,7 @@ import Presence from './Presence'
 import Notify, { PUSH_CONFIGURED } from './Notify'
 import Window from './Window'
 import AddToWallet from './AddToWallet'
+import SaveToGoogle from './SaveToGoogle'
 import StillComing from './StillComing'
 import MissedYou from './MissedYou'
 import Terms from './Terms'
@@ -31,7 +32,7 @@ import { StageIcon, PhoneIcon, PinIcon, KeyIcon, HouseIcon, WaveIcon, VanIcon, C
 // renders on the server and again on the phone, and the two ship different
 // locale data, which tore the page down mid-hydration.
 
-export default function StatusTracker({ initialStatus, initialProfile, initialBrand, initialTerms = null, initialTradeSeenAt = null, initialReviewUrl = null, walletReady = false }) {
+export default function StatusTracker({ initialStatus, initialProfile, initialBrand, initialTerms = null, initialTradeSeenAt = null, initialReviewUrl = null, walletReady = false, googleReady = false }) {
   const trade = useTrade()
   const [status, setStatus] = useState(initialStatus)
   const [profile, setProfile] = useState(initialProfile || null)
@@ -420,6 +421,7 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
         {/* The card in Wallet. Gated on the server knowing it can sign one, and
             not offered on a finished job: nothing left to carry around. */}
         {walletReady && status.stage !== 'DONE' && <AddToWallet code={status.code} />}
+        {googleReady && status.stage !== 'DONE' && <SaveToGoogle code={status.code} />}
 
         {/* A window is an arrangement, so it sits with the things the customer
             does rather than the things they read. Hidden once the job is done:

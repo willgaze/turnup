@@ -11,6 +11,7 @@ import Changelog from './Changelog'
 import Profile from './Profile'
 import Terms from './Terms'
 import WalletShowcase from './WalletShowcase'
+import GoogleWallet from './GoogleWallet'
 import WaitlistPanel from './WaitlistPanel'
 import Roadmap from './Roadmap'
 import ServiceM8 from './ServiceM8'
@@ -847,6 +848,7 @@ export default function Console({ assistant = false }) {
         <div id="panel-servicem8" className="scroll-mt-4"><ServiceM8 onChanged={load} /></div>
         <div id="panel-passkeys" className="scroll-mt-4"><Passkeys /></div>
         <div id="panel-wallet" className="scroll-mt-4"><WalletShowcase tracker={trackers[0]} /></div>
+        <GoogleWallet />
         {/* The attendance record. One row per visit, timestamped from the taps
             above, for whoever pays per visit and is marked per missed one. */}
         <section id="panel-attendance" className="glass r-outer mt-4 scroll-mt-4 p-5">

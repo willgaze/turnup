@@ -33,7 +33,7 @@ are written down:
 
 4. **Link to the panel, not the page.** `/dashboard?open=<panel>` opens Setup
    and settings at that panel (v1.65.2): `doors` (Household cards), `servicem8`,
-   `profile` (Who to expect), `inbound` (Turn on forwarding), `sources` (Where the card hears from), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
+   `profile` (Who to expect), `inbound` (Turn on forwarding), `sources` (Where the card hears from), `googlewallet` (The card on Android), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
    `waitlist`, `roadmap`. A household's own card link is private and lives in
    two places only: the phone that made it on `/join`, and
    `/dashboard?open=doors`, where each card shows its link and its forwarding
@@ -1448,6 +1448,69 @@ matters.** `notifyPassUpdated()` warns on failure and is silent on success, so
 this run was read from what was *absent* — a register line that was not there.
 That is the same ambiguity that cost two days on the wrong `webServiceURL`,
 pointing the other way.
+
+## The same card on Android (`src/lib/google-wallet*.js`)
+
+Apple Wallet works. This is the other half, and Google's shapes were checked
+against their own pages on 25 Oct 2026 rather than recalled, because recalling
+Apple's `webServiceURL` cost two days that week.
+
+| | |
+|---|---|
+| A save link | `https://pay.google.com/gp/v/save/<JWT>`, RS256, signed with the service account key |
+| The claims | `iss` the service account, `aud: 'google'`, `typ: 'savetowallet'`, `iat`, `origins`, `payload.genericObjects` |
+| Ids | `<issuerId>.turnup_job` for the class, `<issuerId>.job_<code>` for a card |
+| An update | `PATCH walletobjects.googleapis.com/walletobjects/v1/genericObject/<id>`, bearer from the service account |
+
+**The 1,800-character ceiling is the whole design constraint.** Google
+truncates a longer save link, which is a button that looks right and does
+nothing — the failure this product keeps having to fix. `check-google-wallet.mjs`
+found it before anything shipped: a real card came to **2,094 characters**.
+Two things fixed it and both are load-bearing.
+
+- **The class is not in the link.** It is made once over REST
+  (`ensureClass()`) when the credentials are saved. Carrying it cost 294
+  characters. `saveClaims({ withClass: true })` exists for the case where the
+  class could not be made, and is measured against the same ceiling.
+- **Every variable field is capped** (`glance()`): the trade's name and the
+  customer's at 40, the address at 64. A card is a glance and a 106-character
+  address is unreadable on one; the whole thing is a tap away behind the QR.
+  So the longest card that *can exist* is **1,760 of 1,800**, and the check
+  proves that by building one with 300-character fields rather than measuring
+  a sample and hoping. A new uncapped field fails it and is named.
+
+There is no `subheader`: it would read "STATUS" above a word that is plainly a
+status, and every character is spent against the ceiling.
+
+**`cardText()` builds both the card and an update**, so the two can never
+drift into saying different things about one job. The update is a PATCH of
+only what moves — Google merges, so sending the whole object would overwrite
+anything changed in their console and re-send the barcode on every tap.
+
+**A card is as forwardable as a link**, so the same rule as `publicShape()`
+binds it: what the trade told the customer, never what the customer told the
+trade. The check names `presence`, `accessNotes`, the door, the dog, both
+photos, the phone and the pin individually, because this is a second surface
+that could grow the way the first one did.
+
+**The credentials are pasted on the phone**, sealed into `GoogleWalletApp` —
+a new table, so it fails soft. `GOOGLE_WALLET_*` still win where all three are
+set. Not Vercel settings: three rounds of those were asked for and never
+happened (rule 5). **Saving ends in a demonstration**: it makes the pass class
+at Google, which is the first thing that uses all three values together, so
+"saved" means they work rather than that they were written down. The panel
+shows the issuer's last four and never the key.
+
+`updateGoogleCard()` is called un-awaited inside `after()` from the tracker
+PATCH, the same rule as `notifyStage()` and `notifyPassUpdated()`. A 404 from
+Google means the customer never added the card, which is the normal case and
+is logged as such rather than as a failure.
+
+**Still to do, and it needs Google, not code:** a new issuer account is in
+demo mode, so a card can only go to the owner's account or an added test
+account. Publishing access is a review wanting a business profile, a real pass
+class and screenshots. `docs/cowork-google-wallet.md` is the owner's half, in
+two parts, and says which can be done today.
 
 ## The native shell (`native/`): the job on the trade's own lock screen
 

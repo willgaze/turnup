@@ -8,6 +8,7 @@ import { publicProfile, publicBrand, publicTerms, tradeSeenAt } from '@/lib/prof
 import { TRADE_PHONE, TRADE_PHONE_TEL } from '@/lib/trade'
 import StatusTracker from '../StatusTracker'
 import { passkitConfigured } from '@/lib/passkit'
+import { googleWallet } from '@/lib/google-wallet'
 import { reviewUrl } from '@/lib/review'
 
 export const dynamic = 'force-dynamic'
@@ -77,5 +78,5 @@ export default async function TrackPage({ params }) {
 
   // Whether this deployment can sign an Apple Wallet pass. Decided here, on
   // the server, so the client never has to guess from a 503.
-  return <StatusTracker initialStatus={status} initialProfile={profile} initialBrand={brand} initialTerms={terms} initialTradeSeenAt={seenAt} initialReviewUrl={review} walletReady={passkitConfigured()} />
+  return <StatusTracker initialStatus={status} initialProfile={profile} initialBrand={brand} initialTerms={terms} initialTradeSeenAt={seenAt} initialReviewUrl={review} walletReady={passkitConfigured()} googleReady={Boolean(await googleWallet())} />
 }
