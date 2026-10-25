@@ -1292,8 +1292,8 @@ card and the diary, and `publicShape` carries only the two times.
 v1.74.0. A pass without an update service is a screenshot: it shows the stage
 at the moment it was added and nothing ever moves it. Apple's answer is five
 calls Wallet makes to the `webServiceURL` baked into the pass, and all of them
-are built now, so the only thing between this product and a card that moves is
-the certificate (see *Not built yet*).
+are built, the certificate is live, and on 25 Oct 2026 a real card moved in a
+real pocket (v1.74.3, v1.74.4). Nothing in this section is pending.
 
 | Wallet calls | We answer |
 |---|---|
@@ -1715,10 +1715,10 @@ A new roadmap item wants a line in `PICTURE` when a screen for it exists.
 
 The wallet section (`src/components/WalletStory.jsx`) is drawn from
 `PassCard`, the same component the real pass is built from, so it cannot
-drift. It carries the same badges the posters do, and the lock screen shows
-the push notification (live) and not the Wallet card (not yet): see *Not built
-yet* below, and do not let that section say the card updates itself in Wallet
-until the pass web service exists.
+drift. It carries the same badges the posters do. Since v1.74.5 it says the
+card is in Apple Wallet and moves with the job, because both were seen on a
+real phone on 25 Oct 2026; it must never say that of Google Wallet, which is
+not started.
 
 ## Getting on the list (`/join`, v1.62.0)
 
@@ -1839,8 +1839,9 @@ for why the update service is not optional polish.
 (`docs/review/2026-10-19.md`) found the first thing a stranger read was the one
 thing not built. The headline is the owner's pick, "Tap On my way. They stop
 ringing.", the first picture is the customer's page from a text, and the card
-sits second under a caption that says it is next. Keep it that way until a pass
-is in a wallet; then the card can lead again.
+sits second. Since v1.74.5 its caption and badge say it is in Apple Wallet,
+because it is. Whether the card leads again is the owner's call, not a
+nightly's.
 
 **And it is short (v1.72.2).** Eighteen phone screens became about six. The
 wallet story (`WalletStory`), the poster strips (`byGroup('either')` and
@@ -1883,6 +1884,28 @@ until it is bad.
 `VERSION`, `BUILD_DATE`, `THEME_INDEX` and `CHANGELOG`. Move the index on by
 one so the app visibly changes colour, add a changelog entry naming what
 actually changed, and set the build date.
+
+**Take the number at merge time, from main, never at the start of the branch.**
+Several sessions build this app in parallel, and a branch that picks its number
+on day one collides: on 23 and 24 Oct 2026 two branches each shipped a v1.72.0
+and a v1.73.0, `claude/wallet-update-service` was renumbered twice, and the
+wallet script fix sat unmergeable for three days over a `VERSION` line. So a
+branch is built under its own name and gets no number until it is about to go
+in. Just before the PR merges:
+
+```bash
+git fetch origin main
+git show origin/main:src/lib/version.js | grep -E "VERSION|THEME_INDEX"
+```
+
+Take the next number from **that**: the next minor for anything the trade or
+the customer can see, the next patch (`x.y.1`) for a script, docs or
+words-only change, which shares the minor's diary folder and only adds a note
+to its row in `docs/diary/README.md`. Put the changelog entry and the diary
+row on top of main's, never over them, and advance `THEME_INDEX` from main's
+value. If main moves again before the merge, do it again; `node
+scripts/check-current.mjs` must pass on the merged tree. A PR that already
+carries a number main has since used is renumbered, not merged.
 
 **Never invent a colour.** `THEMES` is a curated list of background/accent
 pairs. Add one if the list is running short, checking white text on the accent

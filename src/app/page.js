@@ -109,12 +109,12 @@ export default function Home() {
         </section>
 
         {/* --- what it looks like ------------------------------------------ */}
-        {/* The phone first: it is the job from a text, which is what is live
-            today, and the thing the headline above it describes. The card is
-            the premise and the owner's call (12 Oct 2026) was to show it; it
-            stays here, second, under a caption that says it is next (the
-            19 Oct review: the first thing a stranger read was the one thing
-            not built). */}
+        {/* The phone first: it is the job from a text, and the thing the
+            headline above it describes. The card is the premise and the
+            owner's call (12 Oct 2026) was to show it; it sits second (the
+            19 Oct review put the link first while the card was unbuilt).
+            Since 25 Oct 2026 the card is live and moves itself, and the
+            caption says so. Whether it leads again is the owner's call. */}
         <section className="mt-12 grid items-start gap-8 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
           <figure className="mx-auto">
             <Device screen="/home/customer-on-my-way.webp" width={220} tilt={12} priority className="mx-auto"
@@ -126,10 +126,10 @@ export default function Home() {
           <figure className="mx-auto w-full max-w-[320px] sm:max-w-[400px]" style={{ '--tint': '#5856d6' }}>
             <WalletHero tracker={DEMO} tradeName="Sam Hale Plumbing" />
             <figcaption className="mt-2.5 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[14px] leading-snug muted">
-              <Link href="/next" className="font-medium" style={{ color: 'var(--tint)' }}>Next: the same job, as a card in their wallet →</Link>
+              <Link href="/next" className="font-medium" style={{ color: 'var(--tint)' }}>The same job, as a card in their wallet →</Link>
               <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[12px] font-semibold"
                     style={{ color: 'var(--tint)', borderColor: 'color-mix(in srgb, var(--tint) 35%, transparent)', background: 'color-mix(in srgb, var(--tint) 10%, transparent)' }}>
-                Built · awaiting Apple
+                In Apple Wallet
               </span>
             </figcaption>
           </figure>

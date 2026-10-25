@@ -1,11 +1,17 @@
 # The Apple Wallet certificate, as a Cowork job
 
 Standing rule 3 in CLAUDE.md: anything that is clicking through a console is a
-Cowork job, not a step list. The Apple Developer enrolment went through on
-21 Oct 2026, so the one thing between the built pass and a card in a wallet
-is this certificate. A Claude session cannot start Cowork, and must not make
-the key (it would die with the container, and the certificate with it); it
-hands over the prompt. On the Mac the key lives in a folder that stays.
+Cowork job, not a step list. A Claude session cannot start Cowork, and must
+not make the key (it would die with the container, and the certificate with
+it); it hands over the prompt. On the Mac the key lives in a folder that stays.
+
+**It ran, and it worked.** The Apple Developer enrolment went through on
+21 Oct 2026 and this job made the certificate on 22 Oct (pass type
+`pass.com.getturnup.job`, team `WTS45T2YD3`). `/api/passes/<live code>`
+answers 200 with a `.pkpass` whose signature verifies against Apple's WWDR G4
+chain; the first real card went into the owner's wallet on 23 Oct and moved
+itself on 25 Oct (v1.74.3). The paste below is now the re-run for when the
+certificate expires, about a year on; put a reminder a month before.
 
 **Check first.** If `https://www.getturnup.com/api/passes/<any live code>`
 already answers 200, this job is done and must not be run again: a second
@@ -15,7 +21,7 @@ is the one that signs.
 **Replacing a key that has been exposed** is not this job run again: it is
 `bash scripts/apple-wallet.sh rotate` in `~/TurnUp-Apple`, then steps 3 to 7,
 then revoking the old certificate (the script prints where). `csr` refuses to
-run over an existing key since v1.70.1.
+run over an existing key since v1.73.1.
 
 ---
 
