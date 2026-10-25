@@ -107,6 +107,13 @@ export async function notifyPassUpdated(code) {
       else if (r.status || r.error) console.warn('pass push', code, r.status || r.error, r.reason || '')
     }
     if (gone.length) await prisma.passDevice.deleteMany({ where: { id: { in: gone } } })
+
+    // A push that WORKS logs too. This used to warn on failure and say nothing
+    // on success, so the first proof that the push worked at all (25 Oct 2026)
+    // had to be read from a line that was *absent* further down the log -- the
+    // same reading-the-silence that cost two days on the wrong webServiceURL,
+    // pointing the other way. A thing worth knowing happened should say so.
+    console.log(`pass push code=${code} sent=${sent}/${rows.length}${gone.length ? ` dropped=${gone.length}` : ''}`)
     return { sent, devices: rows.length, dropped: gone.length }
   } catch (error) {
     // Includes the table not existing yet. Never throws into a stage tap.

@@ -1425,10 +1425,29 @@ Registered, asked what had changed, took the new card: three seconds. That is
 the premise of this product working for the first time, and the card may now
 be described as updating itself.
 
-**What that run does NOT yet prove is the APNs push.** Those three lines are
-Wallet's own sync at the moment a pass is added, not a phone being woken. The
-push is the next stage tap on a card already in a wallet; until one has been
-seen, say the card updates itself and do not claim it is instant.
+**And twelve minutes later, the push itself (22:03):**
+
+```
+22:03:03  pass changed   device=8ee5291b n=1
+22:03:04  pass served    code=CUTH4PGX stage=ON_SITE
+```
+
+**No `pass register` line before those.** The device had registered once at
+21:51 and came back of its own accord on a stage tap, which nothing but the
+APNs push could have caused; the card then read *On site* without Wallet being
+opened. No `pass push` warning either, so Apple took it — the phone was on
+wifi in aeroplane mode at 11% battery, which is about as unhelpful as
+conditions get.
+
+So the whole loop is evidenced end to end: **stage tap -> empty push to Apple
+-> Wallet wakes -> asks what changed -> fetches the new card.** That is the
+premise of this product, and it is the first time it has been true.
+
+**A push that works logs nothing, and that is the next thing to fix if it ever
+matters.** `notifyPassUpdated()` warns on failure and is silent on success, so
+this run was read from what was *absent* — a register line that was not there.
+That is the same ambiguity that cost two days on the wrong `webServiceURL`,
+pointing the other way.
 
 ## The native shell (`native/`): the job on the trade's own lock screen
 

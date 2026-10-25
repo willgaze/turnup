@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.74.3'
+export const VERSION = '1.74.4'
 export const BUILD_DATE = '2026-10-25'
 
 export const THEMES = [
@@ -48,6 +48,11 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.74.4', date: '2026-10-25', notes: [
+    'The buzz works too. Twelve minutes after the card was added, On site was tapped on the dashboard and the card changed without Wallet being opened \u2014 the phone was woken, asked what had changed and took the new card. On wifi, in aeroplane mode, at 11% battery. That was the last unproven piece.',
+    'So the loop is whole: tap a stage, every phone holding that card is woken, and the card is right the next time anyone looks at it. Nothing about it is a guess any more; both halves are in the log.',
+    'A push that works now writes a line as well. Until tonight it only spoke up when it failed, so the proof that it had worked had to be read from a line that was missing \u2014 which is the same trap, pointing the other way, as the one that cost two days this week.',
+  ] },
   { version: '1.74.3', date: '2026-10-25', notes: [
     'A card in a wallet moved on its own, for the first time. 21:51 tonight: the card was added, the phone signed up for updates, and three seconds later it was showing On my way without being touched. That is the whole idea of this product and until tonight it had never actually happened.',
     'So the words say it now rather than hedging: the roadmap marks the wallet card live, and the plan says a real card in a real wallet, moving itself. What is still not proved is the buzz that wakes a card already in your pocket \u2014 those three seconds were the phone checking in as it added the card. The next stage you tap on a card you are already holding is the one that shows it.',
