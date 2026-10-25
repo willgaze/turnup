@@ -1741,6 +1741,29 @@ warning from a command gets ignored.
 
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key. None exists. Until it does, Android gets the link.
+  The owner's half is a Cowork paste, `docs/cowork-google-wallet.md`, checked
+  against Google's own pages on 25 Oct 2026. Three things in it that are not
+  obvious:
+  **The issuer is TurnUp, not the trade.** The public business name on the
+  account is TurnUp, the way the Apple pass type is `pass.com.getturnup.job`
+  while `organizationName` is the trade's. A second trade must never need a
+  second issuer account, and the name cannot be changed afterwards.
+  **A new issuer account is in DEMO MODE and that is fine.** A pass can go to
+  the owner's account, anyone with the Developer role, or an added test
+  account — which is exactly enough to prove it, the way the Apple card was
+  proved on one phone. Publishing access is a Google review needing a
+  completed business profile, **a real pass class that already exists** and
+  screenshots of a real pass, so it cannot be asked for until the code is
+  built. Two parts, and only the first can be done today.
+  **The service account must be invited to the issuer account** at
+  `pay.google.com/business/console` with the Developer role. Miss it and the
+  key authenticates perfectly and still cannot create one pass — the Google
+  equivalent of a gate that opens onto nothing.
+  Where the three values land is a panel on the dashboard, the way `Sm8App`
+  and `GoogleApp` work, and **not** Vercel settings: those were asked for by
+  hand three times and never happened (rule 5). Until that panel exists the
+  paste leaves them in a file on the Mac and says so, rather than asking for
+  console work that lands nowhere.
 
 **What a real card proved that no check could.** The first one was added while
 the update service was still in a branch, so it froze at the stage it was
