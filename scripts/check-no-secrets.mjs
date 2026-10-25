@@ -121,9 +121,11 @@ function selfTest() {
     [badContent(`-----BEGIN RSA PRIVATE KEY-----\nProc-Type: 4,ENCRYPTED\nDEK-Info: AES-256-CBC,00\n\n${body}\n-----END RSA PRIVATE KEY-----`), true],
     [badContent('-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----'), false],
     [badContent("grep -q 'BEGIN RSA PRIVATE KEY' \"$KEY\""), false],
-    [badContent('sk-ant-api03-' + 'a'.repeat(40)), true],
+    [badContent(['sk', 'ant', 'api03', 'a'.repeat(40)].join('-')), true],
     [badContent('postgresql://user:pass@host/db'), false],
-    [badContent('postgresql://neondb_owner:npg_Zx81kQ@ep-cool-1.eu-west-2.aws.neon.tech/neondb'), true],
+    // Assembled at runtime from invented parts, so no scanner (ours or
+    // GitGuardian's) ever sees a credential-shaped string in this file.
+    [badContent(['postgresql:', '//someone', ':', 'not-a-real-pw', '@', 'db.example', '.org/x'].join('')), true],
     [badContent('postgresql://postgres:postgres@localhost:5432/turnup'), false],
   ]
   const failed = cases.map(([got, want], i) => (Boolean(got) === want ? null : i)).filter((i) => i !== null)
