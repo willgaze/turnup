@@ -79,7 +79,30 @@ intermediate, reads your Team ID and pass type out of the certificate, and
 writes six `KEY=value` lines to `apple/turnup.env`. Paste them into
 <https://vercel.com/willgazes-projects/turnup/settings/environment-variables>
 (Production, Sensitive), then Redeploy. Or `bash scripts/apple-wallet.sh vercel`
-does the pasting if the Vercel CLI is signed in.
+does the pasting and the redeploy if the Vercel CLI is signed in.
+
+**The `vercel` step never uploads the key folder** (v1.70.1). Until then its
+last line was `vercel --prod --yes`, run in the folder that holds
+`apple/pass.key`, and on 21 Oct 2026 that put the folder, key included, on a
+production deployment. Now every Vercel command goes through one gate that
+allows only commands that upload nothing (`env`, `link`, `redeploy`,
+`promote`), they run from an empty temporary folder linked to `turnup` by
+name, and the redeploy re-runs the build already live on www.getturnup.com
+and promotes it. Never run `vercel` or `vercel --prod` by hand in the key
+folder.
+
+## 4a. Replacing the key (`rotate`)
+
+`csr` now stops if `apple/pass.key` exists, because a new key orphans the
+certificate Apple issued for the old one. When a key has been exposed:
+
+    bash scripts/apple-wallet.sh rotate
+
+It moves the old key and everything made from it into `apple/old-<time>/`
+(kept, never deleted), makes a new key and request, and says what to do next:
+steps 3 and 4 again, then `vercel`, then revoke the **old** certificate at
+<https://developer.apple.com/account/resources/certificates/list> once a job's
+pass link answers 200 with the new one.
 
 ## 5. What happens then
 
