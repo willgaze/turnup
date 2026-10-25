@@ -105,7 +105,7 @@ export const PHASES = [
         what: 'The iOS app: the dashboard in a native window, and the job you are on as a Live Activity — stage, time, note, and On site / Paused / Job done buttons on the lock screen and in the Dynamic Island. Written in native/; builds and lands on TestFlight the day Apple says yes.',
         needs: 'Apple Developer Program, £79/yr' },
       { key: 'wallet-pass', name: 'The card in Apple Wallet', state: 'live',
-        what: 'A card that sits in Wallet and moves itself. Seen doing it on 25 Oct 2026: the card was added, the phone registered, and three seconds later it was showing On my way. Tap a stage and every phone holding that card is told to come and look. Switch a job’s link off and the card comes off the phone.',
+        what: 'A card that sits in Wallet and moves itself. Seen doing it on 25 Oct 2026, both halves: added and showing On my way three seconds later, then twelve minutes on, a tap of On site reached it with Wallet never opened — the card was simply right next time it was looked at. Switch a job’s link off and the card comes off the phone.',
         needs: 'Nothing. It works' },
       { key: 'google-wallet', name: 'The same card on Android', state: 'idea',
         what: 'Google Wallet pass alongside the Apple one.',
