@@ -125,5 +125,34 @@ check(apnsMissing().some((m) => m.key === 'PASSKIT_KEY_PEM'), 'and it names the 
 delete process.env.PASSKIT_CERT_PEM
 check(apnsConfigured() === false, 'and no certificate is not ready')
 
-console.log(failed ? `\nFAILED — ${failed} check(s)` : '\nThe pass credential holds, and a push that cannot be sent says so.')
+/* What a changing card may say on a lock screen ------------------------- */
+
+// A pass that updates silently is a card nobody looks at, so the stage field
+// carries `changeMessage` and Wallet puts "Now: On my way" on the lock screen.
+// That makes the pass a lock-screen surface, and the lock-screen rule binds
+// it exactly as it binds push: the stage and nothing else. The danger is not
+// the field that has one today, it is the field somebody adds one to later --
+// a changeMessage on the note or the customer's name would put either on a
+// lock screen, which is the leak this product has already shipped once.
+// So this reads the real source and allows exactly one.
+const passkitSrc = await import('node:fs').then((fs) =>
+  fs.readFileSync(new URL('../src/lib/passkit.js', import.meta.url), 'utf8'))
+
+// Strip comments first: the block above the field explains changeMessage and
+// would otherwise count as three more of them.
+const code = passkitSrc.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+const withMessage = [...code.matchAll(/\{[^{}]*changeMessage[^{}]*\}/g)].map((m) => m[0])
+
+check(withMessage.length === 1, 'exactly one field on the pass carries a changeMessage')
+check(withMessage.every((f) => /key:\s*'stage'/.test(f)),
+  'and it is the stage field, the only thing allowed on a lock screen')
+check(withMessage.every((f) => /changeMessage:\s*'Now: %@'/.test(f)),
+  "and it says only the new stage: 'Now: %@', with no other words")
+
+for (const field of ['note', 'customer', 'where', 'what', 'setoff', 'phone', 'job', 'page']) {
+  const re = new RegExp(`\\{[^{}]*key:\\s*'${field}'[^{}]*changeMessage`)
+  check(!re.test(code), `the ${field} field carries no changeMessage, so it can never reach a lock screen`)
+}
+
+console.log(failed ? `\nFAILED — ${failed} check(s)` : '\nThe pass credential holds, the push that cannot be sent says so, and only the stage reaches a lock screen.')
 process.exit(failed ? 1 : 0)

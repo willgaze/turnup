@@ -1333,11 +1333,22 @@ Rules in here that each cost something to get wrong:
   migrated, every read answers "no devices" — a new table, so it fails soft
   (see *Shipping a schema change*), and the pass still downloads.
 
-**The push carries nothing, and that is why there is no vocabulary here.**
-Apple's pass push is an empty `{}` with `apns-topic` set to the pass type: no
-words, no sound, nothing on a lock screen. It only tells Wallet to come back
-and ask. So the lock-screen rule has nothing to bind — there is no field to
-leak. `src/lib/apns.js` opens an HTTP/2 session per call (a pool is a
+**The push carries nothing, but the CARD does, and that is the part to get
+right.** Apple's pass push is an empty `{}` with `apns-topic` set to the pass
+type: no words, no sound. It only tells Wallet to come back and ask. But a
+card that changes silently is a card nobody looks at, so the **stage field
+carries `changeMessage: 'Now: %@'`** and Wallet itself puts *Now: On my way*
+on the lock screen when the pass updates.
+
+That makes the pass a lock-screen surface, and **the lock-screen rule binds it
+exactly as it binds push**: the stage and nothing else. Wallet adds the
+trade's name itself. The danger is not the field that has one today — it is
+the field somebody gives one to later. A `changeMessage` on the note would put
+`stageNote` on a lock screen, which is the leak this product has already
+shipped once (v1.69.0). So `check-pass-service.mjs` reads `passkit.js` as
+source and allows **exactly one**, on `stage`, saying exactly `Now: %@`, and
+names the eight other fields individually. Adding a `changeMessage` anywhere
+else fails the check four ways. `src/lib/apns.js` opens an HTTP/2 session per call (a pool is a
 long-lived socket inside a function that may be frozen between invocations,
 which is a handle that looks open and delivers nothing), authenticates with
 the **same Pass Type ID certificate that signs the pass**, and never throws.
@@ -1367,7 +1378,7 @@ time Wallet asks, which it does, because the changed-serials route compares
 **Two checks, because one of them could not see a handler.**
 
 ```bash
-node scripts/check-pass-service.mjs        # 37 cases, no database, no server
+node scripts/check-pass-service.mjs        # 48 cases, no database, no server
 bash scripts/local-db.sh                   # then, for the other one:
 PASSKIT_PASS_TYPE_ID=pass.com.getturnup.job npm run build && npx next start
 node scripts/live-pass-service.mjs         # 24 cases, against the real routes

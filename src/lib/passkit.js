@@ -106,7 +106,16 @@ export function buildPassJson(status, { origin, authToken }) {
         ...(status.jobRef ? [{ key: 'job', label: 'JOB', value: `#${status.jobRef}` }] : []),
       ],
       primaryFields: [
-        { key: 'stage', label: 'STATUS', value: stage.label },
+        // changeMessage is the whole point of an updating card: without it
+        // Wallet swaps the pass silently and the customer never looks. With
+        // it, the stage change itself is the notification.
+        //
+        // It is also a lock screen, so the lock-screen rule binds it: the
+        // stage and nothing else. `%@` is the field's new value, Wallet adds
+        // the trade's name itself, and NO other field carries a
+        // changeMessage -- not the note, not the address, not the customer's
+        // name -- so none of them can ever reach a lock screen this way.
+        { key: 'stage', label: 'STATUS', value: stage.label, changeMessage: 'Now: %@' },
       ],
       secondaryFields: [
         ...(status.customerName

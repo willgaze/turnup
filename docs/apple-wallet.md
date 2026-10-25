@@ -91,12 +91,33 @@ does the pasting if the Vercel CLI is signed in.
 
 ## What the pass does today, honestly
 
-It shows the stage at the moment it was added, with the QR code to the full
-page. It does **not yet update itself**: that needs the PassKit web service
-(`/api/passes/v1/...` for device registration and "what changed") and an APNs
-push with the same certificate, which is the next job after the first card is
-in a wallet. The pass JSON already advertises `webServiceURL`, so Wallet will
-start calling it the day the routes exist.
+It shows the job's stage with the QR code to the full page, and **since
+v1.74.0 it moves itself**. Until then it did not, and the first real card
+proved it: job #2742 sat on *Booked in* with no note while the job itself had
+said *running about 30 minutes late* fourteen hours earlier. The pass named a
+`webServiceURL` nobody had built, so Wallet asked, got a 404, and gave up.
+
+| Route | What Wallet uses it for |
+|---|---|
+| `POST`/`DELETE` `/api/passes/v1/devices/<device>/registrations/<type>/<code>` | a phone starts or stops following a card |
+| `GET /api/passes/v1/devices/<device>/registrations/<type>?passesUpdatedSince=` | what has changed since it last asked |
+| `GET /api/passes/v1/passes/<type>/<code>` | the current card, re-signed |
+| `POST /api/passes/v1/log` | Wallet's own complaints, which is the only window into why a card is not updating |
+
+A stage tap on the dashboard, or a booking moving in ServiceM8, sends an empty
+push to Apple and the card comes back and fetches itself. **The lock screen
+reads *Now: On my way*** — the stage, and nothing else, ever: see the
+lock-screen rule in CLAUDE.md, and `node scripts/check-pass-service.mjs`,
+which refuses any other field that tries to announce itself.
+
+Switching a job's link off takes the card off the phone too: the next time
+Wallet asks it is told the pass is no longer theirs.
+
+**The one thing not proved from a container:** that Apple's paths are the
+paths Wallet actually calls. Apple's documentation renders in JavaScript and
+would not fetch, so the routes are built from the long-stable public spec and
+every one of them logs a line. If a card is added and the Vercel log stays
+silent, the paths are the first thing to check.
 
 The certificate expires after a year. The `finish` command prints the date;
 put it in the diary.
