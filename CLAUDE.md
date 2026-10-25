@@ -1292,8 +1292,8 @@ card and the diary, and `publicShape` carries only the two times.
 v1.74.0. A pass without an update service is a screenshot: it shows the stage
 at the moment it was added and nothing ever moves it. Apple's answer is five
 calls Wallet makes to the `webServiceURL` baked into the pass, and all of them
-are built now, so the only thing between this product and a card that moves is
-the certificate (see *Not built yet*).
+are built, the certificate is live, and on 25 Oct 2026 a real card moved in a
+real pocket (v1.74.3, v1.74.4). Nothing in this section is pending.
 
 | Wallet calls | We answer |
 |---|---|
@@ -1652,10 +1652,10 @@ A new roadmap item wants a line in `PICTURE` when a screen for it exists.
 
 The wallet section (`src/components/WalletStory.jsx`) is drawn from
 `PassCard`, the same component the real pass is built from, so it cannot
-drift. It carries the same badges the posters do, and the lock screen shows
-the push notification (live) and not the Wallet card (not yet): see *Not built
-yet* below, and do not let that section say the card updates itself in Wallet
-until the pass web service exists.
+drift. It carries the same badges the posters do. Since v1.74.5 it says the
+card is in Apple Wallet and moves with the job, because both were seen on a
+real phone on 25 Oct 2026; it must never say that of Google Wallet, which is
+not started.
 
 ## Getting on the list (`/join`, v1.62.0)
 
@@ -1753,8 +1753,9 @@ for why the update service is not optional polish.
 (`docs/review/2026-10-19.md`) found the first thing a stranger read was the one
 thing not built. The headline is the owner's pick, "Tap On my way. They stop
 ringing.", the first picture is the customer's page from a text, and the card
-sits second under a caption that says it is next. Keep it that way until a pass
-is in a wallet; then the card can lead again.
+sits second. Since v1.74.5 its caption and badge say it is in Apple Wallet,
+because it is. Whether the card leads again is the owner's call, not a
+nightly's.
 
 **And it is short (v1.72.2).** Eighteen phone screens became about six. The
 wallet story (`WalletStory`), the poster strips (`byGroup('either')` and

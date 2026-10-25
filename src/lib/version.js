@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.74.4'
+export const VERSION = '1.74.5'
 export const BUILD_DATE = '2026-10-25'
 
 export const THEMES = [
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.74.5', date: '2026-10-25', notes: [
+    'The last three places that said the wallet card was waiting on Apple now say it is in Apple Wallet: the badge under the card on the homepage, the wallet poster, and the wallet story on /next, which said the card would move "once the pass is signed". It has been signed since 22 October and it moved in a pocket on the 25th. The poster frame is re-shot so the old badge is not baked into the picture.',
+    'The plan catches up with the owner: the Apple certificate comes off the list of things only he can move, the pilot count is recorded as started on 20 October and ending 19 November, the ServiceM8 developer step points at the panel rather than Vercel, and the Product page lists "Job done? On my way to the next one". The guides say the certificate job ran and when to run it again.',
+  ] },
   { version: '1.74.4', date: '2026-10-25', notes: [
     'The buzz works too. Twelve minutes after the card was added, On site was tapped on the dashboard and the card changed without Wallet being opened \u2014 the phone was woken, asked what had changed and took the new card. On wifi, in aeroplane mode, at 11% battery. That was the last unproven piece.',
     'So the loop is whole: tap a stage, every phone holding that card is woken, and the card is right the next time anyone looks at it. Nothing about it is a guess any more; both halves are in the log.',

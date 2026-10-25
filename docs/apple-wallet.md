@@ -39,6 +39,11 @@ and it takes weeks.
 
 ## Enrolled on 21 Oct 2026. Steps 2 to 4 are one Cowork job on the Mac
 
+**Done, 22 Oct 2026.** The certificate is live in production, the first real
+card went into a wallet on 23 Oct, and on 25 Oct a card moved itself and then
+took a push (v1.74.3, v1.74.4). Steps 2 to 4 are kept for the re-run when the
+certificate expires.
+
 The enrolment is through. Steps 2, 3 and 4 below are written out as a single
 paste for Cowork in `docs/cowork-apple-wallet.md`: it makes the key in a
 folder on the Mac that survives, uploads the request, downloads the
@@ -81,7 +86,7 @@ writes six `KEY=value` lines to `apple/turnup.env`. Paste them into
 (Production, Sensitive), then Redeploy. Or `bash scripts/apple-wallet.sh vercel`
 does the pasting and the redeploy if the Vercel CLI is signed in.
 
-**The `vercel` step never uploads the key folder** (v1.70.1). Until then its
+**The `vercel` step never uploads the key folder** (v1.73.1). Until then its
 last line was `vercel --prod --yes`, run in the folder that holds
 `apple/pass.key`, and on 21 Oct 2026 that put the folder, key included, on a
 production deployment. Now every Vercel command goes through one gate that
