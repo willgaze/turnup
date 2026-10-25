@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.73.0'
-export const BUILD_DATE = '2026-10-23'
+export const VERSION = '1.73.1'
+export const BUILD_DATE = '2026-10-25'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -48,6 +48,11 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.73.1', date: '2026-10-25', notes: [
+    'The Apple Wallet script can no longer publish its own private key. Its last step used to redeploy with a plain deploy command, run from the folder on the Mac that holds the key, and on 21 Oct that uploaded the folder, key included. Now every Vercel command in it goes through one gate that only allows commands which upload nothing, run from an empty temporary folder, and the redeploy re-runs the build that is already live and promotes it.',
+    'Making a key now stops if one already exists, so the certificate Apple issued is never orphaned by accident, and a new rotate command retires an exposed key (kept in a dated folder, never deleted) and starts a fresh one, with the steps to revoke the old certificate once the new one works.',
+    'Written on 22 October and left on a branch until today, while the line that did the damage stayed on main. A security fix that is only on a branch is not a fix.',
+  ] },
   { version: '1.73.0', date: '2026-10-23', notes: [
     'Every moment that matters now reaches a customer with no notifications on. Sorry we missed you, running late (your own figure, with when you said it) and paused join set off, window missed and the day-before ask: an email through ServiceM8 when no push landed, once each per job. That closes the rule that every customer-critical event has a fallback that is not a push.',
     'Connect Gmail is parked, not pending. The panel and the paste exist; your own inbox already reaches the card through the Workspace forwarding rule; it comes back when other households can connect, which waits on Google. Nobody asks you about it again.',
