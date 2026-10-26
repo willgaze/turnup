@@ -102,8 +102,8 @@ export const PHASES = [
     blurb: 'The code is done. These need an account or a certificate that only you can get.',
     items: [
       { key: 'native-app', name: 'Your job on your lock screen', state: 'ready',
-        what: 'The iOS app: the dashboard in a native window, and the job you are on as a Live Activity — stage, time, note, and On site / Paused / Job done buttons on the lock screen and in the Dynamic Island. Written in native/; builds and lands on TestFlight the day Apple says yes.',
-        needs: 'Apple Developer Program, £79/yr' },
+        what: 'The iOS app: the dashboard in a native window, and the job you are on as a Live Activity — stage, time, note, and On site / Paused / Job done buttons on the lock screen and in the Dynamic Island. Written in native/; the Apple membership is live, so what is left is signing the app itself.',
+        needs: 'One Cowork paste on the Mac (docs/cowork-testflight.md): App IDs, a distribution certificate, an App Store Connect key, six GitHub secrets; then it lands on TestFlight' },
       { key: 'wallet-pass', name: 'The card in Apple Wallet', state: 'live',
         what: 'A card that sits in Wallet and moves itself. Seen doing it on 25 Oct 2026, both halves: added and showing On my way three seconds later, then twelve minutes on, a tap of On site reached it with Wallet never opened — the card was simply right next time it was looked at. Switch a job’s link off and the card comes off the phone.',
         needs: 'Nothing. It works' },

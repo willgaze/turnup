@@ -97,6 +97,7 @@ export const STATUS = [
 
 /** The things only the owner can move, each with the link and the step. */
 export const WAITING_ON_OWNER = [
+  { label: 'Paste the TestFlight job', step: 'One Cowork paste on the Mac: App IDs, the distribution certificate, an App Store Connect key, six GitHub secrets, Run workflow. The lock-screen app lands on TestFlight at the end of it; the first run is the test', href: 'https://github.com/willgaze/turnup/blob/main/docs/cowork-testflight.md' },
   { label: 'ServiceM8 developer account', step: 'Free. Then the App ID and App Secret go into two boxes on the ServiceM8 panel, no Vercel. Every TurnUp event into the job diary; opens the add-on listing. Move 3', href: 'https://www.getturnup.com/dashboard?open=servicem8' },
 ]
 

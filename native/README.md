@@ -32,19 +32,24 @@ Xcode. The project builds on a Mac, or on the GitHub macOS runner in
 `.github/workflows/ios.yml`, once three things exist:
 
 1. **Apple Developer Program membership** (individual, £79). **Done:** the
-   enrolment went through on 21 Oct 2026. The wallet certificate is first
-   (`docs/cowork-apple-wallet.md`); the two items below are the app's own
-   Cowork job, still to be written.
+   enrolment went through on 21 Oct 2026 and the wallet certificate followed
+   (`docs/cowork-apple-wallet.md`). The two items below are one Cowork paste
+   on the owner's Mac: **`docs/cowork-testflight.md`**.
 2. **An App ID `com.getturnup.app` with the App Groups capability**, a group
    `group.com.getturnup.app`, and the same group on `com.getturnup.app.widget`.
-   Xcode's automatic signing creates these when signed in; the workflow uses
-   an App Store Connect API key instead.
-3. **Repository secrets** for the workflow: `IOS_CERT_P12` (base64 of the
-   distribution certificate), `IOS_CERT_PASSWORD`, `ASC_KEY_ID`,
-   `ASC_ISSUER_ID`, `ASC_KEY_P8` (base64). Set the repository variable
-   `IOS_SIGNING_READY=true` and the workflow runs on every push to `native`,
-   builds, and uploads to TestFlight. Will installs TestFlight on the iPhone
-   and gets the build in minutes.
+   Registered by hand in that job; automatic signing with the App Store
+   Connect key then makes the two App Store profiles itself.
+3. **Repository secrets** for the workflow, written by
+   `bash scripts/ios-signing.sh finish …` into `apple/ios/github.env`:
+   `IOS_CERT_P12` (base64 of the distribution certificate and its key),
+   `IOS_CERT_PASSWORD`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8` (base64)
+   and `APPLE_TEAM_ID`, which the archive step passes as `DEVELOPMENT_TEAM`
+   because the Xcode project carries no team of its own. Set the repository
+   variable `IOS_SIGNING_READY=true` and the workflow runs on every push to
+   `main` that touches `native/`, builds, and uploads to TestFlight. Will
+   installs TestFlight on the iPhone and gets the build in minutes.
+   `ITSAppUsesNonExemptEncryption` is `false` in `Info.plist` so a build is
+   never parked on the export-compliance question.
 
 ## Nightly builds
 

@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.75.0'
+export const VERSION = '1.75.1'
 export const BUILD_DATE = '2026-10-26'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 59
+export const THEME_INDEX = 60
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,9 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.75.1', date: '2026-10-26', notes: [
+    'The lock-screen app\'s signing is one Cowork paste (docs/cowork-testflight.md): the two App IDs and the App Group, a distribution certificate made by scripts/ios-signing.sh the way the wallet one was, an App Store Connect key, the app record, six GitHub secrets, Run workflow. The workflow now names the team and signs the archive with the distribution certificate it is given, because the Xcode project carries no team of its own, and the app says it uses no encryption of its own so TestFlight never parks a build on that question. Nothing the customer sees changes; the Mac build has never run with a real certificate and the first run is the test.',
+  ] },
   { version: '1.75.0', date: '2026-10-26', notes: [
     'The same card, for Android. Save to Google Wallet appears on the customer\u2019s page on an Android phone, and the card moves on a stage tap exactly as the Apple one does. Everything is built and checked; it stays invisible until three values from Google are pasted on the dashboard, which is one Cowork job on your Mac and then a paste on your phone \u2014 not settings in Vercel, which have been asked for three times and never happened.',
     'Saving those three ends in a demonstration rather than a claim: it makes the pass template at Google there and then, which is the first thing that uses all three together, so Saved means they actually work. The key is sealed before it is stored, never shown again and never reaches a browser.',

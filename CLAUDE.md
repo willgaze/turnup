@@ -1534,6 +1534,19 @@ variable `IOS_SIGNING_READY` and the secrets in `native/README.md` exist. The
 lock screen rule for pushes does not apply here: it is the trade's own phone
 and their own job.
 
+**The signing is one Cowork paste, `docs/cowork-testflight.md` (v1.75.1)**,
+the same shape as the wallet certificate: `scripts/ios-signing.sh csr` makes
+the key and the request on the owner's Mac, `finish` turns Apple's
+distribution certificate, the App Store Connect key, its ids and the Team ID
+into `apple/ios/github.env`, the six GitHub secrets. The archive step passes
+`DEVELOPMENT_TEAM` and signs with `Apple Distribution` because the Xcode
+project carries no team and the runner holds no development certificate;
+`-allowProvisioningUpdates` with the key makes the two App Store profiles.
+`ITSAppUsesNonExemptEncryption` is `false` so a build is never parked on the
+export-compliance question. **The workflow has never run with a real
+certificate**: the first run is the test, and the paste tells Cowork to bring
+back the failing step rather than retry.
+
 ## Paused, and when you are back (`src/lib/pause.js`)
 
 Paused already carried the reason (the stage note). The return is the trade's
