@@ -28,7 +28,7 @@ async function shrink(file, max = 1024, quality = 0.72) {
   return c.toDataURL('image/jpeg', quality)
 }
 
-export default function NoAccess({ tracker, onDone }) {
+export default function NoAccess({ tracker, onDone, children }) {
   const [open, setOpen] = useState(false)
   const [startedAt, setStartedAt] = useState(null)
   const [fix, setFix] = useState(null)
@@ -79,9 +79,17 @@ export default function NoAccess({ tracker, onDone }) {
             {last.reply && <p className="mt-1 font-semibold">{(tracker.customerName || 'The customer').split(' ')[0]} {REPLY[last.reply]} · {hhmm(last.replyAt)}</p>}
           </div>
         )}
-        {['ON_MY_WAY', 'ON_SITE', 'BOOKED'].includes(tracker.stage) && (
-          <button type="button" onClick={start} className="btn btn-grey !min-h-[44px] !px-4 !text-[14px]"><HouseIcon size={16} /> No one home</button>
-        )}
+        {/* Both of these are a record of something that happened rather than
+            a step in the job, and both are one tap from the row for the same
+            reason: a record you have to go and find is a record nobody keeps.
+            They share a line so the open page does not grow by one more
+            button's height per job. */}
+        <div className="flex flex-wrap gap-2">
+          {['ON_MY_WAY', 'ON_SITE', 'BOOKED'].includes(tracker.stage) && (
+            <button type="button" onClick={start} className="btn btn-grey !min-h-[44px] !px-4 !text-[14px]"><HouseIcon size={16} /> No one home</button>
+          )}
+          {children}
+        </div>
       </div>
     )
   }

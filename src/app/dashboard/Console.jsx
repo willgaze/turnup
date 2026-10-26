@@ -22,6 +22,7 @@ import Sources from './Sources'
 import Assistant from './Assistant'
 import Tip from './Tip'
 import NoAccess from './NoAccess'
+import TheyRang from './TheyRang'
 import Pilot from './Pilot'
 import Sm8Week from './Sm8Week'
 import { AttendanceSheet } from './Pictures'
@@ -588,7 +589,9 @@ export default function Console({ assistant = false }) {
 
               {/* Customer not home: the clock, what you tried, the door photo,
                   and the note the customer reads. Nothing charged from here. */}
-              <NoAccess tracker={t} onDone={load} />
+              <NoAccess tracker={t} onDone={load}>
+                <TheyRang tracker={t} />
+              </NoAccess>
 
               {/* Getting there. Shown while you are on your way, which is when
                   you need it; otherwise it waits under More. */}
