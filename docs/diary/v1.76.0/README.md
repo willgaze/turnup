@@ -2,13 +2,10 @@
 
 **2026-10-26** · background `#f5f5fc` · accent `#463a94`
 
-- The paperwork a beta trade signs. Two new pages, linked from the footer: trade terms (/terms-for-trades) say what TurnUp does, what it never does (no times promised, no money held, no job management, no selling anyone’s details), that it is free during the beta, and that either side can stop any time. Data processing terms (/processor) say you are the controller of your customers’ details and TurnUp the processor, in the order the ICO lists: what is held, who else touches it and where, how a breach is reported, and what happens when you stop. The law on both pages is linked to its source.
-- Your data, a new panel under Setup and settings (/dashboard?open=data). Download everything gives one file with every job, every note and every answer. Delete account switches every link off at once, deletes every job and everything on it, and tells every Apple Wallet holding a card that it is gone, so the phone removes it. It only goes once you have typed your business name, and the server checks the name again rather than trusting the screen. It ends by saying what it deleted.
-- One job can now be deleted for good: switch its link off, then Delete for good, twice. That is how a customer’s request to be forgotten is met, and the privacy page said it was possible before it was.
-- Things now go on their own. A daily sweep deletes a job twelve months after it was marked Job done (a job reopened and finished again starts again; one never finished is kept until you delete it) and each household row ninety days after it arrived. The rule is one small file with its own check, and the privacy and processing pages print their numbers from it, so the words cannot say one thing while the code does another.
-- The privacy page catches up with the code: how long each thing is kept, two services it never listed (Ship24 for tracking numbers, Gmail for a connected inbox), a link to where each service runs (the site itself runs in Washington DC, checked with Vercel), and how a trade gets everything out or deletes it.
-
-Not captured this time: the household card (set DEMO_PLACE to a seeded place code).
+- The pilot’s fourth number works. "When are you coming?" calls — the number this whole product is a bet against — was a running total typed on a panel folded inside Setup and settings. It ignored the 30/90 day switch and the start date, carried no dates, and sat somewhere nobody goes between jobs. Six days into the pilot it still read nothing, and in thirty days it would have read 0 — which looks exactly like nobody ringing, the answer the product was hoping for.
+- It is one tap on the job now. They rang sits beside No one home on the row, shares its line so the page does not grow, and queues like every other tap so a call logged with no signal still counts and never doubles.
+- Logging it on the JOB is the real change, not the convenience. The panel can now ask the only question that settles the bet: of the customers who opened their link, how many rang anyway, against the ones who never opened it. That needs no before — the control is inside the pilot — and a tally could never have answered it. A side with no jobs in it says so rather than drawing 0%, because none of nobody ringing is not a finding.
+- An older hand-typed figure is shown beside the count, never added into it: there is no way to tell which window it belongs to.
 
 
 ### wallet-in-stack
@@ -63,26 +60,10 @@ Not captured this time: the household card (set DEMO_PLACE to a seeded place cod
 
 ![join](./join.webp)
 
-### your-data
+### household
 
-The new panel under Setup and settings (`/dashboard?open=data`), on the seeded local database.
+![household](./household.webp)
 
-![your-data](./your-data.webp)
+### household-dark
 
-### your-data-deleted
-
-After Delete account on the seeded database: the counts come back from the server.
-
-![your-data-deleted](./your-data-deleted.webp)
-
-### terms-for-trades
-
-![terms-for-trades](./terms-for-trades.webp)
-
-### processor
-
-![processor](./processor.webp)
-
-### privacy
-
-![privacy](./privacy.webp)
+![household-dark](./household-dark.webp)

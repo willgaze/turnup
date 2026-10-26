@@ -27,6 +27,7 @@ export const EXPORT_HOLDS = [
   'Your profile: name, photo, van, booking terms, review link and settings',
   'Which jobs follow ServiceM8, and the emails sent to customers when no notification landed',
   'Your trade’s own rows on household cards',
+  'The “when are you coming?” calls you logged, with their time and job',
   'Your phones and Face ID by name and date, and your roadmap votes',
 ]
 
@@ -48,7 +49,7 @@ export const DELETE_REMOVES = [
   'Your profile, photo, van, booking terms and settings',
   'Your phones registered for nudges',
   'Your ServiceM8 authorisation, the job links and the email record',
-  'Your trade’s rows on household cards, and your roadmap votes',
+  'Your trade’s rows on household cards, the calls you logged, and your roadmap votes',
 ]
 
 /** What it leaves, and why. */

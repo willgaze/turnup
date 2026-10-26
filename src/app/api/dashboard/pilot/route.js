@@ -15,15 +15,19 @@ export async function GET(request) {
   const since = new Date(Date.now() - (days + 1) * 24 * 60 * 60 * 1000)
   try {
     const profile = await prisma.tradeProfile.findUnique({ where: { id: 'singleton' }, select: { pilotStart: true, pilotCalls: true, pilotCallsAt: true } }).catch(() => null)
-    const [trackers, noAccess] = await Promise.all([
+    const [trackers, noAccess, calls] = await Promise.all([
       prisma.tradeStatus.findMany({
         where: { OR: [{ scheduledFor: { gte: since } }, { createdAt: { gte: since } }] },
         select: { id: true, isActive: true, createdAt: true, scheduledFor: true, viewCount: true, presenceAt: true, presenceAskedAt: true, askedAt: true },
       }),
       prisma.noAccess.findMany({ where: { startedAt: { gte: since } }, select: { tradeStatusId: true, startedAt: true } }).catch(() => []),
+      // PilotCall is a new table (v1.76.0), so this reads as "no calls
+      // logged" wherever the migration has not run rather than taking the
+      // panel down with it.
+      prisma.pilotCall.findMany({ where: { at: { gte: since } }, select: { id: true, at: true, tradeStatusId: true } }).catch(() => []),
     ])
-    const r = pilotNumbers(trackers, noAccess, { days, start: profile?.pilotStart || null, calls: profile?.pilotCalls ?? null })
-    return NextResponse.json({ ...r, callsAt: profile?.pilotCallsAt || null })
+    const r = pilotNumbers(trackers, noAccess, calls, { days, start: profile?.pilotStart || null, typedBefore: profile?.pilotCalls ?? null })
+    return NextResponse.json(r)
   } catch (error) {
     console.error('pilot numbers failed:', error)
     return NextResponse.json({ error: dbReason(error) }, { status: 503 })

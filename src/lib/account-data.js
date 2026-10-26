@@ -42,6 +42,7 @@ export async function exportAll({ now = new Date() } = {}) {
   const devices = await soft(prisma.tradeDevice.findMany({ select: { label: true, createdAt: true, lastSentAt: true } }), [])
   const passkeys = await soft(prisma.passkey.findMany({ select: { label: true, createdAt: true, lastUsedAt: true } }), [])
   const votes = await soft(prisma.featureInterest.findMany(), [])
+  const calls = await soft(prisma.pilotCall.findMany({ orderBy: { at: 'asc' }, select: { at: true, deviceAt: true, tradeStatusId: true, note: true } }), [])
   const walletPhones = await soft(prisma.passDevice.count({ where: { serialNumber: { in: codes } } }), 0)
 
   const { engineerPhotoData, ...profileRest } = profile || {}
@@ -64,6 +65,7 @@ export async function exportAll({ now = new Date() } = {}) {
     faceId: passkeys,
     walletCardsHeld: walletPhones,
     roadmapVotes: votes,
+    whenAreYouComingCalls: calls,
   }
 }
 
@@ -72,7 +74,7 @@ export async function exportAll({ now = new Date() } = {}) {
  * Returns counts, so the panel ends with a demonstration, not a sentence.
  */
 export async function deleteAccount() {
-  const out = { jobs: 0, profile: 0, phones: 0, servicem8: false, cardRows: 0, votes: 0 }
+  const out = { jobs: 0, profile: 0, phones: 0, servicem8: false, cardRows: 0, votes: 0, calls: 0 }
 
   // Every link off first, in one write, so nothing below can leave one live.
   await prisma.tradeStatus.updateMany({ data: { isActive: false } })
@@ -94,6 +96,7 @@ export async function deleteAccount() {
   // Counted, not assumed: the panel only says the ServiceM8 link went if there was one.
   out.servicem8 = ((await soft(prisma.sm8OAuth.deleteMany({})))?.count || 0) > 0
   await soft(prisma.sm8Event.deleteMany({}))
+  out.calls = (await soft(prisma.pilotCall.deleteMany({})))?.count || 0
 
   console.log(`account deleted jobs=${out.jobs} cardRows=${out.cardRows} phones=${out.phones}`)
   return out

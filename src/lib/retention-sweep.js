@@ -44,7 +44,8 @@ export const ERASE_BATCH = 200
 /**
  * Erase jobs by id: the job, its timeline, the customer's answers (they are
  * columns on the job), No one home records, push subscriptions, the
- * ServiceM8 link and its log lines, the email claims. Returns what it did,
+ * ServiceM8 link and its log lines, the email claims, the "they rang" calls
+ * logged against it (PilotCall, v1.76.0). Returns what it did,
  * as counts, for the caller to log or show.
  */
 export async function eraseJobs(ids, { tellWallets = true } = {}) {
@@ -63,6 +64,7 @@ export async function eraseJobs(ids, { tellWallets = true } = {}) {
   await soft(prisma.sm8Link.deleteMany({ where: { tradeStatusId: { in: idsFound } } }))
   await soft(prisma.sm8Event.deleteMany({ where: { tradeStatusId: { in: idsFound } } }))
   await soft(prisma.customerEmail.deleteMany({ where: { tradeStatusId: { in: idsFound } } }))
+  await soft(prisma.pilotCall.deleteMany({ where: { tradeStatusId: { in: idsFound } } }))
   await soft(prisma.arrival.updateMany({ where: { tradeStatusCode: { in: codes } }, data: { tradeStatusCode: null } }))
 
   // 3. The job. Events, No one home records and push subscriptions cascade.

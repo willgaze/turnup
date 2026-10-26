@@ -683,7 +683,7 @@ is **no monitored support mailbox**. The third, a privacy policy page, is done
 (v1.61.0): `/privacy` is live and linked from the homepage footer, because the
 listing field takes a URL and a document in `docs/` is not one.
 
-**`src/app/privacy/page.js` is a claim about the code, and the code wins** (and since v1.76.0 so are `/processor` and `/terms-for-trades`; see *The paperwork* below). It
+**`src/app/privacy/page.js` is a claim about the code, and the code wins** (and since v1.77.0 so are `/processor` and `/terms-for-trades`; see *The paperwork* below). It
 says what is held, who can read it and the one rule the public shape obeys. A
 change that widens what `publicShape()` returns, what a notification carries or
 what a third party is sent is a change to that page as well; if the page and
@@ -1122,13 +1122,45 @@ under When suits you? like any other window. `dayWord()` lives in
 the card are stated only when the window is AGREED.
 
 **The pilot is four numbers** (`src/lib/pilot.js`, panel under Setup and
-settings, `node scripts/check-pilot.mjs`, 19 cases): links opened, "will
+settings, `node scripts/check-pilot.mjs`, 31 cases): links opened, "will
 someone be in?" answered, wasted trips (No one home records), and "when are you
 coming?" calls to the booking line. The product cannot see a phone ring, so the
-fourth is typed by the trade on the panel (`TradeProfile.pilotCalls`, a +1
-button) and the panel says so; "Are you still coming?" taps are shown beside it
-as the nearest thing the product sees, never as calls. Decided 11 Oct 2026:
-nothing moves on housing or pricing until thirty days of these are in.
+fourth is still counted by a person; "Are you still coming?" taps are shown
+beside it as the nearest thing the product sees, never as calls. Decided
+11 Oct 2026: nothing moves on housing or pricing until thirty days of these
+are in. **The clock was started on 20 Oct 2026 and ends 19 Nov.**
+
+**The fourth number was the broken one, and it broke towards the answer the
+product wanted** (v1.76.0). It was an integer on `TradeProfile.pilotCalls`,
+and it failed three ways at once. It **ignored the window** — the 30/90 day
+switch and `pilotStart` moved every number but that one. It carried **no
+date**, so it could never show a direction. And it was typed on a panel
+**folded inside Setup and settings**, which is not a place a trade goes
+between jobs: six days into the pilot it still read nothing, and at thirty
+days it would have read 0. **0 is indistinguishable from nobody ringing**,
+which is exactly the verdict the product was hoping for. A measurement that
+fails quietly towards the result you wanted is worse than no measurement, and
+this one would have declared the bet won.
+
+So a call is a **dated row** (`PilotCall`, a new table, so it fails soft) and
+it is logged in **one tap on the job**: `TheyRang` sits beside **No one home**
+on the row, sharing its line so the open page does not grow by a button's
+height per job, and going through `queueFetch()` like every other tap from a
+driveway — a call logged with no signal still counts, carries the phone's own
+clock, and the `tapId` stops a replayed flush counting it twice.
+
+**Logging it on the JOB is the point, not the convenience.** "Three calls in
+thirty days" needs a before, and there is no before — the product was not
+running. A call attached to a job needs none, because the control is inside
+the window: **of the customers who opened their link, how many rang anyway,
+against the ones who never opened it.** That is `rangAfterOpening()`, it is
+the only number in the pilot that can *settle* the bet rather than describe
+it, and no tally could ever have produced it. Rules that must not drift: a
+call logged from the panel belongs to no job and sits out of that comparison
+rather than landing on a side; a side with **no jobs in it reads null, never
+0%**, because none of nobody ringing is not a finding; and the old integer is
+shown beside the count and **never added into it**, since nothing can say
+which window it belongs to.
 
 **The counting was wrong until v1.67.0, and the audit of 19 Oct 2026 found how.**
 Four faults, each fixed where it sits:
@@ -1850,7 +1882,7 @@ and the homepage shows four customer rows and two trade buttons, not eight and
 six: the whole day is `/for-trades`. Before adding a section to the homepage,
 ask which of these three pages it belongs on; the answer is rarely the homepage.
 
-## The paperwork, and data that goes on its own (v1.76.0, stop 4)
+## The paperwork, and data that goes on its own (v1.77.0, stop 4)
 
 Three pages a beta trade reads before they start, in one frame
 (`src/components/Legal.jsx`): **`/terms-for-trades`** (what TurnUp does and

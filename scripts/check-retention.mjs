@@ -67,6 +67,7 @@ const sweep = src('src/lib/retention-sweep.js')
 check(/jobDue\(/.test(sweep) && /arrivalDue\(/.test(sweep) && /orphanPassDue\(/.test(sweep), 'the sweep decides with the pure rule')
 check(!/\b(365|12 \* 30|90 \*|30 \*)\b/.test(sweep.replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')), 'the sweep keeps no numbers of its own')
 check(/isActive: false/.test(sweep) && sweep.indexOf('isActive: false') < sweep.indexOf('tradeStatus.deleteMany'), 'erasing switches the link off before it deletes anything')
+check(/pilotCall\.deleteMany\(\{ where: \{ tradeStatusId/.test(sweep), 'erasing a job takes the calls logged against it')
 check(!/passDevice\.deleteMany\(\{ where: \{ serialNumber/.test(sweep), 'erasing a job keeps its Wallet registrations so the phone can hear the card is dead')
 const cron = JSON.parse(src('vercel.json')).crons || []
 check(cron.some((c) => c.path === '/api/cron/retention'), 'vercel.json schedules /api/cron/retention')

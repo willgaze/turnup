@@ -57,7 +57,7 @@ export default function Processor() {
           ['Nature and purpose', 'Storing the job you enter, showing the customer the part of it you chose to tell them, sending the notifications and texts you switch on, and keeping the record of what was said when'],
           ['Duration', `For as long as you use TurnUp, and then until deleted: ${RETENTION_WORDS.job}, or at once if you delete the job or the account`],
           ['Whose details', 'Your customers, and anyone at the house they tell you about. Your own staff, where you add them to the profile'],
-          ['What details', 'Name, address, phone number, the job, the hours, the stage and notes with their times, a map pin, photos of the house or door you add, what the customer answers (who will be in, door and access notes, a private note after the job), No one home records with a photo and where your phone was'],
+          ['What details', 'Name, address, phone number, the job, the hours, the stage and notes with their times, a map pin, photos of the house or door you add, what the customer answers (who will be in, door and access notes, a private note after the job), No one home records with a photo and where your phone was, and any “when are you coming?” call you log against the job'],
           ['Special category data', 'None is asked for. Do not put health or other special category details in a note: a note is free text and TurnUp cannot tell what is in it'],
         ] }]}
       />
