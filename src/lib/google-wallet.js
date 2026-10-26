@@ -227,4 +227,32 @@ export async function updateGoogleCard(status, { stage }) {
   }
 }
 
+/**
+ * A job was erased: expire its Google card, if anyone added one.
+ *
+ * Google has no "this pass is no longer yours" call the way Apple's 401 does,
+ * so the card is set to EXPIRED, which moves it out of the wallet's main list.
+ * It carries only what the card already showed. Swallowed like every call
+ * here; a 404 means the card was never added, which is the normal case.
+ */
+export async function expireGoogleCard(code) {
+  try {
+    const g = await googleWallet()
+    if (!g || !code) return { sent: 0 }
+    const token = await accessToken(g)
+    const r = await fetch(objectResource(g.issuerId, code), {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ state: 'EXPIRED' }),
+    })
+    if (r.status === 404) return { sent: 0 }
+    if (!r.ok) { console.warn(`google wallet: could not expire ${code}: ${r.status}`); return { sent: 0 } }
+    console.log(`google wallet: expired ${code}`)
+    return { sent: 1 }
+  } catch (error) {
+    console.warn('google wallet: expire threw:', error?.message)
+    return { sent: 0 }
+  }
+}
+
 export { objectId, buildClass }

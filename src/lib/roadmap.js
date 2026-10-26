@@ -20,6 +20,8 @@ export const PHASES = [
         needs: 'Live since 11 Oct 2026. About a penny a go.' },
       { key: 'terms', name: 'Terms agreed before the day, in one tap', state: 'live',
         what: 'Your notice period, your short-notice charge if you have one, and the customer’s 14-day right to cancel, in plain words on their page under Before the visit. They tap Got it, go ahead; the time and the exact words are recorded, and the card says whether it has happened. A charge only ever holds if it was agreed before the day, and TurnUp never takes one: it states it, and the sorry-we-missed-you note says the figure they agreed.' },
+      { key: 'your-data', name: 'Your data: download it, delete it, and it goes on its own', state: 'live',
+        what: 'Under Setup and settings, Your data: one tap downloads every job and everything on it as a file; Delete account removes every job, switches every link off and takes every Wallet card with it, once you type your business name. A single job can be deleted for good once its link is off, which is how a customer\u2019s request to be forgotten is met. Without you doing anything, finished jobs go twelve months after Job done and household rows ninety days after they arrive. The terms you agree to say exactly this: /terms-for-trades and /processor.' },
       { key: 'still-coming', name: 'Are you still coming?', state: 'live',
         what: 'When a window you gave has started and the card has not moved, the customer gets one button and your phone buzzes. Answer from the card: On my way, or about how late. The answer shows on their page with the time you said it. Nothing invents a time; it notices one has passed.' },
       { key: 'push', name: 'Your phone buzzes when they set off', state: 'live',

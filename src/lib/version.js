@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.75.0'
+export const VERSION = '1.76.0'
 export const BUILD_DATE = '2026-10-26'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 59
+export const THEME_INDEX = 60
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,13 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.76.0', date: '2026-10-26', notes: [
+    'The paperwork a beta trade signs. Two new pages, linked from the footer: trade terms (/terms-for-trades) say what TurnUp does, what it never does (no times promised, no money held, no job management, no selling anyone\u2019s details), that it is free during the beta, and that either side can stop any time. Data processing terms (/processor) say you are the controller of your customers\u2019 details and TurnUp the processor, in the order the ICO lists: what is held, who else touches it and where, how a breach is reported, and what happens when you stop. The law on both pages is linked to its source.',
+    'Your data, a new panel under Setup and settings (/dashboard?open=data). Download everything gives one file with every job, every note and every answer. Delete account switches every link off at once, deletes every job and everything on it, and tells every Apple Wallet holding a card that it is gone, so the phone removes it. It only goes once you have typed your business name, and the server checks the name again rather than trusting the screen. It ends by saying what it deleted.',
+    'One job can now be deleted for good: switch its link off, then Delete for good, twice. That is how a customer\u2019s request to be forgotten is met, and the privacy page said it was possible before it was.',
+    'Things now go on their own. A daily sweep deletes a job twelve months after it was marked Job done (a job reopened and finished again starts again; one never finished is kept until you delete it) and each household row ninety days after it arrived. The rule is one small file with its own check, and the privacy and processing pages print their numbers from it, so the words cannot say one thing while the code does another.',
+    'The privacy page catches up with the code: how long each thing is kept, two services it never listed (Ship24 for tracking numbers, Gmail for a connected inbox), a link to where each service runs (the site itself runs in Washington DC, checked with Vercel), and how a trade gets everything out or deletes it.',
+  ] },
   { version: '1.75.0', date: '2026-10-26', notes: [
     'The same card, for Android. Save to Google Wallet appears on the customer\u2019s page on an Android phone, and the card moves on a stage tap exactly as the Apple one does. Everything is built and checked; it stays invisible until three values from Google are pasted on the dashboard, which is one Cowork job on your Mac and then a paste on your phone \u2014 not settings in Vercel, which have been asked for three times and never happened.',
     'Saving those three ends in a demonstration rather than a claim: it makes the pass template at Google there and then, which is the first thing that uses all three together, so Saved means they actually work. The key is sealed before it is stored, never shown again and never reaches a browser.',

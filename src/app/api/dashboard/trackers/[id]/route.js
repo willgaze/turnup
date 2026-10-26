@@ -13,6 +13,7 @@ import { notifyStage } from '@/lib/push'
 import { syncTrackerToCards } from '@/lib/arrivals'
 import { notifyPassUpdated } from '@/lib/pass-devices'
 import { updateGoogleCard } from '@/lib/google-wallet'
+import { eraseJobs } from '@/lib/retention-sweep'
 import { stageOf, STAGE_ORDER } from '@/lib/trade-status'
 import { proposeWindow, agreeWindow, clearWindow, revisionFor, dayMoveFor, windowHours, lastShown } from '@/lib/window'
 import { dayOnly } from '@/lib/when'
@@ -256,11 +257,28 @@ export async function PATCH(request, { params }) {
 }
 
 // Revoking a link deactivates it; the job history stays.
+//
+// `?erase=1` deletes the job for good instead: how a customer's request to be
+// erased is met (/privacy, Your rights). Only a job whose link is already
+// switched off can be erased, so it is always two deliberate taps, never one,
+// and it goes through the same eraser as retention and Delete account.
 export async function DELETE(request, { params }) {
   const operator = await requireOperator()
   if (operator !== true) return NextResponse.json({ error: operator.error }, { status: operator.status })
 
   const { id } = await params
+  if (new URL(request.url).searchParams.get('erase') === '1') {
+    try {
+      const row = await prisma.tradeStatus.findUnique({ where: { id }, select: { isActive: true } })
+      if (!row) return NextResponse.json({ error: 'not_found' }, { status: 404 })
+      if (row.isActive) return NextResponse.json({ error: 'switch_off_first', fix: 'Switch the link off first, then delete.' }, { status: 409 })
+      const r = await eraseJobs([id])
+      return NextResponse.json({ ok: true, erased: r.jobs })
+    } catch (error) {
+      console.error('tracker erase failed:', error)
+      return NextResponse.json({ error: dbReason(error) }, { status: 503 })
+    }
+  }
   try {
     await prisma.tradeStatus.update({ where: { id }, data: { isActive: false } })
     return NextResponse.json({ ok: true })
