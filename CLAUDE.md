@@ -1530,7 +1530,8 @@ the app; `Console.jsx` calls `syncActivity(rows)` on every load.
 Xcode project Capacitor generates has no widget target, so `add-widget.rb`
 (the `xcodeproj` gem) adds it, idempotently, and `.github/workflows/ios.yml`
 runs it on a macOS runner and uploads to TestFlight once the repository
-variable `IOS_SIGNING_READY` and the secrets in `native/README.md` exist. The
+variable `IOS_SIGNING_READY` and the secrets in `native/README.md` exist
+(`docs/cowork-ios-signing.md` is the owner's half, as a Cowork paste). The
 lock screen rule for pushes does not apply here: it is the trade's own phone
 and their own job.
 

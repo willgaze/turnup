@@ -34,7 +34,8 @@ Xcode. The project builds on a Mac, or on the GitHub macOS runner in
 1. **Apple Developer Program membership** (individual, £79). **Done:** the
    enrolment went through on 21 Oct 2026. The wallet certificate is first
    (`docs/cowork-apple-wallet.md`); the two items below are the app's own
-   Cowork job, still to be written.
+   Cowork job, `docs/cowork-ios-signing.md`, which ends by running the
+   workflow once so done means a build at Apple.
 2. **An App ID `com.getturnup.app` with the App Groups capability**, a group
    `group.com.getturnup.app`, and the same group on `com.getturnup.app.widget`.
    Xcode's automatic signing creates these when signed in; the workflow uses
@@ -42,7 +43,8 @@ Xcode. The project builds on a Mac, or on the GitHub macOS runner in
 3. **Repository secrets** for the workflow: `IOS_CERT_P12` (base64 of the
    distribution certificate), `IOS_CERT_PASSWORD`, `ASC_KEY_ID`,
    `ASC_ISSUER_ID`, `ASC_KEY_P8` (base64). Set the repository variable
-   `IOS_SIGNING_READY=true` and the workflow runs on every push to `native`,
+   `IOS_SIGNING_READY=true` and the workflow runs on every push to `native/`
+   on main,
    builds, and uploads to TestFlight. Will installs TestFlight on the iPhone
    and gets the build in minutes.
 

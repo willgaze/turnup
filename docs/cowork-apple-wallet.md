@@ -142,4 +142,4 @@ Rules:
   (`/api/passes/v1/...`) and an APNs push, the next build after this.
 - The lock-screen app is the other thing the membership unlocks; its own
   Cowork job (App ID, App Group, distribution certificate, App Store Connect
-  key, GitHub secrets) is still to be written. See `native/README.md`.
+  key, GitHub secrets) is `docs/cowork-ios-signing.md` (written 26 Oct 2026).

@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.75.0'
+export const VERSION = '1.75.1'
 export const BUILD_DATE = '2026-10-26'
 
 export const THEMES = [
@@ -48,6 +48,10 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.75.1', date: '2026-10-26', notes: [
+    'The iPhone app\u2019s signing is written as one Cowork job (docs/cowork-ios-signing.md): the App ID, the App Group, the lock-screen card\u2019s ID, the distribution certificate, the App Store Connect key and the app\u2019s record, then the five secrets go to GitHub from Terminal so nothing passes through a chat. It ends by running the build once, so done means a build at Apple, not a sentence.',
+    'The build itself now names the Apple team. Capacitor\u2019s project had none, and automatic signing with no team stops before it starts; that would have been the first red run.',
+  ] },
   { version: '1.75.0', date: '2026-10-26', notes: [
     'The same card, for Android. Save to Google Wallet appears on the customer\u2019s page on an Android phone, and the card moves on a stage tap exactly as the Apple one does. Everything is built and checked; it stays invisible until three values from Google are pasted on the dashboard, which is one Cowork job on your Mac and then a paste on your phone \u2014 not settings in Vercel, which have been asked for three times and never happened.',
     'Saving those three ends in a demonstration rather than a claim: it makes the pass template at Google there and then, which is the first thing that uses all three together, so Saved means they actually work. The key is sealed before it is stored, never shown again and never reaches a browser.',
