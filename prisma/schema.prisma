@@ -661,3 +661,52 @@ model PassDevice {
   @@index([serialNumber])
   @@index([deviceLibraryIdentifier, passTypeIdentifier])
 }
+
+/// A "when are you coming?" call to the booking line.
+///
+/// The fourth pilot number, and the one the whole product is a bet against.
+/// It was a bare integer on TradeProfile until v1.76.0, which could not be
+/// windowed (switching the panel to 90 days showed the same figure), could
+/// not be dated, and was typed on a panel folded inside Setup and settings
+/// — somewhere a trade standing next to a van never goes. Thirty days of
+/// that reads 0, and 0 is indistinguishable from nobody ringing, which is
+/// the answer the product was hoping for. A measurement that fails quietly
+/// towards the result you wanted is worse than no measurement.
+///
+/// So it is a dated row now, logged in one tap from the job itself, which
+/// also makes the pilot a controlled test rather than a tally: of the
+/// customers who opened their link, how many rang anyway, against those who
+/// never opened it. No tally can answer that and it is the actual question.
+///
+/// A new table, so it fails soft where the migration has not run yet (see
+/// "Shipping a schema change" in CLAUDE.md).
+model PilotCall {
+  id String @id @default(cuid())
+
+  /// Server time of the tap. The window is counted on this.
+  at DateTime @default(now())
+
+  /// The phone's own clock, for a tap made with no signal. Believed only
+  /// within the limits readTap() sets.
+  deviceAt DateTime?
+
+  /// The replay guard, as on TradeStatusEvent and NoAccess: a flush cut off
+  /// after the request went but before the item was deleted must replay as
+  /// the same call, not a second one. Indexed, never unique — a unique
+  /// constraint makes `prisma db push` refuse without --accept-data-loss,
+  /// which the build never passes.
+  tapId String?
+
+  /// The job they rang about, where it is known. Null for a call logged
+  /// from the panel that was not about any one job. The whole point of the
+  /// column: it is what lets the panel compare customers who opened their
+  /// link with customers who did not.
+  tradeStatusId String?
+
+  /// Free text, cleaned, and never shown to a customer.
+  note String?
+
+  @@index([at])
+  @@index([tapId])
+  @@index([tradeStatusId])
+}

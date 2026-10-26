@@ -16,7 +16,7 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.75.0'
+export const VERSION = '1.76.0'
 export const BUILD_DATE = '2026-10-26'
 
 export const THEMES = [
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 59
+export const THEME_INDEX = 60
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.76.0', date: '2026-10-26', notes: [
+    'The pilot\u2019s fourth number works. "When are you coming?" calls \u2014 the number this whole product is a bet against \u2014 was a running total typed on a panel folded inside Setup and settings. It ignored the 30/90 day switch and the start date, carried no dates, and sat somewhere nobody goes between jobs. Six days into the pilot it still read nothing, and in thirty days it would have read 0 \u2014 which looks exactly like nobody ringing, the answer the product was hoping for.',
+    'It is one tap on the job now. They rang sits beside No one home on the row, shares its line so the page does not grow, and queues like every other tap so a call logged with no signal still counts and never doubles.',
+    'Logging it on the JOB is the real change, not the convenience. The panel can now ask the only question that settles the bet: of the customers who opened their link, how many rang anyway, against the ones who never opened it. That needs no before \u2014 the control is inside the pilot \u2014 and a tally could never have answered it. A side with no jobs in it says so rather than drawing 0%, because none of nobody ringing is not a finding.',
+    'An older hand-typed figure is shown beside the count, never added into it: there is no way to tell which window it belongs to.',
+  ] },
   { version: '1.75.0', date: '2026-10-26', notes: [
     'The same card, for Android. Save to Google Wallet appears on the customer\u2019s page on an Android phone, and the card moves on a stage tap exactly as the Apple one does. Everything is built and checked; it stays invisible until three values from Google are pasted on the dashboard, which is one Cowork job on your Mac and then a paste on your phone \u2014 not settings in Vercel, which have been asked for three times and never happened.',
     'Saving those three ends in a demonstration rather than a claim: it makes the pass template at Google there and then, which is the first thing that uses all three together, so Saved means they actually work. The key is sealed before it is stored, never shown again and never reaches a browser.',
