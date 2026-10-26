@@ -2,14 +2,28 @@ import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
 
-// Wallet reporting a problem with the service ("Web service error for pass
-// ..."). Logged where a session can read it in Vercel, nothing stored, and
-// always 200: it is Apple telling us something, not asking.
+/**
+ * Wallet's own complaints.
+ *
+ * POST /api/passes/v1/log  {"logs": ["..."]}
+ *
+ * Apple sends here when it cannot do something with the pass — a bad
+ * signature, a URL it could not reach, a certificate it did not trust. It is
+ * the only window into why a card is not updating on somebody else's phone,
+ * and it is worth having on the day the first real certificate lands.
+ *
+ * Unauthenticated, as the spec has it, so the body is a stranger's: capped,
+ * trimmed and logged as text, never parsed into anything that acts.
+ */
 export async function POST(request) {
   try {
-    const body = await request.json()
-    const logs = Array.isArray(body?.logs) ? body.logs.slice(0, 20) : []
-    for (const line of logs) console.warn('wallet log:', String(line).slice(0, 500))
-  } catch { /* an unreadable body is still a 200 */ }
-  return NextResponse.json({ ok: true })
+    const body = await request.json().catch(() => ({}))
+    const logs = Array.isArray(body?.logs) ? body.logs : []
+    for (const line of logs.slice(0, 20)) {
+      console.log('pass log:', String(line).slice(0, 500))
+    }
+  } catch {
+    // A log that cannot be read is not worth an error to the phone sending it.
+  }
+  return NextResponse.json({})
 }

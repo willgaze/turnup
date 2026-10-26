@@ -66,7 +66,7 @@ const STEPS = {
 }
 
 const COMING = [
-  { id: 'forward',  icon: MessageIcon,  head: 'Forward delivery emails', sub: 'Your own address. Live when your place opens.' },
+  { id: 'forward',  icon: MessageIcon,  head: 'Forward delivery emails', sub: 'Your own address, shown the moment your card is made.' },
   { id: 'calendar', icon: CalendarIcon, head: 'Arrivals in my calendar', sub: 'A calendar you subscribe to. Nothing reads yours.' },
   { id: 'gmail',    icon: CompassIcon,  head: 'Let it read my Gmail',    sub: 'Not yet. Google makes apps pass a paid security audit first. Forwarding does the same job.' },
 ]

@@ -39,6 +39,11 @@ and it takes weeks.
 
 ## Enrolled on 21 Oct 2026. Steps 2 to 4 are one Cowork job on the Mac
 
+**Done, 22 Oct 2026.** The certificate is live in production, the first real
+card went into a wallet on 23 Oct, and on 25 Oct a card moved itself and then
+took a push (v1.74.3, v1.74.4). Steps 2 to 4 are kept for the re-run when the
+certificate expires.
+
 The enrolment is through. Steps 2, 3 and 4 below are written out as a single
 paste for Cowork in `docs/cowork-apple-wallet.md`: it makes the key in a
 folder on the Mac that survives, uploads the request, downloads the
@@ -79,29 +84,68 @@ intermediate, reads your Team ID and pass type out of the certificate, and
 writes six `KEY=value` lines to `apple/turnup.env`. Paste them into
 <https://vercel.com/willgazes-projects/turnup/settings/environment-variables>
 (Production, Sensitive), then Redeploy. Or `bash scripts/apple-wallet.sh vercel`
-does the pasting if the Vercel CLI is signed in.
+does the pasting and the redeploy if the Vercel CLI is signed in.
 
-## 5. What happened then (done 23 Oct 2026)
+**The `vercel` step never uploads the key folder** (v1.73.1). Until then its
+last line was `vercel --prod --yes`, run in the folder that holds
+`apple/pass.key`, and on 21 Oct 2026 that put the folder, key included, on a
+production deployment. Now every Vercel command goes through one gate that
+allows only commands that upload nothing (`env`, `link`, `redeploy`,
+`promote`), they run from an empty temporary folder linked to `turnup` by
+name, and the redeploy re-runs the build already live on www.getturnup.com
+and promotes it. Never run `vercel` or `vercel --prod` by hand in the key
+folder.
 
-- `/api/passes/<code>` returns a signed `.pkpass`; the curl said 200.
-- **Add to Apple Wallet** is on every live customer page, on Apple devices.
-- The first pass opened in Apple Wallet on 23 Oct 2026. The badge that read
-  "Built · awaiting Apple" came off the homepage, the frame and the roadmap in
-  v1.72.0, and nothing was promoted to "updates itself", because it does not yet.
+## 4a. Replacing the key (`rotate`)
+
+`csr` now stops if `apple/pass.key` exists, because a new key orphans the
+certificate Apple issued for the old one. When a key has been exposed:
+
+    bash scripts/apple-wallet.sh rotate
+
+It moves the old key and everything made from it into `apple/old-<time>/`
+(kept, never deleted), makes a new key and request, and says what to do next:
+steps 3 and 4 again, then `vercel`, then revoke the **old** certificate at
+<https://developer.apple.com/account/resources/certificates/list> once a job's
+pass link answers 200 with the new one.
+
+## 5. What happens then
+
+- `/api/passes/<code>` starts returning a signed `.pkpass` instead of a 503.
+- **Add to Apple Wallet** appears on every live customer page, on Apple devices.
+- The homepage frame badge "Built · awaiting Apple" is still a static label in
+  `src/app/preview/posters/Posters.jsx`; change it when the first real card is
+  in a wallet.
 
 ## What the pass does today, honestly
 
-It shows the stage, the step, the customer and the address, with the QR code to
-the full page. Since v1.73.0 (23 Oct 2026) it **can update itself**: the pass
-has always advertised `webServiceURL`, and that service now exists
-(`src/app/api/passes/v1/...`, `src/lib/pass-service.js`): Wallet registers
-the phone, every change to the job pokes APNs with the same certificate, and
-Wallet fetches the pass again. Proven end to end against a stand-in Apple on
-the local database (`node scripts/check-pass-service.mjs` for the pure half).
-**Not yet seen on a real phone.** The first card that moves on its own is the
-proof: open the job on the dashboard, tap a stage, and watch the card in
-Wallet. A pass added before the service existed registers the next time Wallet
-looks at it; if it never moves, remove it and add it again from the page.
+It shows the job's stage with the QR code to the full page, and **since
+v1.74.0 it moves itself**. Until then it did not, and the first real card
+proved it: job #2742 sat on *Booked in* with no note while the job itself had
+said *running about 30 minutes late* fourteen hours earlier. The pass named a
+`webServiceURL` nobody had built, so Wallet asked, got a 404, and gave up.
+
+| Route | What Wallet uses it for |
+|---|---|
+| `POST`/`DELETE` `/api/passes/v1/devices/<device>/registrations/<type>/<code>` | a phone starts or stops following a card |
+| `GET /api/passes/v1/devices/<device>/registrations/<type>?passesUpdatedSince=` | what has changed since it last asked |
+| `GET /api/passes/v1/passes/<type>/<code>` | the current card, re-signed |
+| `POST /api/passes/v1/log` | Wallet's own complaints, which is the only window into why a card is not updating |
+
+A stage tap on the dashboard, or a booking moving in ServiceM8, sends an empty
+push to Apple and the card comes back and fetches itself. **The lock screen
+reads *Now: On my way*** — the stage, and nothing else, ever: see the
+lock-screen rule in CLAUDE.md, and `node scripts/check-pass-service.mjs`,
+which refuses any other field that tries to announce itself.
+
+Switching a job's link off takes the card off the phone too: the next time
+Wallet asks it is told the pass is no longer theirs.
+
+**The one thing not proved from a container:** that Apple's paths are the
+paths Wallet actually calls. Apple's documentation renders in JavaScript and
+would not fetch, so the routes are built from the long-stable public spec and
+every one of them logs a line. If a card is added and the Vercel log stays
+silent, the paths are the first thing to check.
 
 The certificate expires after a year. The `finish` command prints the date;
 put it in the diary.

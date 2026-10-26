@@ -40,7 +40,7 @@ when they said it.
 | 10 | Wrong address | Trade taps "wrong address" with a fix; customer asked to confirm or drop a pin; nobody's no-show unless the customer supplied it | Next (pin drop exists) |
 | 11 | No signal | Taps still accepted; device time and last fix stamped; flagged "location not validated"; queued in the browser and synced on reconnect; never dropped | Next |
 | 12 | Trade's phone dead | Dashboard shows "no update since hh:mm"; customer page shows the last stage honestly with its time; back-filled later under a "reconstructed" label | Next |
-| 13 | Customer's push not delivered | Set off, window missed and the day-before ask go by email through ServiceM8 when no push landed (ServiceM8-linked jobs, switch on the ServiceM8 panel); SMS later; push is the enhancement | Live 1.65.0 |
+| 13 | Customer's push not delivered | Every customer-critical event goes by email through ServiceM8 when no push landed: set off, window missed, day-before ask, no one home, running late, paused (ServiceM8-linked jobs, switch on the ServiceM8 panel); SMS later; push is the enhancement | Live 1.73.0 |
 | 14 | Materials run | Paused with a reason (live) and expected return (next); fix at pause and resume; with a native shell, gaps inferred from fixes and offered to confirm | Partly live |
 | 15 | Job overruns | At about three-quarters of the booked duration, ask the trade for a revised finish; recompute the next job; message that customer only if it leaves their window | Later |
 | 16 | Customer cancels in the cooling-off period | Honour 14 days unless urgent repair specifically requested; charge proportionately only if an express start request was recorded in the confirmation | Next (confirmation text) |

@@ -32,9 +32,9 @@ Xcode. The project builds on a Mac, or on the GitHub macOS runner in
 `.github/workflows/ios.yml`, once three things exist:
 
 1. **Apple Developer Program membership** (individual, £79). **Done:** the
-   enrolment went through on 21 Oct 2026 and the wallet certificate was done
-   on 23 Oct (`docs/cowork-apple-wallet.md`). The two items below are one
-   Cowork paste on the owner's Mac: **`docs/cowork-testflight.md`**.
+   enrolment went through on 21 Oct 2026 and the wallet certificate followed
+   (`docs/cowork-apple-wallet.md`). The two items below are one Cowork paste
+   on the owner's Mac: **`docs/cowork-testflight.md`**.
 2. **An App ID `com.getturnup.app` with the App Groups capability**, a group
    `group.com.getturnup.app`, and the same group on `com.getturnup.app.widget`.
    Registered by hand in that job; automatic signing with the App Store

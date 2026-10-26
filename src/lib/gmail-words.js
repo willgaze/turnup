@@ -36,6 +36,12 @@ export const SENDER_DOMAINS = [
 ]
 export const SUBJECT_WORDS = ['order', 'parcel', 'delivery', 'delivered', 'dispatched', 'despatched', 'shipped', '"on its way"', '"out for delivery"', 'collection', 'tracking']
 
+// What Google hands out: a client ID ending .apps.googleusercontent.com and a
+// secret that starts GOCSPX-. Checked loosely; the real test is Connect, and
+// Google says plainly when it refuses them.
+export const validClientId = (v) => /^[\w.-]{10,120}\.apps\.googleusercontent\.com$/.test(String(v || '').trim())
+export const validClientSecret = (v) => /^\S{16,200}$/.test(String(v || '').trim())
+
 /** The Gmail search for one sweep: after a moment, delivery-shaped, not junk. */
 export function gmailQuery(sinceMs) {
   const after = Math.max(0, Math.floor(Number(sinceMs || 0) / 1000))

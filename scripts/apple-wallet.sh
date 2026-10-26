@@ -2,8 +2,10 @@
 #
 # Apple Wallet signing, in two commands and no Keychain.
 #
-#   bash scripts/apple-wallet.sh csr            # 1. makes a key + a request file to upload to Apple
+#   bash scripts/apple-wallet.sh csr              # 1. makes a key + a request file to upload to Apple
 #   bash scripts/apple-wallet.sh finish pass.cer  # 2. turns Apple's certificate into the six settings
+#   bash scripts/apple-wallet.sh vercel           # 3. (optional) sets the six in Vercel; never uploads this folder
+#   bash scripts/apple-wallet.sh rotate           #    retires the key (kept in apple/old-*) and starts again
 #
 # Everything lands in ./apple/ which is gitignored. The private key never
 # leaves this folder except as the value you paste into Vercel.
@@ -35,13 +37,36 @@ KEY=$DIR/pass.key
 CSR=$DIR/pass.csr
 PASS_ID="${PASS_TYPE_ID:-pass.com.getturnup.job}"
 WWDR_URL=https://www.apple.com/certificateauthority/AppleWWDRCAG4.cer
+# Where the settings go, named rather than guessed from whatever this folder is.
+SCOPE="${VERCEL_SCOPE:-willgazes-projects}"
+PROJECT="${VERCEL_PROJECT:-turnup}"
+HOST="${TURNUP_HOST:-www.getturnup.com}"
+ENV_URL="https://vercel.com/$SCOPE/$PROJECT/settings/environment-variables"
 
 say() { printf '\n\033[1;34m==>\033[0m %s\n' "$1"; }
 die() { printf '\n\033[1;31mStopped:\033[0m %s\n' "$1" >&2; exit 1; }
 command -v openssl >/dev/null || die "openssl is not installed."
 
 case "${1:-}" in
-  csr)
+  csr|rotate)
+    if [ "$1" = rotate ]; then
+      if [ -f "$KEY" ]; then
+        OLD="$DIR/old-$(date +%Y%m%d-%H%M%S)"
+        mkdir -p "$OLD"
+        for f in pass.key pass.csr pass.pem key.password turnup.env wwdr.cer wwdr.pem; do
+          [ -f "$DIR/$f" ] && mv "$DIR/$f" "$OLD/"
+        done
+        chmod 700 "$OLD"
+        say "The old key and everything made from it are now in $OLD (kept, never deleted)."
+        ROTATED=1
+      else
+        say "No key to retire. Making the first one."
+      fi
+    elif [ -f "$KEY" ]; then
+      die "There is already a key at $KEY. A new one would orphan the certificate Apple issued for it.
+  If you only need the request file again, it is $CSR.
+  If the key has been exposed and must be replaced:  bash scripts/apple-wallet.sh rotate"
+    fi
     cat <<'WARN'
 
   ────────────────────────────────────────────────────────────
@@ -62,9 +87,8 @@ case "${1:-}" in
 
 WARN
     mkdir -p "$DIR"
-    if [ -f "$KEY" ]; then
-      say "Key already exists at $KEY — keeping it. Delete it first if you really want a new one."
-    else
+    [ -f "$KEY" ] && die "$KEY appeared while this ran. Stopping rather than overwrite it."
+    {
       say "Making a private key (encrypted; the passphrase is saved in $DIR/key.password)"
       PW=$(openssl rand -hex 16)
       printf '%s' "$PW" > "$DIR/key.password"; chmod 600 "$DIR/key.password"
@@ -76,7 +100,7 @@ WARN
         || die "openssl could not make a key."
       grep -q 'BEGIN RSA PRIVATE KEY' "$KEY" || die "The key is not in the PKCS#1 form the signer reads. Which openssl is this? (openssl version)"
       chmod 600 "$KEY"
-    fi
+    }
     PW=$(cat "$DIR/key.password")
     say "Making the certificate request for $PASS_ID"
     openssl req -new -key "$KEY" -passin "pass:$PW" -out "$CSR" \
@@ -97,6 +121,17 @@ Done. Upload this file to Apple:  $(pwd)/$CSR
        bash scripts/apple-wallet.sh finish ~/Downloads/pass.cer
 
 MSG
+    if [ "${ROTATED:-}" = 1 ]; then
+      cat <<MSG
+This was a rotation. Once 'finish' and the six settings are done and a job's
+pass link answers 200, revoke the OLD certificate (and only the old one):
+
+  https://developer.apple.com/account/resources/certificates/list
+  Open the Pass Type ID certificate for $PASS_ID with the EARLIER expiry
+  date, Revoke. The new one has the later date.
+
+MSG
+    fi
     ;;
 
   finish)
@@ -159,20 +194,61 @@ MSG
     ;;
 
   vercel)
+    # Puts the six settings into the TurnUp project and redeploys what Git
+    # already built. It NEVER deploys from here. This folder holds the private
+    # key, its passphrase and turnup.env; on 21 Oct 2026 the old last line,
+    # `vercel --prod --yes` run in this folder, uploaded it to production.
+    # So: every vercel command goes through vc(), which only allows commands
+    # that upload nothing, and they run from an empty temporary folder linked
+    # to turnup by name, so this folder is never linked to anything either.
     ENV=$DIR/turnup.env
     [ -f "$ENV" ] || die "No $ENV yet. Run 'finish' first."
-    command -v vercel >/dev/null || die "Vercel CLI not installed (npm i -g vercel), or paste the six lines by hand."
+    command -v vercel >/dev/null || die "Vercel CLI not installed. Paste the six lines by hand at $ENV_URL"
+    ENV_ABS="$(cd "$(dirname "$ENV")" && pwd)/$(basename "$ENV")"
+    [ -d .vercel ] && say "Warning: $(pwd) is linked to a Vercel project (.vercel/). Never run 'vercel' or 'vercel --prod' in it: that uploads the key. Delete the .vercel folder here when you can."
+    WORK=$(mktemp -d)
+    trap 'rm -rf "$WORK"' EXIT
+    vc() {
+      case "${1:-}" in
+        whoami|link|env|redeploy|promote|inspect) ;;
+        *) die "Refusing 'vercel ${1:-}': it could upload a folder, and $KEY must never be uploaded." ;;
+      esac
+      [ "$(pwd)" = "$WORK" ] || die "Refusing to run vercel outside the empty folder $WORK ($KEY must never be uploaded)."
+      [ -z "$(ls -A "$WORK" | grep -v '^\.vercel$')" ] || die "The temporary folder is not empty. Stopping."
+      command vercel "$@" --scope "$SCOPE"
+    }
+    cd "$WORK"
+    vc whoami >/dev/null 2>&1 || die "Vercel CLI is not signed in. In Terminal:  vercel login   then run this again."
+    say "Linking an empty temporary folder to the $PROJECT project (this folder stays unlinked)"
+    vc link --yes --project "$PROJECT" >/dev/null 2>&1 \
+      || die "Could not link to the $PROJECT project. Paste the six lines by hand at $ENV_URL"
     while IFS='=' read -r k v; do
       [ -n "$k" ] || continue
-      say "Setting $k"
-      vercel env rm "$k" production --yes >/dev/null 2>&1 || true
-      printf '%s' "$v" | vercel env add "$k" production --sensitive >/dev/null \
-        || die "Vercel refused $k. Paste it by hand at https://vercel.com/willgazes-projects/turnup/settings/environment-variables"
-    done < "$ENV"
-    say "All six set. Redeploying production."
-    vercel --prod --yes >/dev/null && echo "Deployed. Open a job card at https://www.getturnup.com/dashboard and press Add to Apple Wallet."
+      say "Setting $k (removing the old one first)"
+      vc env rm "$k" production --yes >/dev/null 2>&1 || true
+      printf '%s' "$v" | vc env add "$k" production --sensitive >/dev/null \
+        || die "Vercel refused $k. Paste it by hand at $ENV_URL"
+    done < "$ENV_ABS"
+    MANUAL="Open https://vercel.com/$SCOPE/$PROJECT/deployments, find the newest Production deployment that shows a Git commit (main), press its three dots, Redeploy, Redeploy. When it says Ready, its three dots again, Promote to Production if it is not already Current."
+    say "All six set. Redeploying the build that is live on $HOST (the one Git made from main), then promoting it."
+    NEW=$(vc redeploy "$HOST" 2>/dev/null | grep -Eo 'https://[A-Za-z0-9.-]+\.vercel\.app' | tail -1) || true
+    if [ -z "$NEW" ]; then
+      die "Could not redeploy from here. Do it by hand: $MANUAL"
+    fi
+    vc promote "$NEW" --yes >/dev/null 2>&1 \
+      || say "Redeployed as $NEW but could not promote it from here. $MANUAL"
+    cd - >/dev/null
+    cat <<MSG
+
+Done. Prove it: with a live job code in place of CODE,
+
+  curl -s -o /dev/null -w '%{http_code}\n' https://$HOST/api/passes/CODE
+
+200 is a signed pass. 503 means a setting is missing: check all six at $ENV_URL
+
+MSG
     ;;
 
   *)
-    sed -n 2,13p "$0"; exit 1 ;;
+    sed -n 3,8p "$0"; exit 1 ;;
 esac

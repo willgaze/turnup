@@ -20,8 +20,11 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
-| [v1.73.0](./v1.73.0/) | 2026-10-23 | Ochre — the wallet card can update itself: the PassKit web service and the APNs poke, proven against a stand-in Apple; the TestFlight job written |
-| [v1.72.0](./v1.72.0/) | 2026-10-23 | Plum — the card is in a wallet: the first signed pass opened in Apple Wallet; the awaiting-Apple badges come off, nothing promoted to moving on its own |
+| [v1.75.0](./v1.75.0/) | 2026-10-26 | Clay — the same card on Android: Save to Google Wallet, and it moves on a stage tap (v1.75.1, 26 Oct: the TestFlight signing as a Cowork paste and scripts/ios-signing.sh; no screen changed) |
+| [v1.74.0](./v1.74.0/) | 2026-10-24 | Slate — the wallet card can update itself: the service Wallet calls, built and tested end to end |
+| [v1.74.0](./v1.74.0/) | 2026-10-24 | Slate — the wallet card can update itself: the service Wallet calls, built and tested end to end (v1.74.5, 25 Oct: the words say the card is in Apple Wallet; no screen changed but a badge) |
+| [v1.73.0](./v1.73.0/) | 2026-10-23 | Moss — every customer event has an email fallback; Connect Gmail parked on Will's rule |
+| [v1.72.0](./v1.72.0/) | 2026-10-23 | Plum — Connect Gmail is two boxes on the phone, not Vercel |
 | [v1.71.0](./v1.71.0/) | 2026-10-22 | Teal — the ServiceM8 add-on is two boxes on the phone, not two Vercel settings and a redeploy |
 | [v1.70.0](./v1.70.0/) | 2026-10-20 | Indigo — Job done? On my way to the next one, offered |
 | [v1.69.0](./v1.69.0/) | 2026-10-19 | Clay — the trade's lock screen stops naming customers; one vocabulary, one check |

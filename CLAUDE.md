@@ -20,9 +20,20 @@ are written down:
    for him; it hands over the prompt.
 
 
+5. **Never wait on Will. Will, 23 Oct 2026: "Please do it yourself or build
+   something else. Don't wait for me."** When a build needs something only he
+   can do (an account, a console sign-in, a passkey, a secret into Vercel),
+   park it: one line on the board under Your moves with the paste, no reminder
+   in chat, no "your one thing" that is the same thing as last time. Then build
+   the next item that needs nothing from him. A session that ends on an ask it
+   has already made is a session that did nothing. The ServiceM8 add-on
+   (`Sm8App`) and Connect Gmail (`GoogleApp`) both moved their secrets onto the
+   phone for this reason; when a setting can live in a row the dashboard
+   writes, it should, so the ask shrinks to a paste on his phone or vanishes.
+
 4. **Link to the panel, not the page.** `/dashboard?open=<panel>` opens Setup
    and settings at that panel (v1.65.2): `doors` (Household cards), `servicem8`,
-   `profile` (Who to expect), `inbound` (Turn on forwarding), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
+   `profile` (Who to expect), `inbound` (Turn on forwarding), `sources` (Where the card hears from), `googlewallet` (The card on Android), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
    `waitlist`, `roadmap`. A household's own card link is private and lives in
    two places only: the phone that made it on `/join`, and
    `/dashboard?open=doors`, where each card shows its link and its forwarding
@@ -57,6 +68,10 @@ NEXT_PUBLIC_TRADE_PHONE_TEL  "01264502027"
 
 Fitting this to a second trade must stay a configuration change, never a code
 change. `src/lib/trade.js` is the only place those are read.
+The customer's page components take the trade from `useTrade()` in
+`src/components/TradeProvider.jsx`, which defaults to those values; only `/preview`,
+and so `/demo`, overrides it, with an invented plumber and no phone (v1.72.1), because
+the demo said everything on it was invented and then rang the real business.
 
 ## What it is
 
@@ -993,10 +1008,18 @@ after the newest already read, from a courier's or shop's domain or with an
 order word in the subject, never spam, bin or sent; what the reader drops is
 read by nobody and nothing is stored but the row. Tokens are sealed with a
 key from `JWT_SECRET` in one `GmailLink` row and no route returns them.
-Disconnect revokes at Google first. Gated on `GOOGLE_CLIENT_ID` and
-`GOOGLE_CLIENT_SECRET`; the Google project, the Internal consent screen and
-the OAuth client are the owner's to make (`docs/connect-gmail.md`, one Cowork
-paste). **No session creates an OAuth app.** Other households are stages 2
+Disconnect revokes at Google first. **The OAuth client is pasted on the
+phone** (v1.72.0): two boxes on the panel, sealed into one `GoogleApp` row,
+with `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` still winning where both
+are set. Two Vercel settings were asked for on 20 Oct 2026 and had not
+happened by the 23rd, the same wall `Sm8App` was built for the day before;
+when an ask keeps not happening, the ask is the thing to change. The Google
+project, the Internal consent screen and the client are still the owner's to
+make, in their Workspace (`docs/connect-gmail.md`). **No session creates an
+OAuth app.** Parked on 23 Oct 2026 under rule 5 above: the panel and the
+paste exist, Will's own inbox already reaches the card through the Workspace
+forwarding rule, and nobody asks him again. It comes back when other
+households can connect, which is Google's review. Other households are stages 2
 and 3 of `docs/research/inbox-connect.md` and wait on Google's review.
 
 **Tracking by number** (`src/lib/ship24.js`, pure parts in
@@ -1170,9 +1193,14 @@ reached no phone of theirs, they get an email instead.
   email is two more round trips than a serverless function promises once its
   response has gone). The sweep awaits it.
 
-The day-before nudge to the trade says when the ask went by email. Running late
-and Job done are not emailed yet: the first is a figure the trade typed, which
-the page shows with when it was said; the second is not urgent.
+The day-before nudge to the trade says when the ask went by email. Since
+v1.73.0 three more go by email when no push landed: **no one home** (sorry we
+missed you, from `recordNoAccess()`), **running late** (the trade's own
+figure with when it was said, from `runningLate()`), and **paused** (from
+`notifyStage`). Each is once per job per kind, so a second "running late" in
+one visit is the page's job, not another email. Job done is not emailed: it
+is not urgent. That closes rule 1 of `docs/design/when-things-go-wrong.md`
+for every customer-critical event the product has.
 
 ## No hook after an early return (`node scripts/check-hook-order.mjs`)
 
@@ -1259,6 +1287,231 @@ runs from the cron two hours after the last DONE event, pushes once per job
 note (`feedbackText`/`feedbackAt`); the note goes to the trade's phone, the
 card and the diary, and `publicShape` carries only the two times.
 
+## The wallet card keeps itself current (`src/app/api/passes/v1/`)
+
+v1.74.0. A pass without an update service is a screenshot: it shows the stage
+at the moment it was added and nothing ever moves it. Apple's answer is five
+calls Wallet makes to the `webServiceURL` baked into the pass, and all of them
+are built, the certificate is live, and on 25 Oct 2026 a real card moved in a
+real pocket (v1.74.3, v1.74.4). Nothing in this section is pending.
+
+| Wallet calls | We answer |
+|---|---|
+| `POST   /devices/<d>/registrations/<type>/<serial>` | 201 new, 200 again, 401 wrong token, 404 revoked |
+| `DELETE /devices/<d>/registrations/<type>/<serial>` | always 200 |
+| `GET    /devices/<d>/registrations/<type>?passesUpdatedSince=<tag>` | the serials that moved, or **204** |
+| `GET    /passes/<type>/<serial>` | the signed pass, 304 if unmoved, **401 if revoked** |
+| `POST   /log` | Wallet's own complaints, capped and logged |
+
+**The token is derived, never stored.** `passAuthToken()` in
+`src/lib/pass-auth.js` is an HMAC of the code under `JWT_SECRET`, baked into
+the pass and sent back as `Authorization: ApplePass <token>`. So there is no
+column to add, nothing extra to leak if the database is read, one job's pass
+cannot ask about another's, and it fails closed: **no `JWT_SECRET` means
+nobody is authorised**, the same way `requireOperator()` does. The compare is
+`timingSafeEqual`, because `===` on a secret leaks its prefix.
+
+Rules in here that each cost something to get wrong:
+
+- **204, not an empty 200**, when nothing has changed. Wallet reads an empty
+  list in a 200 as "these changed" and re-downloads every pass it holds, on a
+  timer.
+- **No tag means the beginning of time, not now.** A device that has never
+  asked sends nothing; reading that as "nothing changed" is a reinstalled
+  phone whose card never updates again.
+- **A revoked link answers 401 on the pass itself**, which is how Wallet is
+  told the card is no longer theirs and takes it off the phone. The
+  registration routes answer 404 for the same row, because there the token was
+  right and the card simply is not a thing any more. `serialsChangedSince()`
+  deliberately reports a dead code as *changed*, so the card is allowed to
+  find out it is dead.
+- **The changed-serials route carries no Authorization**, by Apple's design:
+  the device library identifier is the credential and it only ever yields
+  serials that device itself registered. It must never widen into a list of
+  jobs.
+- **Only the registration routes need the database.** If `PassDevice` has not
+  migrated, every read answers "no devices" — a new table, so it fails soft
+  (see *Shipping a schema change*), and the pass still downloads.
+
+**The push carries nothing, but the CARD does, and that is the part to get
+right.** Apple's pass push is an empty `{}` with `apns-topic` set to the pass
+type: no words, no sound. It only tells Wallet to come back and ask. But a
+card that changes silently is a card nobody looks at, so the **stage field
+carries `changeMessage: 'Now: %@'`** and Wallet itself puts *Now: On my way*
+on the lock screen when the pass updates.
+
+That makes the pass a lock-screen surface, and **the lock-screen rule binds it
+exactly as it binds push**: the stage and nothing else. Wallet adds the
+trade's name itself. The danger is not the field that has one today — it is
+the field somebody gives one to later. A `changeMessage` on the note would put
+`stageNote` on a lock screen, which is the leak this product has already
+shipped once (v1.69.0). So `check-pass-service.mjs` reads `passkit.js` as
+source and allows **exactly one**, on `stage`, saying exactly `Now: %@`, and
+names the eight other fields individually. Adding a `changeMessage` anywhere
+else fails the check four ways. `src/lib/apns.js` opens an HTTP/2 session per call (a pool is a
+long-lived socket inside a function that may be frozen between invocations,
+which is a handle that looks open and delivers nothing), authenticates with
+the **same Pass Type ID certificate that signs the pass**, and never throws.
+A 410 means the pass was deleted from that wallet: the row goes and is never
+retried, the same rule the web-push subscriptions follow.
+
+**`apnsConfigured()` and `apnsMissing()` live in `src/lib/pass-auth.js`, not
+in `apns.js`**, and the reason is the bug they exist for. `apns.js` imports
+`passkit.js`, which pulls in `passkit-generator` and three aliased modules, so
+no bare node script can load it — and the gate that sat there went untested
+and was wrong: the private key `scripts/apple-wallet.sh` writes is **AES-256
+encrypted**, so a push needs `PASSKIT_KEY_PASSWORD` too, and the gate did not
+look at it. It answered "configured", the handshake failed, the error was
+swallowed, and a card quietly never updated. `pem()` moved across with them
+and `passkit.js` re-exports it. **If a push gate cannot be reached by a check,
+move the gate, not the check.** And when devices hold a card that cannot be
+pushed, `notifyPassUpdated()` logs the missing names: silence in the log is
+the one failure mode nobody can diagnose.
+
+`notifyPassUpdated()` is called **un-awaited, inside `after()`**, from the
+tracker PATCH and from `syncTracker()` — the two places a field the pass shows
+moves. Same rule as `notifyStage()`: the trade tapped a button on a driveway.
+Everything is swallowed, and the worst case is a card that catches up the next
+time Wallet asks, which it does, because the changed-serials route compares
+`updatedAt` and so catches every write whether or not it was pushed.
+
+**Two checks, because one of them could not see a handler.**
+
+```bash
+node scripts/check-pass-service.mjs        # 54 cases, no database, no server
+bash scripts/local-db.sh                   # then, for the other one:
+PASSKIT_PASS_TYPE_ID=pass.com.getturnup.job npm run build && npx next start
+node scripts/live-pass-service.mjs         # 24 cases, against the real routes
+```
+
+The first proves the credential and nothing else. **It passed while a revoked
+card was answered 503 instead of 401**: the certificate gate sat above the row
+lookup, so a card whose link had been switched off was told "come back later"
+rather than being taken off the phone. The live run found it on its first
+pass. Whether a link is revoked is a fact about the card; whether we can sign
+a pass is a fact about this deployment, and the card's fact comes first.
+
+**The gap was real and it bit (25 Oct 2026).** `webServiceURL` is the **BASE**
+of the service and **Wallet appends `/v1/...` to it itself**. It read
+`${origin}/api/passes/v1`, so Wallet asked for
+`/api/passes/v1/v1/devices/...`, Next answered 404 in the router before any
+handler ran, and the log stayed **silent** — which read like "Wallet never
+called" rather than "we gave it the wrong address". Two days, and the first
+real card never stood a chance. It is `${origin}/api/passes` now, with the
+`/v1` folder under it, and `check-pass-service.mjs` walks from the URL in the
+pass to the four route files on disk: put the `/v1` back and it fails five
+ways, naming the doubled path.
+
+**A pass cannot be told a new address.** Every card added before that fix has
+the wrong base sealed inside it, so it has to be removed from Wallet and added
+again. There is no migration for a pass in somebody's pocket.
+
+**Silence in a log must mean one thing.** It meant two here, and that is what
+cost the time: every route logged on success and nothing on refusal, so an
+empty log could not tell "never called" from "called and turned away". The
+refusal paths log now. **Any route whose absence of output is used as evidence
+has to log when it says no.**
+
+**A real pass has now been seen to move (25 Oct 2026, 21:51).** The whole
+handshake is in the production log, from the owner's own phone:
+
+```
+21:51:16  pass register  code=CUTH4PGX device=8ee5291b new
+21:51:17  pass changed   device=8ee5291b n=1
+21:51:18  pass served    code=CUTH4PGX stage=ON_MY_WAY
+```
+
+Registered, asked what had changed, took the new card: three seconds. That is
+the premise of this product working for the first time, and the card may now
+be described as updating itself.
+
+**And twelve minutes later, the push itself (22:03):**
+
+```
+22:03:03  pass changed   device=8ee5291b n=1
+22:03:04  pass served    code=CUTH4PGX stage=ON_SITE
+```
+
+**No `pass register` line before those.** The device had registered once at
+21:51 and came back of its own accord on a stage tap, which nothing but the
+APNs push could have caused; the card then read *On site* without Wallet being
+opened. No `pass push` warning either, so Apple took it — the phone was on
+wifi in aeroplane mode at 11% battery, which is about as unhelpful as
+conditions get.
+
+So the whole loop is evidenced end to end: **stage tap -> empty push to Apple
+-> Wallet wakes -> asks what changed -> fetches the new card.** That is the
+premise of this product, and it is the first time it has been true.
+
+**A push that works logs nothing, and that is the next thing to fix if it ever
+matters.** `notifyPassUpdated()` warns on failure and is silent on success, so
+this run was read from what was *absent* — a register line that was not there.
+That is the same ambiguity that cost two days on the wrong `webServiceURL`,
+pointing the other way.
+
+## The same card on Android (`src/lib/google-wallet*.js`)
+
+Apple Wallet works. This is the other half, and Google's shapes were checked
+against their own pages on 25 Oct 2026 rather than recalled, because recalling
+Apple's `webServiceURL` cost two days that week.
+
+| | |
+|---|---|
+| A save link | `https://pay.google.com/gp/v/save/<JWT>`, RS256, signed with the service account key |
+| The claims | `iss` the service account, `aud: 'google'`, `typ: 'savetowallet'`, `iat`, `origins`, `payload.genericObjects` |
+| Ids | `<issuerId>.turnup_job` for the class, `<issuerId>.job_<code>` for a card |
+| An update | `PATCH walletobjects.googleapis.com/walletobjects/v1/genericObject/<id>`, bearer from the service account |
+
+**The 1,800-character ceiling is the whole design constraint.** Google
+truncates a longer save link, which is a button that looks right and does
+nothing — the failure this product keeps having to fix. `check-google-wallet.mjs`
+found it before anything shipped: a real card came to **2,094 characters**.
+Two things fixed it and both are load-bearing.
+
+- **The class is not in the link.** It is made once over REST
+  (`ensureClass()`) when the credentials are saved. Carrying it cost 294
+  characters. `saveClaims({ withClass: true })` exists for the case where the
+  class could not be made, and is measured against the same ceiling.
+- **Every variable field is capped** (`glance()`): the trade's name and the
+  customer's at 40, the address at 64. A card is a glance and a 106-character
+  address is unreadable on one; the whole thing is a tap away behind the QR.
+  So the longest card that *can exist* is **1,760 of 1,800**, and the check
+  proves that by building one with 300-character fields rather than measuring
+  a sample and hoping. A new uncapped field fails it and is named.
+
+There is no `subheader`: it would read "STATUS" above a word that is plainly a
+status, and every character is spent against the ceiling.
+
+**`cardText()` builds both the card and an update**, so the two can never
+drift into saying different things about one job. The update is a PATCH of
+only what moves — Google merges, so sending the whole object would overwrite
+anything changed in their console and re-send the barcode on every tap.
+
+**A card is as forwardable as a link**, so the same rule as `publicShape()`
+binds it: what the trade told the customer, never what the customer told the
+trade. The check names `presence`, `accessNotes`, the door, the dog, both
+photos, the phone and the pin individually, because this is a second surface
+that could grow the way the first one did.
+
+**The credentials are pasted on the phone**, sealed into `GoogleWalletApp` —
+a new table, so it fails soft. `GOOGLE_WALLET_*` still win where all three are
+set. Not Vercel settings: three rounds of those were asked for and never
+happened (rule 5). **Saving ends in a demonstration**: it makes the pass class
+at Google, which is the first thing that uses all three values together, so
+"saved" means they work rather than that they were written down. The panel
+shows the issuer's last four and never the key.
+
+`updateGoogleCard()` is called un-awaited inside `after()` from the tracker
+PATCH, the same rule as `notifyStage()` and `notifyPassUpdated()`. A 404 from
+Google means the customer never added the card, which is the normal case and
+is logged as such rather than as a failure.
+
+**Still to do, and it needs Google, not code:** a new issuer account is in
+demo mode, so a card can only go to the owner's account or an added test
+account. Publishing access is a review wanting a business profile, a real pass
+class and screenshots. `docs/cowork-google-wallet.md` is the owner's half, in
+two parts, and says which can be done today.
+
 ## The native shell (`native/`): the job on the trade's own lock screen
 
 iOS shows buttons and a live card on the lock screen only through a **Live
@@ -1280,6 +1533,19 @@ runs it on a macOS runner and uploads to TestFlight once the repository
 variable `IOS_SIGNING_READY` and the secrets in `native/README.md` exist. The
 lock screen rule for pushes does not apply here: it is the trade's own phone
 and their own job.
+
+**The signing is one Cowork paste, `docs/cowork-testflight.md` (v1.75.1)**,
+the same shape as the wallet certificate: `scripts/ios-signing.sh csr` makes
+the key and the request on the owner's Mac, `finish` turns Apple's
+distribution certificate, the App Store Connect key, its ids and the Team ID
+into `apple/ios/github.env`, the six GitHub secrets. The archive step passes
+`DEVELOPMENT_TEAM` and signs with `Apple Distribution` because the Xcode
+project carries no team and the runner holds no development certificate;
+`-allowProvisioningUpdates` with the key makes the two App Store profiles.
+`ITSAppUsesNonExemptEncryption` is `false` so a build is never parked on the
+export-compliance question. **The workflow has never run with a real
+certificate**: the first run is the test, and the paste tells Cowork to bring
+back the failing step rather than retry.
 
 ## Paused, and when you are back (`src/lib/pause.js`)
 
@@ -1462,10 +1728,10 @@ A new roadmap item wants a line in `PICTURE` when a screen for it exists.
 
 The wallet section (`src/components/WalletStory.jsx`) is drawn from
 `PassCard`, the same component the real pass is built from, so it cannot
-drift. It carries the same badges the posters do, and the lock screen shows
-the push notification (live) and not the Wallet card (not yet): see *Not built
-yet* below, and do not let that section say the card updates itself in Wallet
-until the pass web service exists.
+drift. It carries the same badges the posters do. Since v1.74.5 it says the
+card is in Apple Wallet and moves with the job, because both were seen on a
+real phone on 25 Oct 2026; it must never say that of Google Wallet, which is
+not started.
 
 ## Getting on the list (`/join`, v1.62.0)
 
@@ -1508,84 +1774,94 @@ calling it done; nothing scrolls sideways but a strip that means to.
 
 ## Not built yet
 
-**The wallet pass, half built.** This is the premise of the product. Since
-23 Oct 2026 the Apple half exists as a card that is added once; the idea is a
-card that sits in Apple Wallet and Google Wallet and updates itself:
+**The wallet pass was the premise of the product and the thing it did not have.
+Half of that is now untrue.**
 
-- **Apple Wallet (PassKit)** — an Apple Developer Program membership and a Pass
-  Type ID certificate. Everything else is built and tested with a stand-in
-  chain (v1.15.4): `bash scripts/apple-wallet.sh csr` makes the key and the
-  request, `finish pass.cer` turns Apple's certificate into the six `PASSKIT_*`
-  settings (`docs/apple-wallet.md`). The library wants **PEM, never a .p12**.
-  **Done: enrolled 21 Oct 2026, certificate issued and the first pass opened
-  in Apple Wallet on 23 Oct 2026 (v1.72.0).** The certificate was made on the
-  owner's Mac as one Cowork paste (`docs/cowork-apple-wallet.md`), because the
-  key has to be made where it survives, never in a session container. The
-  script falls back for macOS's LibreSSL, which has no `-traditional` flag and
-  writes PKCS#1 anyway. The six `PASSKIT_*` settings are in Vercel, Production.
-  The certificate expires a year on; re-running the same Cowork job renews it.
-  **The `/api/passes/v1` web service exists since v1.73.0** (see *The pass
-  updates itself*, below); the first real card seen moving on its own is the
-  proof still owed, and until it is seen the homepage says "built", not
-  "updates itself".
+**Apple Wallet is DONE, as of 23 Oct 2026.** A real signed pass is in a real
+wallet — job #2742, added from the customer's own page — and production has all
+six `PASSKIT_*` settings (`/api/passes/<code>?preview=1` answers
+`configured: true, missing: []`). The enrolment went through on 21 Oct and the
+certificate the day after; `bash scripts/apple-wallet.sh csr` then
+`finish pass.cer` is what made it, on the owner's Mac, because the key must be
+made where it survives. The library wants **PEM, never a .p12**, and the key
+the script writes is **AES-256 encrypted**, so `PASSKIT_KEY_PASSWORD` is a
+sixth setting that both signing and APNs need — `apnsConfigured()` checks it
+for that reason, rather than reporting itself ready and then failing into a
+swallowed error.
+
+So the honest line has moved, and this is the first day it may say *card*:
+**Apple Wallet is live and a card that updates itself ships with v1.74.0.**
+Google Wallet is not, and nothing customer-facing may suggest otherwise.
+
+**The `vercel` step can never upload the key folder (v1.73.1).** On 21 Oct
+2026 its last line, `vercel --prod --yes` run inside `~/TurnUp-Apple`, put
+that folder, `pass.key` included, on a production deployment. Every Vercel
+command in `scripts/apple-wallet.sh` now goes through `vc()`, which allows
+only `whoami`/`link`/`env`/`redeploy`/`promote`/`inspect` and only from an
+empty temporary folder linked to `turnup` by name; the redeploy re-runs what
+is live on the host and promotes it. **Keep `vercel deploy` and `--prod` out
+of it for good.** `csr` stops if a key exists; `rotate` retires the old one to
+`apple/old-<time>/` and starts again. The fix sat unmerged on a branch for
+three days while the dangerous line stayed on `main`; a security fix that is
+only on a branch is not a fix.
+
+**`bash scripts/check-wallet-script.sh` proves it** rather than trusting the
+comment: it lifts `vc()` out of the real script at runtime (so it cannot drift
+from what it checks, and says so loudly if it can no longer find it), runs it
+against a stub `vercel` that shouts if it is ever reached, and refuses seven
+ways of uploading a folder while letting the six harmless commands through.
+Run against the version that leaked the key, it fails on all three counts. It
+strips comments and quoted strings first, because the script contains a
+*warning* with the words `vercel --prod` in it and a check that cannot tell a
+warning from a command gets ignored.
+
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
-  a service account key.
+  a service account key. None exists. Until it does, Android gets the link.
+  The owner's half is a Cowork paste, `docs/cowork-google-wallet.md`, checked
+  against Google's own pages on 25 Oct 2026. Three things in it that are not
+  obvious:
+  **The issuer is TurnUp, not the trade.** The public business name on the
+  account is TurnUp, the way the Apple pass type is `pass.com.getturnup.job`
+  while `organizationName` is the trade's. A second trade must never need a
+  second issuer account, and the name cannot be changed afterwards.
+  **A new issuer account is in DEMO MODE and that is fine.** A pass can go to
+  the owner's account, anyone with the Developer role, or an added test
+  account — which is exactly enough to prove it, the way the Apple card was
+  proved on one phone. Publishing access is a Google review needing a
+  completed business profile, **a real pass class that already exists** and
+  screenshots of a real pass, so it cannot be asked for until the code is
+  built. Two parts, and only the first can be done today.
+  **The service account must be invited to the issuer account** at
+  `pay.google.com/business/console` with the Developer role. Miss it and the
+  key authenticates perfectly and still cannot create one pass — the Google
+  equivalent of a gate that opens onto nothing.
+  Where the three values land is a panel on the dashboard, the way `Sm8App`
+  and `GoogleApp` work, and **not** Vercel settings: those were asked for by
+  hand three times and never happened (rule 5). Until that panel exists the
+  paste leaves them in a file on the Mac and says so, rather than asking for
+  console work that lands nowhere.
 
-So the honest position since 23 Oct 2026: on an Apple device it is a card
-with an update service behind it that has been proven against a stand-in
-Apple and not yet watched on a real phone; on Android it is still a link. Do
-not describe the card as updating itself as a plain fact anywhere
-customer-facing until one has been seen doing it, and do not describe Android
-as having a card at all.
+**What a real card proved that no check could.** The first one was added while
+the update service was still in a branch, so it froze at the stage it was
+added: the card read *Booked in* with no note while the job had said *running
+about 30 minutes late* fourteen hours earlier. That is the gap this product
+exists to close, demonstrated on the owner's own phone, and it is the argument
+for why the update service is not optional polish.
 
-## The pass updates itself (`src/lib/pass-service.js`, v1.73.0)
+**The homepage leads with the link (v1.72.1).** The 19 Oct review
+(`docs/review/2026-10-19.md`) found the first thing a stranger read was the one
+thing not built. The headline is the owner's pick, "Tap On my way. They stop
+ringing.", the first picture is the customer's page from a text, and the card
+sits second. Since v1.74.5 its caption and badge say it is in Apple Wallet,
+because it is. Whether the card leads again is the owner's call, not a
+nightly's.
 
-Apple's PassKit web service, the five calls Wallet makes and nothing more,
-under `src/app/api/passes/v1/`: register a device for a pass, unregister it,
-"which of my passes changed since this tag", the latest signed pass, and a
-log sink. The pure half (`src/lib/pass-update.js`: the `ApplePass` header,
-the since-tag, what changed, If-Modified-Since, what to do with APNs' answer)
-is proven by `node scripts/check-pass-service.mjs`, and the whole thing was
-run end to end on 23 Oct 2026 against the seeded local database with a
-stand-in certificate chain and a stand-in APNs on this box: 27 cases, the
-dead-phone cleanup and the client certificate included. **Not yet watched on
-a real phone.** Rules that must not drift:
-
-- **Every change to a job pokes Wallet, and none of them waits for it.**
-  `pushPassUpdate(code)` runs inside `after()` from the tracker PATCH (every
-  PATCH, not only a stage: the pass carries the note and the address too),
-  un-awaited from the ServiceM8 sync, the late figure and the wasted-trip
-  record. It never throws. Same rule as `notifyStage()`: a tap on a driveway
-  is never held up by Apple.
-- **The pass certificate is the APNs credential.** The same `PASSKIT_*` pair
-  that signs the pass is the TLS client certificate for `api.push.apple.com`,
-  over HTTP/2 from Node's own module, topic = the pass type, body `{}`, no
-  `apns-push-type` (it must match a payload, and an empty one matches none).
-  So the service is dark exactly when signing is: `passkitConfigured()`.
-- **A dead token is deleted, not retried.** 410, `BadDeviceToken` and
-  `DeviceTokenNotForTopic` delete the registration; 403 and a bad topic are
-  our certificate and are logged loudly; anything else waits for the next
-  change. `apnsVerdict()` is the one place that decides.
-- **The authentication token is derived, never stored.** `passAuthToken()`
-  is an HMAC of the code under `JWT_SECRET`, compared timing-safe, and fails
-  closed with no secret. The token in the pass Will added on 23 Oct was made
-  the same way, so that pass registers without being re-issued.
-- **The one lock-screen line is the stage.** Wallet shows a field's
-  `changeMessage` under the trade's name when the pass updates; only the
-  stage field has one (`'%@'`), by the same rule as `LINES` in
-  `src/lib/push.js`. Never add one to the customer, address or note fields.
-- **The device listing has no token, by Apple's design.** `GET
-  /v1/devices/<id>/registrations/<type>` answers with job codes, which are
-  credentials, to anyone who knows the device identifier: 32 random
-  characters the phone made up. It is the one route where a device id is
-  worth as much as a code; it returns serials and a tag and must never carry
-  more.
-- **`PassRegistration` is a new table**, so it fails soft, and `serial` is
-  the job code because that has been the pass's `serialNumber` since the
-  first one was signed. Changing it would orphan every pass in a wallet.
-- A customer who switched on *Tell me when they set off* and holds the pass
-  gets both: the web push and Wallet's own change notice. Known, accepted,
-  not yet seen in practice.
+**And it is short (v1.72.2).** Eighteen phone screens became about six. The
+wallet story (`WalletStory`), the poster strips (`byGroup('either')` and
+`byGroup('next')`) and the never-list live on **`/next`** (`src/app/next/page.js`),
+and the homepage shows four customer rows and two trade buttons, not eight and
+six: the whole day is `/for-trades`. Before adding a section to the homepage,
+ask which of these three pages it belongs on; the answer is rarely the homepage.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 
@@ -1621,6 +1897,28 @@ until it is bad.
 `VERSION`, `BUILD_DATE`, `THEME_INDEX` and `CHANGELOG`. Move the index on by
 one so the app visibly changes colour, add a changelog entry naming what
 actually changed, and set the build date.
+
+**Take the number at merge time, from main, never at the start of the branch.**
+Several sessions build this app in parallel, and a branch that picks its number
+on day one collides: on 23 and 24 Oct 2026 two branches each shipped a v1.72.0
+and a v1.73.0, `claude/wallet-update-service` was renumbered twice, and the
+wallet script fix sat unmergeable for three days over a `VERSION` line. So a
+branch is built under its own name and gets no number until it is about to go
+in. Just before the PR merges:
+
+```bash
+git fetch origin main
+git show origin/main:src/lib/version.js | grep -E "VERSION|THEME_INDEX"
+```
+
+Take the next number from **that**: the next minor for anything the trade or
+the customer can see, the next patch (`x.y.1`) for a script, docs or
+words-only change, which shares the minor's diary folder and only adds a note
+to its row in `docs/diary/README.md`. Put the changelog entry and the diary
+row on top of main's, never over them, and advance `THEME_INDEX` from main's
+value. If main moves again before the merge, do it again; `node
+scripts/check-current.mjs` must pass on the merged tree. A PR that already
+carries a number main has since used is renumbered, not merged.
 
 **Never invent a colour.** `THEMES` is a curated list of background/accent
 pairs. Add one if the list is running short, checking white text on the accent

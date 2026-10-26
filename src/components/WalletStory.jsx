@@ -18,10 +18,11 @@ import { STAGE_ORDER, stageOf } from '@/lib/trade-status'
  * standing up on dark tiles, and its back. All drawn from the same PassCard
  * the real pass is built from, so nothing here can drift from it.
  *
- * Honesty: the pass has been in a real wallet since 23 Oct 2026, so the
- * strip says so. The update service is built (v1.73.0) and proven against a
- * stand-in Apple, but no real card has yet been seen moving on its own, so
- * nothing below says "updates itself" as a plain fact until one has.
+ * Honesty, because this is the one feature that is built but not in anybody's
+ * wallet yet: the strip carries the same badge the posters do. The card is
+ * built; the push notification on the lock screen is live today; the card
+ * updating itself in Wallet waits on Apple's certificate and the pass web
+ * service. Nothing below says otherwise.
  */
 const TRADE = 'Sam Hale Plumbing'
 const DEMO = {
@@ -312,7 +313,7 @@ function PassBack() {
 const LIKE = [
   ['One per job', 'like a ticket', <TickIcon key="t" size={20} />],
   ['Beside their bank card', 'where they already look', <WalletIcon key="w" size={20} />],
-  ['Will change as the job moves', 'the update service is built; first seen moving: not yet', <BellIcon key="b" size={20} />],
+  ['Changes as the job moves', 'the card updates itself', <BellIcon key="b" size={20} />],
   ['Scan it', 'the page opens', <PhoneIcon key="p" size={20} />],
 ]
 
@@ -323,9 +324,9 @@ export default function WalletStory() {
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <H3>Where it lives</H3>
-          <Badge>In Apple Wallet since 23 Oct 2026</Badge>
+          <Badge>In Apple Wallet</Badge>
         </div>
-        <p className="mt-1 text-[15px] muted">Add to Apple Wallet is on every job page. The buzz on the lock screen is live too.</p>
+        <p className="mt-1 text-[15px] muted">The buzz on the lock screen is live today.</p>
         <div className="mt-4"><Journey /></div>
       </div>
 
@@ -335,8 +336,8 @@ export default function WalletStory() {
       </div>
 
       <div>
-        <H3>It will move with the job</H3>
-        <p className="mt-1 text-[15px] muted">Same card. The service that moves the dot is built; the first card seen moving on a real phone is the proof still to come. The page moves today either way.</p>
+        <H3>It moves with the job</H3>
+        <p className="mt-1 text-[15px] muted">Same card. Tap a stage and every phone holding it is woken and fetches the new card. Seen working on 25 Oct 2026: On site tapped on the dashboard, the card changed in a pocket, Wallet never opened.</p>
         <div className="mt-4"><Stages /></div>
       </div>
 
@@ -366,7 +367,7 @@ export default function WalletStory() {
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-[14px] leading-snug muted">The card is built. It goes in wallets when Apple signs it. Android next.</p>
+          <p className="mt-4 text-[14px] leading-snug muted">The card is live. Apple's developer enrolment went through on 21 October, the certificate on the 22nd, the first real card went into a wallet on the 23rd and moved itself on the 25th. Google Wallet is not started.</p>
         </div>
       </div>
     </div>

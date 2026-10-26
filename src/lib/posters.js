@@ -7,7 +7,7 @@
  *
  * group    customer | trade | either | next | shipped (live, drawn, on no strip)
  * state    live   — a real capture of the real screen (public/home/*.webp)
- *          ready  — built, waiting on something outside the code (a certificate); none since 23 Oct 2026
+ *          ready  — built, waiting on something outside the code (a certificate)
  *          next   — not built; drawn as a mock and badged so nobody is misled
  * screen   a capture; or `mock` names a drawing in Posters.jsx; or `wallet`.
  *
@@ -74,7 +74,7 @@ export const FRAMES = [
     'Your day,\nin order.', 'What you are on, what is next, what is finished. Nothing else on the screen.',
     { screen: '/home/trade-run.webp', alt: 'The dashboard: the day’s jobs in order' }),
   f('t-wallet', 'trade', 'live', INDIGO,
-    'In their\nwallet.', 'The same job as a card in Apple Wallet, since 23 October 2026. Built to move with the job; the first one seen moving is the proof to come.',
+    'In their\nwallet.', 'The same job as a card in Apple Wallet. Tap a stage and the card changes, in their pocket. Live since 25 Oct 2026.',
     { wallet: true, alt: 'The job as a wallet card, lifted out of a stack of other cards' }),
 
   // ---- either end ---------------------------------------------------------------

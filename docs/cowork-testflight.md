@@ -2,7 +2,8 @@
 
 Standing rule 3 in CLAUDE.md: anything that is clicking through a console is a
 Cowork job, not a step list. The Apple membership is live (21 Oct 2026) and
-the wallet certificate is done (23 Oct). This is the app's own signing: two
+the wallet certificate is done and a card has moved in a pocket (25 Oct).
+This is the app's own signing: two
 App IDs and an App Group, a distribution certificate, an App Store Connect
 key, the app record, six GitHub secrets, and one press of Run workflow. The
 build itself happens on GitHub's Mac (`.github/workflows/ios.yml`); nothing

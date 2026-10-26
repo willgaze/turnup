@@ -2,6 +2,7 @@ import { PKPass } from 'passkit-generator'
 import { STAGES, STAGE_ORDER, stageOf } from '@/lib/trade-status'
 import { TRADE_NAME, TRADE_PHONE } from '@/lib/trade'
 import { passImages } from '@/lib/pass-images'
+import { pem } from '@/lib/pass-auth'
 
 /**
  * Apple Wallet passes.
@@ -48,14 +49,16 @@ export function passkitMissing() {
   return REQUIRED.filter(([key]) => !process.env[key]).map(([key, what]) => ({ key, what }))
 }
 
-// A PEM, whether it was pasted as text or as one line of base64.
-export function pem(value) {
-  const v = String(value || '').trim()
-  if (!v) return ''
-  if (v.includes('-----BEGIN')) return v.replace(/\\n/g, '\n')
-  const decoded = Buffer.from(v, 'base64').toString('utf8')
-  return decoded.includes('-----BEGIN') ? decoded : v
-}
+// A PEM, whether pasted as text or as one line of base64. It lives in
+// pass-auth.js so a check with no bundler can reach the APNs gate beside it.
+//
+// IMPORTED and then re-exported, not `export { pem } from '...'`. That form is
+// a re-export: it forwards the binding to importers and creates NO local one,
+// so buildSignedPass() below called an undefined `pem` and every Add to Apple
+// Wallet answered 503 (v1.74.0, live for an hour on 25 Oct). Nothing caught it
+// because signing is the one path that needs a real certificate, which no
+// check here has.
+export { pem }
 
 // Wallet wants #rrggbb or rgb(). Keep them here so the pass and the web page
 // cannot drift apart.
@@ -89,9 +92,17 @@ export function buildPassJson(status, { origin, authToken }) {
     backgroundColor: NAVY,
     labelColor: 'rgb(157, 182, 205)',
 
-    // How the pass keeps itself up to date (src/app/api/passes/v1/...).
-    // Wallet registers there, and pushPassUpdate() tells it when to bother.
-    webServiceURL: `${origin}/api/passes/v1`,
+    // How the pass keeps itself up to date. Wallet calls this service, and a
+    // push tells it when to bother.
+    // The BASE of the service, with NO /v1 on it. Wallet appends the version
+    // itself: it calls `${webServiceURL}/v1/devices/...`. With `/v1` here it
+    // asked for /api/passes/v1/v1/devices/... , which is not a route, so Next
+    // answered 404 before any handler ran -- and the log stayed silent, which
+    // read like "Wallet never called" rather than "we told it the wrong
+    // address". Every card added before 25 Oct 2026 has the wrong base baked
+    // into it and must be removed from Wallet and added again; a pass cannot
+    // be told a new URL. scripts/check-pass-service.mjs pins this.
+    webServiceURL: `${origin}/api/passes`,
     authenticationToken: authToken,
 
     // Tapping the barcode area opens the full page. The pass is the glance;
@@ -111,12 +122,16 @@ export function buildPassJson(status, { origin, authToken }) {
         ...(status.jobRef ? [{ key: 'job', label: 'JOB', value: `#${status.jobRef}` }] : []),
       ],
       primaryFields: [
-        // The one field with a changeMessage. When the pass updates itself
-        // (src/lib/pass-service.js) Wallet puts this on the lock screen under
-        // the trade's name, so it is the stage and nothing else: the same rule
-        // as LINES in src/lib/push.js. Never add a changeMessage to the
-        // customer, address or note fields.
-        { key: 'stage', label: 'STATUS', value: stage.label, changeMessage: '%@' },
+        // changeMessage is the whole point of an updating card: without it
+        // Wallet swaps the pass silently and the customer never looks. With
+        // it, the stage change itself is the notification.
+        //
+        // It is also a lock screen, so the lock-screen rule binds it: the
+        // stage and nothing else. `%@` is the field's new value, Wallet adds
+        // the trade's name itself, and NO other field carries a
+        // changeMessage -- not the note, not the address, not the customer's
+        // name -- so none of them can ever reach a lock screen this way.
+        { key: 'stage', label: 'STATUS', value: stage.label, changeMessage: 'Now: %@' },
       ],
       secondaryFields: [
         ...(status.customerName

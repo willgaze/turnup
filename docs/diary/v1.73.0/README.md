@@ -1,9 +1,9 @@
-# v1.73.0 — Ochre
+# v1.73.0 — Moss
 
-**2026-10-23** · background `#fbf8f0` · accent `#8a6414`
+**2026-10-23** · background `#f3f8f4` · accent `#2c6e49`
 
-- The wallet card can now update itself. Wallet registers the phone with the pass web service the pass has advertised since the first one was signed (/api/passes/v1: register, what changed, the latest pass, unregister, log), and every change to a job, a stage tap, a note, a ServiceM8 check-in, a late figure, a wasted trip, pokes Apple's push service with the pass certificate so Wallet fetches the card again. The stage field carries the one change message Wallet may put on the lock screen: the stage, under the trade's name, and nothing else, the same rule as every other notification here. Proven end to end against a stand-in Apple on the local database: 27 cases, the dead-phone cleanup and the client certificate included. Not yet seen on a real phone: the first card that moves on its own is the proof, and the homepage does not say "updates itself" until it has.
-- The lock-screen app's signing is one Cowork paste (docs/cowork-testflight.md): the App IDs and the App Group, a distribution certificate made by scripts/ios-signing.sh the way the wallet one was, an App Store Connect key, the app record, six GitHub secrets, Run workflow. The workflow now names the team and signs the archive with the distribution certificate it is given, and the app says it uses no encryption of its own so TestFlight never parks a build on that question.
+- Every moment that matters now reaches a customer with no notifications on. Sorry we missed you, running late (your own figure, with when you said it) and paused join set off, window missed and the day-before ask: an email through ServiceM8 when no push landed, once each per job. That closes the rule that every customer-critical event has a fallback that is not a push.
+- Connect Gmail is parked, not pending. The panel and the paste exist; your own inbox already reaches the card through the Workspace forwarding rule; it comes back when other households can connect, which waits on Google. Nobody asks you about it again.
 
 
 ### wallet-in-stack

@@ -2,10 +2,15 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { publicShape } from '@/lib/trade-status'
 import { passkitConfigured, passkitMissing, buildSignedPass, buildPassJson } from '@/lib/passkit'
+import { passAuthToken } from '@/lib/pass-auth'
 import { rpFromRequest } from '@/lib/webauthn'
-import { passAuthToken } from '@/lib/pass-service'
 
 export const dynamic = 'force-dynamic'
+
+// The token Wallet sends back on every update call lives in src/lib/pass-auth.js
+// now, because the four update routes need it too and a route is a bad place
+// to import from. Re-exported so nothing that used it from here breaks.
+export { passAuthToken }
 
 // Public, like the page it mirrors: the code in the URL is the credential.
 export async function GET(request, { params }) {

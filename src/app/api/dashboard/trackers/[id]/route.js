@@ -10,8 +10,10 @@ import { isValidStage } from '@/lib/trade-status'
 import { dbReason } from '@/lib/db-errors'
 import { cleanText } from '@/lib/clean-text'
 import { notifyStage } from '@/lib/push'
-import { pushPassUpdate } from '@/lib/pass-service'
 import { syncTrackerToCards } from '@/lib/arrivals'
+import { notifyPassUpdated } from '@/lib/pass-devices'
+import { updateGoogleCard } from '@/lib/google-wallet'
+import { stageOf, STAGE_ORDER } from '@/lib/trade-status'
 import { proposeWindow, agreeWindow, clearWindow, revisionFor, dayMoveFor, windowHours, lastShown } from '@/lib/window'
 import { dayOnly } from '@/lib/when'
 import { normaliseW3w, normaliseMapPin, normalisePhotoUrl } from '@/lib/places'
@@ -213,6 +215,30 @@ export async function PATCH(request, { params }) {
       ))
     }
 
+    // The wallet card in the customer's pocket, told to come back and look.
+    // Every write here, not just a stage change: hours moving or a pause note
+    // is exactly the kind of thing somebody opens the card for, and the push
+    // carries no words anyway — it only says "ask me again" (src/lib/apns.js).
+    //
+    // after() for the same reason as the push above: this is a round trip to
+    // Apple per registered phone, after the response has gone. Swallowed
+    // whole, so a card that does not update is a card showing the stage it
+    // was added at, which is where the product was before this existed.
+    after(() => notifyPassUpdated(tracker.code).catch((error) =>
+      console.warn('wallet pass push failed:', error?.message),
+    ))
+
+    // The Android card, moved the same way and under the same rule: inside
+    // after(), un-awaited, everything swallowed. A Google card nobody added
+    // is a 404 from Google and costs one round trip; it is not an error.
+    after(() => {
+      const st = stageOf(tracker.stage)
+      const step = STAGE_ORDER.indexOf(st.key)
+      return updateGoogleCard(tracker, {
+        stage: { ...st, position: step >= 0 ? `${step + 1} of ${STAGE_ORDER.length}` : null },
+      }).catch((error) => console.warn('google wallet update failed:', error?.message))
+    })
+
     // Any household card carrying this job moves with it. Un-awaited and
     // swallowed for the same reason as the push above: the household card is a
     // nicety, the stage change on a driveway is not. A job on no card at all —
@@ -220,11 +246,6 @@ export async function PATCH(request, { params }) {
     syncTrackerToCards(tracker).catch((error) =>
       console.error('household card sync failed:', error?.message),
     )
-
-    // The Wallet pass on any phone that holds one. Same rule as the push: a
-    // nicety that must not slow or fail the tap. Every PATCH, not only a stage
-    // change, because the pass carries the note and the address too.
-    after(() => pushPassUpdate(tracker.code).catch(() => {}))
 
     return NextResponse.json({ tracker })
   } catch (error) {
