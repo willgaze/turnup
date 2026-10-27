@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.77.0](./v1.77.0/) | 2026-10-27 | Teal — a Job done card stops saying the trade is running late; the late row shows only while the customer is still waiting |
 | [v1.76.0](./v1.76.0/) | 2026-10-26 | Indigo — the pilot's fourth number works: a call is one tap on the job, and the panel can finally ask whether the people who read the card rang less |
 | [v1.75.0](./v1.75.0/) | 2026-10-26 | Clay — the same card on Android: Save to Google Wallet, and it moves on a stage tap |
 | [v1.74.0](./v1.74.0/) | 2026-10-24 | Slate — the wallet card can update itself: the service Wallet calls, built and tested end to end (v1.74.5, 25 Oct: the words say the card is in Apple Wallet; no screen changed but a badge) |

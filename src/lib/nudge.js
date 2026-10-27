@@ -4,6 +4,7 @@ import { TRADE_NAME } from '@/lib/trade'
 import { dayBeforeAskDue } from '@/lib/day-before'
 import { diaryFor } from '@/lib/sm8-oauth'
 import { dayWord } from '@/lib/nudge-words'
+import { lateNote } from '@/lib/late-note'
 import { askNudgeDue, inQuietHours, askExpired, MAX_ASK_NUDGES, REPEAT_MS } from '@/lib/ask-reminder'
 import { TRADE_LINES } from '@/lib/trade-push-words'
 export { dayWord }
@@ -225,7 +226,7 @@ export async function stopAskReminders(tracker) {
 export async function runningLate(tracker, minutes) {
   const now = new Date()
   const m = minutes ? Math.max(5, Math.min(240, Math.round(minutes))) : null
-  const note = m ? `Running about ${m} minutes late — sorry. Said at ${hhmm(now)}.` : null
+  const note = m ? lateNote(m, hhmm(now)) : null
   const updated = await prisma.tradeStatus.update({ where: { id: tracker.id }, data: {
     lateMinutes: m, lateAt: m ? now : null, askAnsweredAt: now,
     ...(note ? { stageNote: note, events: { create: { stage: tracker.stage, note } } } : {}),

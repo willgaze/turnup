@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '26 Oct 2026',
+  updated: '27 Oct 2026',
 }
 
 export const STAGES = [
