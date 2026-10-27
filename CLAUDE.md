@@ -1246,6 +1246,23 @@ page opened) and gone after the fix. The check reads every component's
 top-level lines and fails a `useX(` that follows a top-level return; it
 carries a self-test with the original bug. Run it before every push.
 
+## The pilot, once a week, on the trade's phone (`src/lib/pilot-summary.js`)
+
+v1.77.0. The four numbers used to wait on a panel; now they arrive. Every
+Monday at 08:00 in the trade's zone (`summaryDue()`, `SUMMARY_HOUR`), the
+sweep sends one push to the trade's registered phones: last week's four
+beside the week before, and the totals since the Start date, built by
+`summaryBody()` from counts alone and sent through `TRADE_LINES.pilotWeek()`,
+so the trade-push rule holds by construction (no customer anywhere in it).
+Claimed atomically on `TradeProfile.pilotSummaryAt` before sending, so two
+sweeps cannot both send; not claimed while no phone is registered, so the
+first Monday after a phone appears still gets it. **Send me this week's now**
+on the pilot panel (`POST /api/dashboard/pilot {action:'summary'}`) sends the
+same message today and does not move the Monday clock. The week before the
+Start date is not a comparison; the first summary has no "was".
+`node scripts/check-pilot-summary.mjs` (16 cases, BST and GMT, the clock
+change weekend included).
+
 ## Job done? On my way to the next one, offered (`src/lib/next-job.js`)
 
 v1.70.0. The moment one job ends is the moment the next customer most wants

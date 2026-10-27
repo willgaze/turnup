@@ -61,6 +61,7 @@ const TAKES_ARGUMENTS = {
   reminderReply: 'fixed words from REMINDER_REPLIES, and the trade\'s next step',
   afterNoAccess: 'fixed words from REPLIES, and the trade\'s next step',
   customerLate: 'minutes from a fixed list, and two clock times',
+  pilotWeek: 'the pilot counts from pilotNumbers(): numbers, built into words inside the vocabulary',
 }
 for (const name of names) {
   const takesArgs = TRADE_LINES[name].length > 0

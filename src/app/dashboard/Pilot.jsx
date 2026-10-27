@@ -94,6 +94,16 @@ export default function Pilot() {
   }, [days])
   useEffect(() => { load() }, [load])
 
+  const [summaryNote, setSummaryNote] = useState(null)
+  const sendSummary = async () => {
+    setBusy('summary'); setSummaryNote(null)
+    try {
+      const r = await fetch('/api/dashboard/pilot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'summary' }) })
+      const j = await r.json().catch(() => ({}))
+      setSummaryNote(!r.ok ? `Did not send: ${j.error || r.status}` : j.devices === 0 ? 'No phone registered yet: switch on Nudge me first.' : `Sent to ${j.sent} phone${j.sent === 1 ? '' : 's'}.`)
+    } finally { setBusy(null) }
+  }
+
   const save = async (what, body) => {
     setBusy(what)
     try {
@@ -168,6 +178,16 @@ export default function Pilot() {
               {calls.typedBefore} call{calls.typedBefore === 1 ? ' was' : 's were'} typed here before calls were dated. Not in the count above: there is no way to tell which window {calls.typedBefore === 1 ? 'it belongs' : 'they belong'} to.
             </p>
           )}
+          {/* Monday 08:00, the four numbers on your phone. The button sends
+              the same message now, so the schedule is seen before it is trusted. */}
+          <div className="r-inner mt-3 px-4 py-3 text-[14px]" style={{ background: 'rgb(var(--glass-line) / 0.08)' }}>
+            <p className="font-semibold">Every Monday at 8, on your phone</p>
+            <p className="mt-0.5 muted">Last week's four numbers beside the week before, as a notification to the phone you registered under Nudge me. {r.summaryAt ? `Last sent ${day(r.summaryAt)}.` : 'Not sent yet.'}</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <button type="button" disabled={busy} onClick={sendSummary} className="btn btn-grey !min-h-[40px] !px-4 !text-[14px]">{busy === 'summary' ? '…' : 'Send me this week\u2019s now'}</button>
+              {summaryNote && <span className="text-[13px] muted">{summaryNote}</span>}
+            </div>
+          </div>
           <p className="mt-3 text-[12px] muted">If the first two stay low, the product is wrong, not the pitch. Nothing moves on housing or pricing until these are in.</p>
         </>
       )}
