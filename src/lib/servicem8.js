@@ -25,6 +25,7 @@ import { prisma } from './prisma'
 import { notifyStage } from './push'
 import { notifyPassUpdated } from './pass-devices'
 import { cleanText } from './clean-text'
+import { noteAfterStage } from './late-note'
 import { generateCode } from './trade-status'
 import { nudgeIfDue } from './nudge'
 import { revisionFor, dayMoveFor, windowHours, lastShown } from './window'
@@ -206,7 +207,7 @@ export async function syncTracker(tracker, { source = 'sync' } = {}) {
     }
 
     if (stage !== tracker.stage) {
-      const keep = tracker.stageNote === AWAY_NOTE ? null : tracker.stageNote
+      const keep = tracker.stageNote === AWAY_NOTE || noteAfterStage(tracker.stageNote, stage) === null ? null : tracker.stageNote
       const data = { stage, stageNote: note ? cleanText(note) : keep, events: { create: { stage, note: `From ServiceM8: ${why}` } } }
       // Same rule as the stage button: setting off is stamped on the way into
       // On my way only, and cleared only by going back to Booked in.

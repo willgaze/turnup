@@ -1053,6 +1053,17 @@ Before any schedule nothing called it, so a window could pass unnoticed
 whenever no customer happened to have their page open — which is the case a
 trade cannot rely on.
 
+**Late is about getting to the door, and stops at it (v1.78.0).** The late
+note was written into `stageNote` and a stage change never took it out, so
+job #2742 said "Running about 30 minutes late" at Job done, on the page and on
+the Wallet card. `src/lib/late-note.js` owns the wording (`lateNote()`) and
+the rule (`noteAfterStage()`): on the way to On site, Paused or Job done, the
+note `runningLate()` wrote is cleared by the stage button and by a ServiceM8
+check-in, and `publicShape()` hides one already sitting on a row past the
+door. Words the trade typed are never touched. The **Are you still coming?**
+row and the dashboard's late figure show only at Booked in or On my way.
+`node scripts/check-late-note.mjs` proves all of it.
+
 **It ran on GitHub Actions until v1.56.0, and GitHub ran it every four hours.**
 The workflow asked for every five minutes; GitHub's scheduler is best effort
 and dropped almost every run (37 runs in total; on 17 Oct at 00:57, 05:29,
@@ -1122,13 +1133,45 @@ under When suits you? like any other window. `dayWord()` lives in
 the card are stated only when the window is AGREED.
 
 **The pilot is four numbers** (`src/lib/pilot.js`, panel under Setup and
-settings, `node scripts/check-pilot.mjs`, 19 cases): links opened, "will
+settings, `node scripts/check-pilot.mjs`, 31 cases): links opened, "will
 someone be in?" answered, wasted trips (No one home records), and "when are you
 coming?" calls to the booking line. The product cannot see a phone ring, so the
-fourth is typed by the trade on the panel (`TradeProfile.pilotCalls`, a +1
-button) and the panel says so; "Are you still coming?" taps are shown beside it
-as the nearest thing the product sees, never as calls. Decided 11 Oct 2026:
-nothing moves on housing or pricing until thirty days of these are in.
+fourth is still counted by a person; "Are you still coming?" taps are shown
+beside it as the nearest thing the product sees, never as calls. Decided
+11 Oct 2026: nothing moves on housing or pricing until thirty days of these
+are in. **The clock was started on 20 Oct 2026 and ends 19 Nov.**
+
+**The fourth number was the broken one, and it broke towards the answer the
+product wanted** (v1.76.0). It was an integer on `TradeProfile.pilotCalls`,
+and it failed three ways at once. It **ignored the window** — the 30/90 day
+switch and `pilotStart` moved every number but that one. It carried **no
+date**, so it could never show a direction. And it was typed on a panel
+**folded inside Setup and settings**, which is not a place a trade goes
+between jobs: six days into the pilot it still read nothing, and at thirty
+days it would have read 0. **0 is indistinguishable from nobody ringing**,
+which is exactly the verdict the product was hoping for. A measurement that
+fails quietly towards the result you wanted is worse than no measurement, and
+this one would have declared the bet won.
+
+So a call is a **dated row** (`PilotCall`, a new table, so it fails soft) and
+it is logged in **one tap on the job**: `TheyRang` sits beside **No one home**
+on the row, sharing its line so the open page does not grow by a button's
+height per job, and going through `queueFetch()` like every other tap from a
+driveway — a call logged with no signal still counts, carries the phone's own
+clock, and the `tapId` stops a replayed flush counting it twice.
+
+**Logging it on the JOB is the point, not the convenience.** "Three calls in
+thirty days" needs a before, and there is no before — the product was not
+running. A call attached to a job needs none, because the control is inside
+the window: **of the customers who opened their link, how many rang anyway,
+against the ones who never opened it.** That is `rangAfterOpening()`, it is
+the only number in the pilot that can *settle* the bet rather than describe
+it, and no tally could ever have produced it. Rules that must not drift: a
+call logged from the panel belongs to no job and sits out of that comparison
+rather than landing on a side; a side with **no jobs in it reads null, never
+0%**, because none of nobody ringing is not a finding; and the old integer is
+shown beside the count and **never added into it**, since nothing can say
+which window it belongs to.
 
 **The counting was wrong until v1.67.0, and the audit of 19 Oct 2026 found how.**
 Four faults, each fixed where it sits:
@@ -1213,6 +1256,23 @@ on 19 Oct 2026 (a Booked-in card, agreed window starting 40 seconds after the
 page opened) and gone after the fix. The check reads every component's
 top-level lines and fails a `useX(` that follows a top-level return; it
 carries a self-test with the original bug. Run it before every push.
+
+## The pilot, once a week, on the trade's phone (`src/lib/pilot-summary.js`)
+
+v1.77.0. The four numbers used to wait on a panel; now they arrive. Every
+Monday at 08:00 in the trade's zone (`summaryDue()`, `SUMMARY_HOUR`), the
+sweep sends one push to the trade's registered phones: last week's four
+beside the week before, and the totals since the Start date, built by
+`summaryBody()` from counts alone and sent through `TRADE_LINES.pilotWeek()`,
+so the trade-push rule holds by construction (no customer anywhere in it).
+Claimed atomically on `TradeProfile.pilotSummaryAt` before sending, so two
+sweeps cannot both send; not claimed while no phone is registered, so the
+first Monday after a phone appears still gets it. **Send me this week's now**
+on the pilot panel (`POST /api/dashboard/pilot {action:'summary'}`) sends the
+same message today and does not move the Monday clock. The week before the
+Start date is not a comparison; the first summary has no "was".
+`node scripts/check-pilot-summary.mjs` (16 cases, BST and GMT, the clock
+change weekend included).
 
 ## Job done? On my way to the next one, offered (`src/lib/next-job.js`)
 

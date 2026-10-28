@@ -1,6 +1,7 @@
 import { NextResponse, after } from 'next/server'
 import { runningLate, answeredByStage, stopAskReminders } from '@/lib/nudge'
 import { pausedBack, pauseStampFor } from '@/lib/pause'
+import { noteAfterStage } from '@/lib/late-note'
 import { diaryFor } from '@/lib/sm8-oauth'
 import { STAGES } from '@/lib/trade-status'
 import { readTap, hhmmLondon } from '@/lib/tap'
@@ -63,6 +64,11 @@ export async function PATCH(request, { params }) {
       data.stage = body.stage
       Object.assign(data, answeredByStage(current))
       Object.assign(data, pauseStampFor(current, body.stage))
+      // A "running late" note is about getting to the door. Once the van is
+      // there it is history, and left on the card it reads as news (#2742 at
+      // Job done, 21 Oct). Only the note runningLate() wrote; typed words stay,
+      // and a note sent in this same body (below) still wins.
+      if (noteAfterStage(current.stageNote, body.stage) === null) data.stageNote = null
       // Setting off is the moment worth stamping: the one the customer is
       // waiting on, and a record of what happened rather than a promise.
       //

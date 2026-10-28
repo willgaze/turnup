@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '26 Oct 2026',
+  updated: '27 Oct 2026',
 }
 
 export const STAGES = [
@@ -83,7 +83,7 @@ export const STATUS = [
   { item: 'Nudges on time', state: 'green', note: 'every five minutes on Vercel Cron since 17 Oct 2026; GitHub had run it every four hours' },
   { item: 'ServiceM8 connector', state: 'green', note: 'connected 9 Oct 2026: reads every booking, texts the link, follows a move, check-in is On site' },
   { item: 'Email letterbox (Cloudflare)', state: 'green', note: 'receiving since 18 Oct 2026: in.getturnup.com, a Worker, /api/inbound; forwarded emails land on the card' },
-  { item: 'Pilot: thirty days, four numbers', state: 'amber', note: 'started 20 Oct 2026, ends 19 Nov; the app counts links opened, in? answered and wasted trips, the owner taps +1 for each when-are-you-coming call' },
+  { item: 'Pilot: thirty days, four numbers', state: 'amber', note: 'started 20 Oct 2026, ends 19 Nov; the app counts links opened, in? answered and wasted trips, and from 26 Oct a call is one tap on the job \u2014 which also splits the result by whether that customer had opened their link' },
   { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live 18 Oct 2026: the plate fills in make, model and colour' },
   { item: 'Privacy policy', state: 'green', note: 'a public page, getturnup.com/privacy, since 17 Oct 2026' },
   { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },

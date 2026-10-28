@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.75.1'
-export const BUILD_DATE = '2026-10-26'
+export const VERSION = '1.78.1'
+export const BUILD_DATE = '2026-10-28'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 59
+export const THEME_INDEX = 62
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,9 +48,22 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
-  { version: '1.75.1', date: '2026-10-26', notes: [
+  { version: '1.78.1', date: '2026-10-28', notes: [
     'The iPhone app\u2019s signing is written as one Cowork job (docs/cowork-ios-signing.md): the App ID, the App Group, the lock-screen card\u2019s ID, the distribution certificate, the App Store Connect key and the app\u2019s record, then the five secrets go to GitHub from Terminal so nothing passes through a chat. It ends by running the build once, so done means a build at Apple, not a sentence.',
     'The build itself now names the Apple team. Capacitor\u2019s project had none, and automatic signing with no team stops before it starts; that would have been the first red run.',
+  ] },
+  { version: '1.78.0', date: '2026-10-28', notes: [
+    'A Job done card stops saying the trade is running late. "Running about 30 minutes late" was written into the card\u2019s note and nothing ever took it out, so job #2742 still said it after Job done, on the page and on the Wallet card. The note now comes off the moment the van is there (On site, Paused or Job done), whether the tap was on the dashboard or a ServiceM8 check-in, and cards already in that state stop showing it without anyone touching them. Anything the trade typed stays.',
+    'The "are you still coming?" row and the late figure on the dashboard row now show only while the customer is still waiting: Booked in or On my way. On site, Paused or Job done, they are history. "When suits you?" was already hidden at Job done.',
+  ] },
+  { version: '1.77.0', date: '2026-10-27', notes: [
+    'The pilot comes to you. Every Monday at eight, one notification to your phone with last week\'s four numbers beside the week before: jobs, links opened by a customer, will-someone-be-in answered, wasted trips, calls asking when you are coming, and the totals since the count started. A tap opens the panel. Numbers only, never a name. Send me this week\'s now, on the pilot panel, sends the same message today so you can see it before you trust it.',
+  ] },
+  { version: '1.76.0', date: '2026-10-26', notes: [
+    'The pilot\u2019s fourth number works. "When are you coming?" calls \u2014 the number this whole product is a bet against \u2014 was a running total typed on a panel folded inside Setup and settings. It ignored the 30/90 day switch and the start date, carried no dates, and sat somewhere nobody goes between jobs. Six days into the pilot it still read nothing, and in thirty days it would have read 0 \u2014 which looks exactly like nobody ringing, the answer the product was hoping for.',
+    'It is one tap on the job now. They rang sits beside No one home on the row, shares its line so the page does not grow, and queues like every other tap so a call logged with no signal still counts and never doubles.',
+    'Logging it on the JOB is the real change, not the convenience. The panel can now ask the only question that settles the bet: of the customers who opened their link, how many rang anyway, against the ones who never opened it. That needs no before \u2014 the control is inside the pilot \u2014 and a tally could never have answered it. A side with no jobs in it says so rather than drawing 0%, because none of nobody ringing is not a finding.',
+    'An older hand-typed figure is shown beside the count, never added into it: there is no way to tell which window it belongs to.',
   ] },
   { version: '1.75.0', date: '2026-10-26', notes: [
     'The same card, for Android. Save to Google Wallet appears on the customer\u2019s page on an Android phone, and the card moves on a stage tap exactly as the Apple one does. Everything is built and checked; it stays invisible until three values from Google are pasted on the dashboard, which is one Cowork job on your Mac and then a paste on your phone \u2014 not settings in Vercel, which have been asked for three times and never happened.',

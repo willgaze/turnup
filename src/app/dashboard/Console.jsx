@@ -22,6 +22,7 @@ import Sources from './Sources'
 import Assistant from './Assistant'
 import Tip from './Tip'
 import NoAccess from './NoAccess'
+import TheyRang from './TheyRang'
 import Pilot from './Pilot'
 import Sm8Week from './Sm8Week'
 import { AttendanceSheet } from './Pictures'
@@ -553,7 +554,9 @@ export default function Console({ assistant = false }) {
               {/* "Are you still coming?" — the customer asked, or the window has
                   started and the card has not moved. Answer in one tap: set off,
                   or say how late. The estimate is yours, written with the time. */}
-              {(() => {
+              {['BOOKED', 'ON_MY_WAY'].includes(t.stage) && (() => {
+                // Gone once the van is there or the job is done: a late figure
+                // from this morning is not news on a Job done card.
                 const askOpen = t.askedAt && !t.askAnsweredAt
                 const start = t.windowStart || t.scheduledFor
                 const started = start && new Date(start) <= new Date() && t.stage === 'BOOKED'
@@ -588,7 +591,9 @@ export default function Console({ assistant = false }) {
 
               {/* Customer not home: the clock, what you tried, the door photo,
                   and the note the customer reads. Nothing charged from here. */}
-              <NoAccess tracker={t} onDone={load} />
+              <NoAccess tracker={t} onDone={load}>
+                <TheyRang tracker={t} />
+              </NoAccess>
 
               {/* Getting there. Shown while you are on your way, which is when
                   you need it; otherwise it waits under More. */}

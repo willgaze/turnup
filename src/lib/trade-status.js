@@ -22,6 +22,7 @@
 // scripts/check-public-shape.mjs, which has no bundler to resolve the '@'
 // alias — and that check running without a build step is the point of it.
 import { publicWindow } from './window.js'
+import { noteAfterStage } from './late-note.js'
 
 export const STAGES = {
   BOOKED: {
@@ -114,7 +115,9 @@ export function publicShape(row) {
   return {
     code: row.code,
     stage: isValidStage(row.stage) ? row.stage : 'BOOKED',
-    stageNote: row.stageNote || null,
+    // A late note left from before the van arrived is not shown once it has:
+    // covers rows written before the stage change started clearing it.
+    stageNote: (noteAfterStage(row.stageNote, row.stage) === null ? null : row.stageNote) || null,
     customerName: row.customerName || null,
     jobRef: row.jobRef || null,
     jobAddress: row.jobAddress || null,
