@@ -2,11 +2,20 @@
 
 **2026-10-27** · background `#f2f9f9` · accent `#1f6f72`
 
-- A Job done card stops saying the trade is running late. "Running about 30 minutes late" was written into the card’s note and nothing ever took it out, so job #2742 still said it after Job done, on the page and on the Wallet card. The note now comes off the moment the van is there (On site, Paused or Job done), whether the tap was on the dashboard or a ServiceM8 check-in, and cards already in that state stop showing it without anyone touching them. Anything the trade typed stays.
-- The "are you still coming?" row and the late figure on the dashboard row now show only while the customer is still waiting: Booked in or On my way. On site, Paused or Job done, they are history. "When suits you?" was already hidden at Job done.
+- The pilot comes to you. Every Monday at eight, one notification to your phone with last week's four numbers beside the week before: jobs, links opened by a customer, will-someone-be-in answered, wasted trips, calls asking when you are coming, and the totals since the count started. A tap opens the panel. Numbers only, never a name. Send me this week's now, on the pilot panel, sends the same message today so you can see it before you trust it.
 
-Not captured this time: the household card (set DEMO_PLACE to a seeded place code); the wallet views and the dashboard (they need an operator session).
 
+### wallet-in-stack
+
+![wallet-in-stack](./wallet-in-stack.webp)
+
+### wallet-opened
+
+![wallet-opened](./wallet-opened.webp)
+
+### wallet-alone
+
+![wallet-alone](./wallet-alone.webp)
 
 ### customer-light
 
@@ -16,9 +25,13 @@ Not captured this time: the household card (set DEMO_PLACE to a seeded place cod
 
 ![customer-dark](./customer-dark.webp)
 
-### customer-booked
+### dashboard
 
-![customer-booked](./customer-booked.webp)
+![dashboard](./dashboard.webp)
+
+### dashboard-setup
+
+![dashboard-setup](./dashboard-setup.webp)
 
 ### login
 
@@ -43,3 +56,11 @@ Not captured this time: the household card (set DEMO_PLACE to a seeded place cod
 ### join
 
 ![join](./join.webp)
+
+### household
+
+![household](./household.webp)
+
+### household-dark
+
+![household-dark](./household-dark.webp)

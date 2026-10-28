@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.77.0'
-export const BUILD_DATE = '2026-10-27'
+export const VERSION = '1.78.0'
+export const BUILD_DATE = '2026-10-28'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 61
+export const THEME_INDEX = 62
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,9 +48,12 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
-  { version: '1.77.0', date: '2026-10-27', notes: [
+  { version: '1.78.0', date: '2026-10-28', notes: [
     'A Job done card stops saying the trade is running late. "Running about 30 minutes late" was written into the card\u2019s note and nothing ever took it out, so job #2742 still said it after Job done, on the page and on the Wallet card. The note now comes off the moment the van is there (On site, Paused or Job done), whether the tap was on the dashboard or a ServiceM8 check-in, and cards already in that state stop showing it without anyone touching them. Anything the trade typed stays.',
     'The "are you still coming?" row and the late figure on the dashboard row now show only while the customer is still waiting: Booked in or On my way. On site, Paused or Job done, they are history. "When suits you?" was already hidden at Job done.',
+  ] },
+  { version: '1.77.0', date: '2026-10-27', notes: [
+    'The pilot comes to you. Every Monday at eight, one notification to your phone with last week\'s four numbers beside the week before: jobs, links opened by a customer, will-someone-be-in answered, wasted trips, calls asking when you are coming, and the totals since the count started. A tap opens the panel. Numbers only, never a name. Send me this week\'s now, on the pilot panel, sends the same message today so you can see it before you trust it.',
   ] },
   { version: '1.76.0', date: '2026-10-26', notes: [
     'The pilot\u2019s fourth number works. "When are you coming?" calls \u2014 the number this whole product is a bet against \u2014 was a running total typed on a panel folded inside Setup and settings. It ignored the 30/90 day switch and the start date, carried no dates, and sat somewhere nobody goes between jobs. Six days into the pilot it still read nothing, and in thirty days it would have read 0 \u2014 which looks exactly like nobody ringing, the answer the product was hoping for.',
