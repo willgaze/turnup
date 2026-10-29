@@ -31,7 +31,10 @@ export default function StillComing({ status, onAsked }) {
   // started at 00:00" is a time nobody gave. publicWindow() already withholds
   // hours the customer proposed and the trade has not agreed.
   const start = status.window?.start || null
-  if (!start || status.stage === 'DONE') return null
+  // Only while someone is still waiting for the van. On site, Paused or Job
+  // done, a late figure or an open ask is history, and showing it reads as
+  // news: #2742 said "running about 30 minutes late" after Job done (21 Oct).
+  if (!start || !['BOOKED', 'ON_MY_WAY'].includes(status.stage)) return null
   const end = status.window?.end || null
   const startPassed = now >= new Date(start).getTime()
   const endPassed = end && now >= new Date(end).getTime()

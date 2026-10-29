@@ -554,7 +554,9 @@ export default function Console({ assistant = false }) {
               {/* "Are you still coming?" — the customer asked, or the window has
                   started and the card has not moved. Answer in one tap: set off,
                   or say how late. The estimate is yours, written with the time. */}
-              {(() => {
+              {['BOOKED', 'ON_MY_WAY'].includes(t.stage) && (() => {
+                // Gone once the van is there or the job is done: a late figure
+                // from this morning is not news on a Job done card.
                 const askOpen = t.askedAt && !t.askAnsweredAt
                 const start = t.windowStart || t.scheduledFor
                 const started = start && new Date(start) <= new Date() && t.stage === 'BOOKED'
