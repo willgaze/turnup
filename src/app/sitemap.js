@@ -3,7 +3,7 @@
  * never listed here; robots.js says the same thing from the other side.
  */
 const BASE = 'https://www.getturnup.com'
-const PAGES = ['/', '/for-trades', '/for-homes', '/next', '/join', '/with-servicem8', '/privacy']
+const PAGES = ['/', '/for-trades', '/for-homes', '/next', '/join', '/with-servicem8', '/privacy', '/processor', '/terms-for-trades']
 
 export default function sitemap() {
   return PAGES.map((path) => ({

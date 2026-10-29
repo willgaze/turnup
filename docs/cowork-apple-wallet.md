@@ -20,8 +20,16 @@ is the one that signs.
 
 **Replacing a key that has been exposed** is not this job run again: it is
 `bash scripts/apple-wallet.sh rotate` in `~/TurnUp-Apple`, then steps 3 to 7,
-then revoking the old certificate (the script prints where). `csr` refuses to
-run over an existing key since v1.73.1.
+then revoking the old certificate. `csr` refuses to run over an existing key
+since v1.73.1.
+
+**Where Revoke is (learned 21 Oct 2026).** Not on the Certificates list. Open
+https://developer.apple.com/account/resources/identifiers/list/passTypeId ,
+then `pass.com.getturnup.job`: its certificates are listed on that page and
+Revoke sits beside each. Revoke the one with the EARLIER expiry, never the one
+named "TurnUp NEW 20261021". If the button is greyed out, it is Apple's side:
+https://developer.apple.com/contact/ (Membership and Account, Certificates).
+Revoking is Will's to do, signed in with his Apple ID; a session cannot.
 
 ---
 
@@ -73,7 +81,23 @@ the private key in it is the only one the certificate works with.
    certificate good until <a date>". Write that date down for step 7.
    If it says "This certificate was not made from", STOP and tell me.
 
-5. Put the six settings into Vercel.
+5. Put the six settings into Vercel, with the script.
+   Since v1.73.1 the script does this and CANNOT upload the folder (every
+   vercel command it runs is from an empty temporary folder, and deploy and
+   --prod are refused; scripts/check-wallet-script.sh proves it). First get the
+   current script, then run it:
+
+     cd ~/TurnUp-Apple
+     curl -fsSL https://raw.githubusercontent.com/willgaze/turnup/main/scripts/apple-wallet.sh -o scripts/apple-wallet.sh
+     bash scripts/apple-wallet.sh vercel
+
+   If it says "Vercel CLI is not signed in", run `vercel login` and run it
+   again. If it ends with "Done. Prove it:", it has also redeployed and
+   promoted the live build: skip step 6 and go to step 7.
+   NEVER type `vercel`, `vercel deploy` or `vercel --prod` yourself in
+   ~/TurnUp-Apple. That is exactly how the key leaked on 21 Oct 2026.
+
+   Only if the script says to paste them by hand:
    The file ~/TurnUp-Apple/apple/turnup.env has six lines, each KEY=value.
    Four of the values are very long single lines; that is correct.
    Open https://vercel.com/willgazes-projects/turnup/settings/environment-variables
@@ -92,7 +116,7 @@ the private key in it is the only one the certificate works with.
      PASSKIT_PASS_TYPE_ID
      PASSKIT_TEAM_ID
 
-6. Redeploy.
+6. Redeploy (only if the script in step 5 did not).
    Open https://vercel.com/willgazes-projects/turnup/deployments
    On the top Production deployment press the three dots, then Redeploy,
    then Redeploy again in the box. Wait for it to say Ready (about two
@@ -133,13 +157,12 @@ Rules:
 
 ## After it is in a wallet
 
-- `src/app/preview/posters/Posters.jsx` carries the badge "Built · awaiting
-  Apple" on the wallet frame; change it the day the first real card is in a
-  wallet.
-- The roadmap item `wallet-pass` in `src/lib/roadmap.js` moves to `live`, and
-  the plan's STATUS row goes green, in the same push.
-- The pass does not yet update itself: that is the PassKit web service
-  (`/api/passes/v1/...`) and an APNs push, the next build after this.
+- Done (v1.74.5): the wallet badges, the roadmap item `wallet-pass` and the
+  plan's STATUS row all say the card is in Apple Wallet.
+- The pass updates itself: the PassKit web service (`/api/passes/v1/...`)
+  and the APNs push shipped in v1.74.0 and were seen working on a real phone
+  on 25 Oct 2026. A card added before v1.74.3 has the wrong service address
+  sealed in it and must be removed from Wallet and added again.
 - The lock-screen app is the other thing the membership unlocks; its own
   Cowork job (App ID, App Group, distribution certificate, App Store Connect
   key, GitHub secrets) is still to be written. See `native/README.md`.

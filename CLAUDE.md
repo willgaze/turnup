@@ -34,7 +34,7 @@ are written down:
 4. **Link to the panel, not the page.** `/dashboard?open=<panel>` opens Setup
    and settings at that panel (v1.65.2): `doors` (Household cards), `servicem8`,
    `profile` (Who to expect), `inbound` (Turn on forwarding), `sources` (Where the card hears from), `googlewallet` (The card on Android), `terms`, `nudges`, `push`, `passkeys`, `pilot`,
-   `waitlist`, `roadmap`. A household's own card link is private and lives in
+   `waitlist`, `roadmap`, `data` (Your data: download, delete). A household's own card link is private and lives in
    two places only: the phone that made it on `/join`, and
    `/dashboard?open=doors`, where each card shows its link and its forwarding
    address.
@@ -683,7 +683,7 @@ is **no monitored support mailbox**. The third, a privacy policy page, is done
 (v1.61.0): `/privacy` is live and linked from the homepage footer, because the
 listing field takes a URL and a document in `docs/` is not one.
 
-**`src/app/privacy/page.js` is a claim about the code, and the code wins.** It
+**`src/app/privacy/page.js` is a claim about the code, and the code wins** (and since v1.78.0 so are `/processor` and `/terms-for-trades`; see *The paperwork* below). It
 says what is held, who can read it and the one rule the public shape obeys. A
 change that widens what `publicShape()` returns, what a notification carries or
 what a third party is sent is a change to that page as well; if the page and
@@ -1045,7 +1045,13 @@ nobody On site); pressing it sets `askedAt` and pushes every `TradeDevice`
 answers from the card: a stage change, or **15 / 30 / 60 min late**, which
 writes `lateMinutes`/`lateAt`, a note with the time, and pushes the customer.
 Unasked nudges go to the trade at window start (`nudgeLevel` 1) and window
-end (2); an unanswered ask repeats every ten minutes. `nudgeIfDue` runs on
+end (2). An unanswered ask is reminded every ten minutes, **three buzzes at
+most, none between 21:00 and 07:00 in the trade's zone (one summary at 07:00
+if it was left open overnight), and never after the end of the job's day**;
+**Stop reminders** on the card answers it without moving the stage. All three
+locks are `src/lib/ask-reminder.js`, pure, proved by
+`node scripts/check-nudge-ask.mjs`. Before them an ask made at 15:34 on
+18 Oct 2026 buzzed the owner's phone through the night. `nudgeIfDue` runs on
 the customer's 30-second poll, after every ServiceM8 sync, and from
 `GET /api/cron/nudge`, which **Vercel Cron calls every five minutes**
 (`vercel.json`), with `.github/workflows/nudge.yml` as a half-hourly backup.
@@ -1851,6 +1857,29 @@ strips comments and quoted strings first, because the script contains a
 *warning* with the words `vercel --prod` in it and a check that cannot tell a
 warning from a command gets ignored.
 
+**No key ever ships (go-to-market stop 1, restored in v1.78.0).** The script
+fix is one lock; the second looks at what would be *served*.
+`node scripts/check-no-secrets.mjs` fails, naming the file and never the
+value, on a key-shaped path (`apple/`, `*.key`, `*.p12`, `*.cer`, `*.csr`,
+`*.pem`, `turnup.env`, `key.password`, any `.env` but `.env.example`) or a
+key-shaped body (a PEM private key with a real body, an Anthropic, GitHub,
+AWS or Stripe live key, a Postgres URL with a real password). With no
+argument it reads the tracked files; with `.next` it reads the build output,
+and **`npm run build` ends with that, so a Vercel build that would serve a
+key fails and does not deploy** (the last good deploy stays live).
+`.vercelignore` drops the same names from any upload.
+`.github/workflows/checks.yml` runs it, the wallet-script check, every pure
+check, `check-current` and the build on every push to `main` and `plan` and
+every PR. Its own test fixtures are assembled at runtime, so no scanner (GitGuardian flagged
+the first version on PR #45) ever sees a credential-shaped string in the repo.
+The sweep that found the repo, its history, every deployment from 13 to 25 Oct
+and the live site clean is `docs/launch/security-sweep-2026-10-25.md`; what a
+second trade would still hit is `docs/launch/known-issues.md`. **PR #45, which
+first carried all this, was closed unmerged on 26 Oct 2026**; v1.78.0 brought
+the safety half back and left the late-notice half to PR #50, which redid it.
+The old certificate is still to be revoked, on the **Pass Type ID page**
+(Revoke is there, not on the Certificates list), by the owner.
+
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key. None exists. Until it does, Android gets the link.
   The owner's half is a Cowork paste, `docs/cowork-google-wallet.md`, checked
@@ -1898,6 +1927,54 @@ wallet story (`WalletStory`), the poster strips (`byGroup('either')` and
 and the homepage shows four customer rows and two trade buttons, not eight and
 six: the whole day is `/for-trades`. Before adding a section to the homepage,
 ask which of these three pages it belongs on; the answer is rarely the homepage.
+
+## The paperwork, and data that goes on its own (v1.78.0, stop 4)
+
+Three pages a beta trade reads before they start, in one frame
+(`src/components/Legal.jsx`): **`/terms-for-trades`** (what TurnUp does and
+never does, free in beta, either side stops), **`/processor`** (the trade is
+controller, TurnUp processor; one section per item on the ICO's Article 28
+list) and **`/privacy`**. All three are claims about the code, the same rule as
+`/privacy` always was: if a sentence and the code disagree, the page is the
+defect. Three things are **not typed on any of them** and must stay that way:
+
+| What | Lives in | Checked by |
+|---|---|---|
+| How long things are kept | `RETENTION_WORDS` and the numbers in `src/lib/retention.js` | `node scripts/check-retention.mjs` (fails if a page types "12 months" or "90 days" itself) |
+| Who else touches the data, where, and the safeguard | `src/lib/processors.js` | read it; every line names its source |
+| What a download holds and a delete removes | `src/lib/your-data.js` | `node scripts/check-your-data.mjs` |
+
+**Retention is a pure rule and a daily cron.** A job goes `JOB_KEEP_MONTHS`
+(12) after its **latest** Done event; a job not Done today is never due,
+however old, because guessing that an unfinished job is abandoned deletes
+somebody's live booking. A household row goes `ARRIVAL_KEEP_DAYS` (90) after
+it arrived. `/api/cron/retention` runs `sweepRetention()` at 03:17 UTC
+(`vercel.json`); it narrows with a query and **decides with the pure rule**.
+Open by default like the nudge sweep, for the same reason: it can only delete
+what is already due.
+
+**One eraser** (`eraseJobs()` in `src/lib/retention-sweep.js`) serves the
+sweep, **Delete for good** on one job (`DELETE /api/dashboard/trackers/<id>?erase=1`,
+only once the link is off, two taps) and **Delete account**. It switches the
+link off before it deletes anything, and it **keeps `PassDevice` rows**: a
+registration for a job that no longer exists is how the phone is told the card
+is dead (`serialsChangedSince()` reports it changed, the pass answers 401,
+Wallet removes it). The sweep drops those rows `ORPHAN_PASS_DAYS` (30) later.
+Google has no 401 equivalent, so `expireGoogleCard()` sets the object EXPIRED.
+
+**Your data** (`src/app/dashboard/YourData.jsx`, `/api/dashboard/data`): GET is
+the JSON download, POST is the delete. Until stop 5 an install serves one trade,
+so "the account" is that trade's data in it; the sign-in, household cards and
+the waiting list stay, and the panel says so. The delete needs the business name
+(`TRADE_NAME`) typed, **checked again on the server**. The download selects
+field by field: a new secret column does not reach it unless someone adds it,
+and the check fails if `cipher`, `inboxKey`, a push key or a passkey's public
+key ever appears in the export's code.
+
+**Not sourced, so not claimed:** Neon's region. `NEON_REGION` in
+`src/lib/processors.js` is null and both pages say the region is being
+confirmed; set it from the Neon console and they follow. Vercel's region
+(iad1, Washington DC) was read from the production deployment on 26 Oct 2026.
 
 ## Every build updates the words (Standing Rule 24, Will, 12 Oct 2026)
 

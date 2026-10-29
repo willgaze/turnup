@@ -126,9 +126,11 @@ MSG
 This was a rotation. Once 'finish' and the six settings are done and a job's
 pass link answers 200, revoke the OLD certificate (and only the old one):
 
-  https://developer.apple.com/account/resources/certificates/list
-  Open the Pass Type ID certificate for $PASS_ID with the EARLIER expiry
-  date, Revoke. The new one has the later date.
+  https://developer.apple.com/account/resources/identifiers/list/passTypeId
+  Open $PASS_ID. Its certificates are listed on that page (Revoke is
+  there, not on the Certificates list). Revoke the one with the EARLIER
+  expiry date; the new one has the later date. If Revoke is greyed out,
+  ask Apple Developer Support: https://developer.apple.com/contact/
 
 MSG
     fi

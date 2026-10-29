@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { TRADE_NAME } from '@/lib/trade'
 import { HouseIcon } from '@/components/icons'
+import { timeOnly } from '@/lib/when'
 
 /**
  * "Sorry we missed you." The facts of the visit — at the door at 10:04,
@@ -11,7 +12,9 @@ import { HouseIcon } from '@/components/icons'
  * they agreed; and the photo stays with the trade — this page only says one
  * was taken.
  */
-const hhmm = (d) => new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+// Through when.js, never toLocaleString in a component: this page renders on
+// the server (UTC) and on the phone (UK), and they disagree for seven months.
+const hhmm = (d) => timeOnly(d)
 const first = TRADE_NAME.split(' ')[0]
 const WORDS = { KNOCKED: 'knocked', CALLED: 'called', TEXTED: 'texted' }
 

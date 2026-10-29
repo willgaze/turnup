@@ -13,6 +13,7 @@ import Terms from './Terms'
 import WalletShowcase from './WalletShowcase'
 import GoogleWallet from './GoogleWallet'
 import WaitlistPanel from './WaitlistPanel'
+import YourData from './YourData'
 import Roadmap from './Roadmap'
 import ServiceM8 from './ServiceM8'
 import Nudges from './Nudges'
@@ -222,6 +223,20 @@ export default function Console({ assistant = false }) {
       await load()
     } catch {
       setError({ title: 'Could not switch that link off', fix: 'Check your connection and try again.' })
+    }
+  }
+
+  // Delete for good: first tap arms, second tap erases. Disarms itself.
+  const [eraseArm, setEraseArm] = useState(null)
+  const erase = async (id) => {
+    if (eraseArm !== id) { setEraseArm(id); setTimeout(() => setEraseArm((a) => (a === id ? null : a)), 5000); return }
+    setEraseArm(null)
+    try {
+      const r = await fetch(`/api/dashboard/trackers/${id}?erase=1`, { method: 'DELETE' })
+      if (!r.ok) return setError(await failure(r, 'Could not delete that job'))
+      await load()
+    } catch {
+      setError({ title: 'Could not delete that job', fix: 'Check your connection and try again.' })
     }
   }
 
@@ -788,10 +803,19 @@ export default function Console({ assistant = false }) {
                   /* A link switched off by mistake used to be dead: the only way back
                      was a new job. Same place, same size; the API took
                      { isActive: true } all along, only the button was missing. */
-                  <button type="button" onClick={() => patch(t.id, { isActive: true })}
-                          className="btn accent-fill !min-h-[44px] !px-4 !text-[14px]">
-                    Switch link back on
-                  </button>
+                  <>
+                    <button type="button" onClick={() => patch(t.id, { isActive: true })}
+                            className="btn accent-fill !min-h-[44px] !px-4 !text-[14px]">
+                      Switch link back on
+                    </button>
+                    {/* Erasing is two taps on a link already off: how a customer's
+                        "delete what you hold on me" is met. Same eraser as
+                        retention and Delete account (src/lib/retention-sweep.js). */}
+                    <button type="button" onClick={() => erase(t.id)}
+                            className="btn btn-danger !min-h-[44px] !px-4 !text-[14px]">
+                      {eraseArm === t.id ? 'Tap again: delete for good' : 'Delete for good'}
+                    </button>
+                  </>
                 )}
                 <span className="text-[14px] muted">{t.viewCount || 0} view{t.viewCount === 1 ? '' : 's'}</span>
               </div>
@@ -833,7 +857,7 @@ export default function Console({ assistant = false }) {
         <span className="min-w-0">
           <span className="block text-[16px] font-semibold leading-tight">Setup and settings</span>
           <span className="mt-px block truncate text-[13px]" style={{ color: 'var(--label-2)' }}>
-            Who to expect, Booking terms, Nudge me, notifications, household cards, ServiceM8, Face ID, the wallet card, the attendance record, the pilot numbers, what is next
+            Who to expect, Booking terms, Nudge me, notifications, household cards, ServiceM8, Face ID, the wallet card, the attendance record, the pilot numbers, your data, what is next
           </span>
         </span>
         <ChevronIcon size={18} style={{ color: 'var(--label-3)' }}
@@ -865,6 +889,7 @@ export default function Console({ assistant = false }) {
           <p className="mt-2 text-[12px] muted">Names, addresses and the job go in it. Nothing the customer told you does, nor the link.</p>
         </section>
         <div id="panel-pilot" className="scroll-mt-4"><Pilot /></div>
+        <div id="panel-data" className="scroll-mt-4"><YourData /></div>
         <div id="panel-waitlist" className="scroll-mt-4"><WaitlistPanel /></div>
         <div id="panel-roadmap" className="scroll-mt-4"><Roadmap /></div>
         <div id="panel-changelog" className="scroll-mt-4"><Changelog /></div>

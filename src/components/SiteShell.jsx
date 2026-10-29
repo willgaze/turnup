@@ -41,7 +41,7 @@ export function SiteFooter({ id }) {
     <footer className="mt-12 text-center">
       <Mark className="mx-auto h-6 w-auto opacity-60" id={id} />
       <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--label-3)' }}>
-        TurnUp · <Link href="/for-trades" className="underline">For trades</Link> · <Link href="/for-homes" className="underline">For homes</Link> · <Link href="/with-servicem8" className="underline">With ServiceM8</Link> · <Link href="/privacy" className="underline">Privacy</Link> · <Link href="/dashboard" className="underline">Sign in</Link>
+        TurnUp · <Link href="/for-trades" className="underline">For trades</Link> · <Link href="/for-homes" className="underline">For homes</Link> · <Link href="/with-servicem8" className="underline">With ServiceM8</Link> · <Link href="/privacy" className="underline">Privacy</Link> · <Link href="/terms-for-trades" className="underline">Trade terms</Link> · <Link href="/dashboard" className="underline">Sign in</Link>
       </p>
     </footer>
   )
