@@ -42,6 +42,10 @@ jobs:
     defaults:
       run:
         working-directory: native
+    env:
+      # Not a secret: it is printed in every signed Wallet pass. Capacitor's
+      # project names no team, and automatic signing with none fails at once.
+      TEAM_ID: WTS45T2YD3
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -60,7 +64,9 @@ jobs:
           echo "$IOS_CERT_P12" | base64 --decode > cert.p12
           security create-keychain -p ci build.keychain
           security default-keychain -s build.keychain
+          security list-keychains -d user -s build.keychain login.keychain
           security unlock-keychain -p ci build.keychain
+          security set-keychain-settings -lut 7200 build.keychain
           security import cert.p12 -k build.keychain -P "$IOS_CERT_PASSWORD" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k ci build.keychain
           mkdir -p ~/.appstoreconnect/private_keys
@@ -69,18 +75,20 @@ jobs:
         run: |
           xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Release \
             -archivePath build/App.xcarchive -allowProvisioningUpdates \
-            CURRENT_PROJECT_VERSION=${{ github.run_number }} \
+            CURRENT_PROJECT_VERSION=${{ github.run_number }} DEVELOPMENT_TEAM=$TEAM_ID CODE_SIGN_STYLE=Automatic \
             -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_${{ secrets.ASC_KEY_ID }}.p8 \
             -authenticationKeyID ${{ secrets.ASC_KEY_ID }} -authenticationKeyIssuerID ${{ secrets.ASC_ISSUER_ID }} \
             archive
       - name: Export and upload
         run: |
-          cat > export.plist <<'PLIST'
+          cat > export.plist <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0"><dict>
             <key>method</key><string>app-store-connect</string>
             <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
           </dict></plist>
           PLIST
           xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/out \

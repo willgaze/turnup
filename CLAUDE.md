@@ -1053,6 +1053,17 @@ Before any schedule nothing called it, so a window could pass unnoticed
 whenever no customer happened to have their page open — which is the case a
 trade cannot rely on.
 
+**Late is about getting to the door, and stops at it (v1.78.0).** The late
+note was written into `stageNote` and a stage change never took it out, so
+job #2742 said "Running about 30 minutes late" at Job done, on the page and on
+the Wallet card. `src/lib/late-note.js` owns the wording (`lateNote()`) and
+the rule (`noteAfterStage()`): on the way to On site, Paused or Job done, the
+note `runningLate()` wrote is cleared by the stage button and by a ServiceM8
+check-in, and `publicShape()` hides one already sitting on a row past the
+door. Words the trade typed are never touched. The **Are you still coming?**
+row and the dashboard's late figure show only at Booked in or On my way.
+`node scripts/check-late-note.mjs` proves all of it.
+
 **It ran on GitHub Actions until v1.56.0, and GitHub ran it every four hours.**
 The workflow asked for every five minutes; GitHub's scheduler is best effort
 and dropped almost every run (37 runs in total; on 17 Oct at 00:57, 05:29,
@@ -1579,7 +1590,8 @@ the app; `Console.jsx` calls `syncActivity(rows)` on every load.
 Xcode project Capacitor generates has no widget target, so `add-widget.rb`
 (the `xcodeproj` gem) adds it, idempotently, and `.github/workflows/ios.yml`
 runs it on a macOS runner and uploads to TestFlight once the repository
-variable `IOS_SIGNING_READY` and the secrets in `native/README.md` exist. The
+variable `IOS_SIGNING_READY` and the secrets in `native/README.md` exist
+(`docs/cowork-ios-signing.md` is the owner's half, as a Cowork paste). The
 lock screen rule for pushes does not apply here: it is the trade's own phone
 and their own job.
 
