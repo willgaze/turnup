@@ -30,6 +30,12 @@ Set up signing for the TurnUp iPhone app, on this Mac, in one go.
 Everything lands in the folder ~/TurnUp-iOS. Do not delete it afterwards:
 the private key in it is the only one the certificate works with.
 
+0a. Check the build is on main.
+   Open https://github.com/willgaze/turnup/blob/main/docs/cowork-ios-signing.md
+   If GitHub says "404" or "file not found", STOP and tell me: pull
+   request #46 has to be merged first, or step 11 runs an old build that
+   names no Apple team and fails.
+
 0. Check the tools.
    Open Terminal and run:
 
