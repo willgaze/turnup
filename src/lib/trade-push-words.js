@@ -27,6 +27,8 @@
  * leaks, and that no call site anywhere has gone back to building its own.
  */
 
+import { summaryBody } from './pilot-summary.js'
+
 /** The vocabulary. Adding one is a privacy decision, not a copy one. */
 export const TRADE_LINES = {
   /* The window, and the trade's own silence --------------------------- */
@@ -106,6 +108,16 @@ export const TRADE_LINES = {
   feedbackLeft: () => ({
     title: 'A customer left a note after the job',
     body: 'It is on their card and on your dashboard. Nobody else can read it.',
+  }),
+
+  /* The pilot, once a week. The body is counts and fixed words from
+     src/lib/pilot-summary.js: no customer is in it anywhere. ------------- */
+
+  pilotWeek: (week, prior, since) => ({
+    title: 'Your pilot, this week',
+    // Built here from counts (src/lib/pilot-summary.js), never handed a
+    // string: there is no argument a name could travel in.
+    body: summaryBody(week, prior, since),
   }),
 
   /* The customer is the late one ---------------------------------------- */

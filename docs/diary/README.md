@@ -20,7 +20,8 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
-| [v1.77.0](./v1.77.0/) | 2026-10-26 | Teal — the paperwork a beta trade signs: trade terms, processing terms, Your data (download, delete), retention on a daily sweep |
+| [v1.78.0](./v1.78.0/) | 2026-10-29 | Plum — the paperwork a beta trade signs: trade terms, processing terms, Your data (download, delete), retention on a daily sweep; the Stop 1 key-leak check and CI back in |
+| [v1.77.0](./v1.77.0/) | 2026-10-27 | Teal — the pilot comes to you: Monday 08:00, the four numbers on your phone |
 | [v1.76.0](./v1.76.0/) | 2026-10-26 | Indigo — the pilot's fourth number works: a call is one tap on the job, and the panel can finally ask whether the people who read the card rang less |
 | [v1.75.0](./v1.75.0/) | 2026-10-26 | Clay — the same card on Android: Save to Google Wallet, and it moves on a stage tap |
 | [v1.74.0](./v1.74.0/) | 2026-10-24 | Slate — the wallet card can update itself: the service Wallet calls, built and tested end to end (v1.74.5, 25 Oct: the words say the card is in Apple Wallet; no screen changed but a badge) |

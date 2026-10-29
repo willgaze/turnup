@@ -4,11 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && prisma db push --skip-generate --accept-data-loss=false || true; next build",
+    "build": "prisma generate && prisma db push --skip-generate --accept-data-loss=false || true; next build && node scripts/check-no-secrets.mjs .next",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
-    "check:current": "node scripts/check-current.mjs"
+    "check:current": "node scripts/check-current.mjs",
+    "check:secrets": "node scripts/check-no-secrets.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

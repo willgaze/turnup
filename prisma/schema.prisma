@@ -281,6 +281,8 @@ model TradeProfile {
   pilotStart   DateTime?
   pilotCalls   Int?
   pilotCallsAt DateTime?
+  // When the Monday summary last went to the trade's phone (src/lib/pilot-weekly.js).
+  pilotSummaryAt DateTime?
 
   updatedAt DateTime @updatedAt
 }

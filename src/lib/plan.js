@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '26 Oct 2026',
+  updated: '29 Oct 2026',
 }
 
 export const STAGES = [
@@ -86,7 +86,7 @@ export const STATUS = [
   { item: 'Pilot: thirty days, four numbers', state: 'amber', note: 'started 20 Oct 2026, ends 19 Nov; the app counts links opened, in? answered and wasted trips, and from 26 Oct a call is one tap on the job \u2014 which also splits the result by whether that customer had opened their link' },
   { item: 'Van lookup (DVSA MOT API)', state: 'green', note: 'live 18 Oct 2026: the plate fills in make, model and colour' },
   { item: 'Privacy policy', state: 'green', note: 'a public page, getturnup.com/privacy, since 17 Oct 2026; retention, delete and export added 26 Oct' },
-  { item: 'Paperwork a beta trade signs', state: 'green', note: 'trade terms (/terms-for-trades) and data processing terms (/processor), 26 Oct 2026 (v1.77.0); Your data on the dashboard: download everything, delete the account; finished jobs deleted after twelve months by a daily sweep' },
+  { item: 'Paperwork a beta trade signs', state: 'green', note: 'trade terms (/terms-for-trades) and data processing terms (/processor), 26 Oct 2026 (v1.78.0); Your data on the dashboard: download everything, delete the account; finished jobs deleted after twelve months by a daily sweep' },
   { item: 'ServiceM8 Add-on Store', state: 'amber', note: 'listing written 17 Oct 2026; public release needs an account per trade and a support mailbox' },
   { item: 'Lock-screen app (iOS)', state: 'amber', note: 'the job as a Live Activity, written 15 Oct 2026; the Apple enrolment is live since 21 Oct, the signing job for the app is next' },
   { item: 'Apple Wallet card', state: 'green', note: 'a real card in a real wallet, moving itself: seen on 25 Oct 2026, registered and showing the new stage three seconds after it was added' },

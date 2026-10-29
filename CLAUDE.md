@@ -683,7 +683,7 @@ is **no monitored support mailbox**. The third, a privacy policy page, is done
 (v1.61.0): `/privacy` is live and linked from the homepage footer, because the
 listing field takes a URL and a document in `docs/` is not one.
 
-**`src/app/privacy/page.js` is a claim about the code, and the code wins** (and since v1.77.0 so are `/processor` and `/terms-for-trades`; see *The paperwork* below). It
+**`src/app/privacy/page.js` is a claim about the code, and the code wins** (and since v1.78.0 so are `/processor` and `/terms-for-trades`; see *The paperwork* below). It
 says what is held, who can read it and the one rule the public shape obeys. A
 change that widens what `publicShape()` returns, what a notification carries or
 what a third party is sent is a change to that page as well; if the page and
@@ -1045,7 +1045,13 @@ nobody On site); pressing it sets `askedAt` and pushes every `TradeDevice`
 answers from the card: a stage change, or **15 / 30 / 60 min late**, which
 writes `lateMinutes`/`lateAt`, a note with the time, and pushes the customer.
 Unasked nudges go to the trade at window start (`nudgeLevel` 1) and window
-end (2); an unanswered ask repeats every ten minutes. `nudgeIfDue` runs on
+end (2). An unanswered ask is reminded every ten minutes, **three buzzes at
+most, none between 21:00 and 07:00 in the trade's zone (one summary at 07:00
+if it was left open overnight), and never after the end of the job's day**;
+**Stop reminders** on the card answers it without moving the stage. All three
+locks are `src/lib/ask-reminder.js`, pure, proved by
+`node scripts/check-nudge-ask.mjs`. Before them an ask made at 15:34 on
+18 Oct 2026 buzzed the owner's phone through the night. `nudgeIfDue` runs on
 the customer's 30-second poll, after every ServiceM8 sync, and from
 `GET /api/cron/nudge`, which **Vercel Cron calls every five minutes**
 (`vercel.json`), with `.github/workflows/nudge.yml` as a half-hourly backup.
@@ -1245,6 +1251,23 @@ on 19 Oct 2026 (a Booked-in card, agreed window starting 40 seconds after the
 page opened) and gone after the fix. The check reads every component's
 top-level lines and fails a `useX(` that follows a top-level return; it
 carries a self-test with the original bug. Run it before every push.
+
+## The pilot, once a week, on the trade's phone (`src/lib/pilot-summary.js`)
+
+v1.77.0. The four numbers used to wait on a panel; now they arrive. Every
+Monday at 08:00 in the trade's zone (`summaryDue()`, `SUMMARY_HOUR`), the
+sweep sends one push to the trade's registered phones: last week's four
+beside the week before, and the totals since the Start date, built by
+`summaryBody()` from counts alone and sent through `TRADE_LINES.pilotWeek()`,
+so the trade-push rule holds by construction (no customer anywhere in it).
+Claimed atomically on `TradeProfile.pilotSummaryAt` before sending, so two
+sweeps cannot both send; not claimed while no phone is registered, so the
+first Monday after a phone appears still gets it. **Send me this week's now**
+on the pilot panel (`POST /api/dashboard/pilot {action:'summary'}`) sends the
+same message today and does not move the Monday clock. The week before the
+Start date is not a comparison; the first summary has no "was".
+`node scripts/check-pilot-summary.mjs` (16 cases, BST and GMT, the clock
+change weekend included).
 
 ## Job done? On my way to the next one, offered (`src/lib/next-job.js`)
 
@@ -1834,6 +1857,29 @@ strips comments and quoted strings first, because the script contains a
 *warning* with the words `vercel --prod` in it and a check that cannot tell a
 warning from a command gets ignored.
 
+**No key ever ships (go-to-market stop 1, restored in v1.78.0).** The script
+fix is one lock; the second looks at what would be *served*.
+`node scripts/check-no-secrets.mjs` fails, naming the file and never the
+value, on a key-shaped path (`apple/`, `*.key`, `*.p12`, `*.cer`, `*.csr`,
+`*.pem`, `turnup.env`, `key.password`, any `.env` but `.env.example`) or a
+key-shaped body (a PEM private key with a real body, an Anthropic, GitHub,
+AWS or Stripe live key, a Postgres URL with a real password). With no
+argument it reads the tracked files; with `.next` it reads the build output,
+and **`npm run build` ends with that, so a Vercel build that would serve a
+key fails and does not deploy** (the last good deploy stays live).
+`.vercelignore` drops the same names from any upload.
+`.github/workflows/checks.yml` runs it, the wallet-script check, every pure
+check, `check-current` and the build on every push to `main` and `plan` and
+every PR. Its own test fixtures are assembled at runtime, so no scanner (GitGuardian flagged
+the first version on PR #45) ever sees a credential-shaped string in the repo.
+The sweep that found the repo, its history, every deployment from 13 to 25 Oct
+and the live site clean is `docs/launch/security-sweep-2026-10-25.md`; what a
+second trade would still hit is `docs/launch/known-issues.md`. **PR #45, which
+first carried all this, was closed unmerged on 26 Oct 2026**; v1.78.0 brought
+the safety half back and left the late-notice half to PR #50, which redid it.
+The old certificate is still to be revoked, on the **Pass Type ID page**
+(Revoke is there, not on the Certificates list), by the owner.
+
 - **Google Wallet** — a Google Cloud project, a Wallet API issuer account, and
   a service account key. None exists. Until it does, Android gets the link.
   The owner's half is a Cowork paste, `docs/cowork-google-wallet.md`, checked
@@ -1882,7 +1928,7 @@ and the homepage shows four customer rows and two trade buttons, not eight and
 six: the whole day is `/for-trades`. Before adding a section to the homepage,
 ask which of these three pages it belongs on; the answer is rarely the homepage.
 
-## The paperwork, and data that goes on its own (v1.77.0, stop 4)
+## The paperwork, and data that goes on its own (v1.78.0, stop 4)
 
 Three pages a beta trade reads before they start, in one frame
 (`src/components/Legal.jsx`): **`/terms-for-trades`** (what TurnUp does and
