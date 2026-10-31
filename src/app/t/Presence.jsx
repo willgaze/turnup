@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { PRESENCE, PRESENCE_ORDER, presenceOf, presenceIsFresh, presenceAgeLabel } from '@/lib/presence'
 import { PresenceIcon } from '@/components/icons'
 import { readOwn, writeOwn } from './own-answers'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * The customer answering the one question that costs a wasted visit.
@@ -14,6 +15,7 @@ import { readOwn, writeOwn } from './own-answers'
  * Thursday.
  */
 export default function Presence({ status, own, onSaved }) {
+  const statusFetch = useStatusFetch()
   const [saving, setSaving] = useState(null)
   const [note, setNote] = useState('')
   const [showNote, setShowNote] = useState(false)
@@ -30,7 +32,7 @@ export default function Presence({ status, own, onSaved }) {
   const send = async (presence, presenceNote = note) => {
     setSaving(presence)
     try {
-      const r = await fetch(`/api/status/${status.code}/notes`, {
+      const r = await statusFetch(`/api/status/${status.code}/notes`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         // Only the answer. The route leaves every field it is not sent

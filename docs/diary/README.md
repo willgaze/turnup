@@ -20,6 +20,7 @@ the one thing this exists for.
 
 | Version | Date | Theme |
 |---|---|---|
+| [v1.78.0](./v1.78.0/) | 2026-10-31 | Plum — the homepage shows the job going round: a silent film of the card, and the demo stays on the page |
 | [v1.77.0](./v1.77.0/) | 2026-10-27 | Teal — the pilot comes to you: Monday 08:00, the four numbers on your phone |
 | [v1.76.0](./v1.76.0/) | 2026-10-26 | Indigo — the pilot's fourth number works: a call is one tap on the job, and the panel can finally ask whether the people who read the card rang less |
 | [v1.75.0](./v1.75.0/) | 2026-10-26 | Clay — the same card on Android: Save to Google Wallet, and it moves on a stage tap |

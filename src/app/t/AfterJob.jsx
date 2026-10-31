@@ -1,18 +1,22 @@
 'use client'
 
 import { useState } from 'react'
-import { TRADE_NAME } from '@/lib/trade'
+import { useTrade } from '@/components/TradeProvider'
 import { TickIcon, MessageIcon } from '@/components/icons'
 import { timeOnly } from '@/lib/when'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * After Job done: how did it go? Two doors, both always open: a Google review,
  * or a note to the trade. Nobody is steered by how happy they seem; a
  * one-person firm's reviews are worth having only if they are real.
  */
-const first = TRADE_NAME.split(' ')[0]
 
 export default function AfterJob({ status, reviewUrl, onSaved }) {
+  // The trade the page says is coming, which on /demo is an invented one
+  // and must never fall back to the environment's name.
+  const first = useTrade().name.split(' ')[0]
+  const statusFetch = useStatusFetch()
   const [note, setNote] = useState('')
   const [writing, setWriting] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -20,7 +24,7 @@ export default function AfterJob({ status, reviewUrl, onSaved }) {
   const post = async (payload) => {
     setBusy(true)
     try {
-      const r = await fetch(`/api/status/${status.code}/review`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
+      const r = await statusFetch(`/api/status/${status.code}/review`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) })
       const d = await r.json().catch(() => ({}))
       if (r.ok) onSaved?.(d)
       return r.ok

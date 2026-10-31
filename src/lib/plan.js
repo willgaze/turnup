@@ -31,7 +31,7 @@ export const PLAN_META = {
   walletDocUrl: 'https://github.com/willgaze/turnup/blob/main/docs/apple-wallet.md',
   diaryUrl: 'https://github.com/willgaze/turnup/tree/main/docs/diary',
   liveSince: '8 Oct 2026',
-  updated: '27 Oct 2026',
+  updated: '31 Oct 2026',
 }
 
 export const STAGES = [
@@ -77,6 +77,7 @@ export const MOATS = [
 export const STATUS = [
   { item: 'Live at getturnup.com', state: 'green', note: 'since 8 Oct 2026' },
   { item: 'Customer card and dashboard', state: 'green', note: `version ${VERSION}` },
+  { item: 'Homepage: the card on film', state: 'green', note: 'since 31 Oct 2026: thirteen silent seconds of the demo going Booked in to Job done, beside the headline; the demo itself now answers its taps on the page' },
   { item: 'Nightly build', state: 'green', note: '02:00, one improvement a night; the words updated with it' },
   { item: 'Push to the lock screen', state: 'green', note: 'live 10 Oct 2026, a real buzz on a real phone' },
   { item: 'Household card', state: 'green', note: 'live 12 Oct 2026; fills from forwarded email since the letterbox came on, 18 Oct' },

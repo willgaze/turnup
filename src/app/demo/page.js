@@ -27,7 +27,7 @@ export default function DemoPage() {
     <>
       {/* Above the page rather than floating over it: anything overlapping the
           status card hides the one thing the visitor came to look at. */}
-      <div className="relative z-20 px-4 pt-safe">
+      <div className="relative z-20 px-4 pt-safe" data-demo-banner="">
         <div className="glass r-outer mx-auto mt-3 max-w-md p-4 text-center" style={{ '--tint': 'var(--mts-accent)' }}>
           <p className="text-[15px] font-semibold">This is an example</p>
           <p className="mt-1 text-[14px] leading-snug muted">

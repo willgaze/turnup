@@ -5,6 +5,7 @@ import { normaliseW3w, normaliseMapPin, w3wUrl } from '@/lib/places'
 import { readOwn, writeOwn } from './own-answers'
 import DropPin from '@/components/DropPin'
 import FindWords from '@/components/FindWords'
+import { useStatusFetch } from './status-fetch'
 
 const DOORS = [
   { key: 'FRONT', label: 'Front' },
@@ -24,6 +25,7 @@ const DOORS = [
  * People will type one in if you let them, and this is a link sent by text.
  */
 export default function AccessNotes({ status, onSaved }) {
+  const statusFetch = useStatusFetch()
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [door, setDoor] = useState(null)
@@ -51,7 +53,7 @@ export default function AccessNotes({ status, onSaved }) {
   const save = async () => {
     setSaving(true); setSaved(false)
     try {
-      const r = await fetch(`/api/status/${status.code}/notes`, {
+      const r = await statusFetch(`/api/status/${status.code}/notes`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ doorToUse: door, petsOnSite: pets, what3words: w3w, mapPin: pin, accessNotes: notes }),

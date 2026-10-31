@@ -7,6 +7,7 @@ import { windowHours } from '@/lib/window'
 import { dayOnly, timeOnly } from '@/lib/when'
 import { dayWord } from '@/lib/nudge-words'
 import { writeOwn } from './own-answers'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * The day before: "Tomorrow, between 10 and 12. Still fine?" and three
@@ -20,6 +21,7 @@ import { writeOwn } from './own-answers'
 const REPLIES = [['OK', 'Still fine'], ['SOMEONE_ELSE', 'Someone else will be in'], ['MOVE', 'Need to move it']]
 
 export default function Tomorrow({ status, onReplied }) {
+  const statusFetch = useStatusFetch()
   const first = useTrade().name.split(' ')[0]
   const [now, setNow] = useState(() => Date.now())
   const [busy, setBusy] = useState(false)
@@ -35,7 +37,7 @@ export default function Tomorrow({ status, onReplied }) {
   const reply = async (choice) => {
     setBusy(true)
     try {
-      const r = await fetch(`/api/status/${status.code}/reminder`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ choice }) })
+      const r = await statusFetch(`/api/status/${status.code}/reminder`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ choice }) })
       const d = await r.json().catch(() => ({}))
       if (r.ok) {
         // The presence answer this tap implied is remembered on this device,

@@ -1682,6 +1682,37 @@ Rules that must not drift:
   makes the link the durable copy. Do not put a fee in the SMS that the page
   does not also show.
 
+## The homepage shows the job going round (`src/components/HomeVideo.jsx`)
+
+v1.78.0. The phone beside the headline plays thirteen silent seconds of the
+customer's page moving Booked in, On my way, On site, Job done, filmed from
+`/demo` by `scripts/record-social.mjs` into `public/video/customer-card.*`
+(mp4, webm, and the first frame as the poster). A stranger gets the product
+from it before reading a word, which is the one job the top of that page has.
+**Changed /demo or the customer card? Run `npm run record:social` and commit
+the new video.** It films a local server only and refuses any other address;
+it blocks and counts every request that is not a GET, and fails if the count
+is not zero. The file holds no wallet card and nothing in it counts down.
+Loaded only when scrolled near, muted, inline, looping; a phone set to reduced
+motion gets the still. The first frame is a real `next/image` under the
+video, so the largest paint is an image as before and nothing shifts.
+
+**The demo stays on the page (v1.78.0).** Until then every tap on `/demo`
+posted to the real API under the fixture's code, where nothing was listening:
+dead buttons on the page people are sent to try, and a worked example sending
+traffic at production. Every component under `src/app/t/` now gets its
+`fetch` from `useStatusFetch()` in `src/app/t/status-fetch.js`; under
+`<DemoProvider>` (which `Preview` wraps itself in) that is `demoResponse()`
+from `src/lib/demo-answers.js`, pure, answering each route the way the server
+would with the browser's own clock, and the poll returns early. In demo only,
+`StatusTracker` exposes `window.__turnupDemo.setStage()` for the recorder.
+`node scripts/check-demo.mjs` fails any component that reaches for the global
+`fetch(` with a status URL, and any route folder the demo cannot answer. Two
+rows (`AfterJob`, `MissedYou`) still read `TRADE_NAME` from the environment
+and named the real business on the demo; the v1.72.1 rule applies to every
+row: **the trade comes from `useTrade()`, never from `TRADE_NAME`, in anything
+the customer's page draws.**
+
 ## The homepage shows parts of screens, not phones
 
 Since v1.35.0 the front page explains each thing the app does with a picture of
