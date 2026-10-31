@@ -5,6 +5,7 @@ import { windowHours, windowRevisionLine } from '@/lib/window'
 import { timeOnly } from '@/lib/when'
 import { ClockIcon, TickIcon } from '@/components/icons'
 import { readOwn, writeOwn } from './own-answers'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * The customer's half of agreeing a window.
@@ -28,6 +29,7 @@ const HOURS = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00',
   '13:00', '14:00', '15:00', '16:00', '17:00', '18:00']
 
 export default function Window({ status, onSaved }) {
+  const statusFetch = useStatusFetch()
   const win = status.window || {}
   const [busy, setBusy] = useState(null)
   const [error, setError] = useState(null)
@@ -49,7 +51,7 @@ export default function Window({ status, onSaved }) {
     setBusy(action)
     setError(null)
     try {
-      const r = await fetch(`/api/status/${status.code}/window`, {
+      const r = await statusFetch(`/api/status/${status.code}/window`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, ...payload }),

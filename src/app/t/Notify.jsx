@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { BellIcon, PlusIcon, ShareIcon } from '@/components/icons'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * "Tell me when they set off."
@@ -48,6 +49,7 @@ const VAPID = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
 export const PUSH_CONFIGURED = Boolean(VAPID)
 
 export default function Notify({ code }) {
+  const statusFetch = useStatusFetch()
   // 'checking' until the browser has been asked what it can do.
   const [state, setState] = useState('checking')
   const [busy, setBusy] = useState(false)
@@ -97,7 +99,7 @@ export default function Notify({ code }) {
         applicationServerKey: urlBase64ToUint8Array(VAPID),
       })
 
-      const r = await fetch(`/api/status/${code}/push`, {
+      const r = await statusFetch(`/api/status/${code}/push`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sub.toJSON()),
@@ -132,7 +134,7 @@ export default function Notify({ code }) {
       const reg = await navigator.serviceWorker.ready
       const sub = await reg.pushManager.getSubscription()
       if (sub) {
-        await fetch(`/api/status/${code}/push`, {
+        await statusFetch(`/api/status/${code}/push`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ endpoint: sub.endpoint }),

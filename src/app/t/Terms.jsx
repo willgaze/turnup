@@ -5,6 +5,7 @@ import { useTrade } from '@/components/TradeProvider'
 import { termsParagraphs } from '@/lib/terms'
 import { dayAndTime } from '@/lib/when'
 import { TickIcon } from '@/components/icons'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * Before the visit: three short paragraphs and one tap.
@@ -17,6 +18,7 @@ import { TickIcon } from '@/components/icons'
  */
 
 export default function Terms({ status, terms, onAgreed }) {
+  const statusFetch = useStatusFetch()
   const fallback = useTrade().name.split(' ')[0]
   const [busy, setBusy] = useState(false)
   const [failed, setFailed] = useState(false)
@@ -28,7 +30,7 @@ export default function Terms({ status, terms, onAgreed }) {
   const agree = async () => {
     setBusy(true); setFailed(false)
     try {
-      const r = await fetch(`/api/status/${status.code}/terms`, { method: 'POST' })
+      const r = await statusFetch(`/api/status/${status.code}/terms`, { method: 'POST' })
       const d = await r.json().catch(() => ({}))
       if (r.ok && d.termsAgreedAt) onAgreed?.({ termsAgreedAt: d.termsAgreedAt, termsAgreed: d.termsAgreed || null })
       else setFailed(true)

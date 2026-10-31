@@ -16,6 +16,7 @@ import Tomorrow from './Tomorrow'
 import CustomerLate from './CustomerLate'
 import AfterJob from './AfterJob'
 import { readOwn } from './own-answers'
+import { useIsDemo } from './status-fetch'
 import Disclosure from '@/components/Disclosure'
 import { presenceOf, presenceIsFresh, presenceAgeLabel } from '@/lib/presence'
 import Mark from '@/components/Mark'
@@ -34,6 +35,7 @@ import { StageIcon, PhoneIcon, PinIcon, KeyIcon, HouseIcon, WaveIcon, VanIcon, C
 
 export default function StatusTracker({ initialStatus, initialProfile, initialBrand, initialTerms = null, initialTradeSeenAt = null, initialReviewUrl = null, walletReady = false, googleReady = false }) {
   const trade = useTrade()
+  const demo = useIsDemo()
   const [status, setStatus] = useState(initialStatus)
   const [profile, setProfile] = useState(initialProfile || null)
   const [brand, setBrand] = useState(initialBrand || null)
@@ -62,6 +64,10 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
   useEffect(() => { setOwn(readOwn(initialStatus.code)) }, [initialStatus.code])
 
   const refresh = useCallback(async () => {
+    // The demo holds a fixture nothing serves: polling it would 404 every
+    // thirty seconds and print "not reaching the server" under a page that
+    // was never meant to reach one.
+    if (demo) return
     try {
       const r = await fetch(`/api/status/${initialStatus.code}`, { cache: 'no-store' })
       if (!r.ok) { setPollFailed(true); return }
@@ -77,7 +83,7 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
         return next
       })
     } catch { setPollFailed(true) /* said in the footer, not as an error */ }
-  }, [initialStatus.code])
+  }, [initialStatus.code, demo])
 
   useEffect(() => {
     const timer = setInterval(refresh, 30000)
@@ -90,6 +96,25 @@ export default function StatusTracker({ initialStatus, initialProfile, initialBr
       document.removeEventListener('visibilitychange', onFocus)
     }
   }, [refresh])
+
+  // The demo's one handle for the outside: scripts/record-social.mjs moves
+  // the fixture through its stages to film the card. Demo only, so a real
+  // tracking page exposes nothing, and it is words on this screen alone.
+  useEffect(() => {
+    if (!demo) return
+    const stamp = () => new Date().toISOString()
+    window.__turnupDemo = {
+      setStage: (stage, note = null, at = stamp()) => setStatus((s) => {
+        const next = { ...s, stage, stageNote: note, updatedAt: at, events: [...(s.events || []), { stage, note, at }] }
+        if (stage === 'ON_MY_WAY' && !s.arrivingAt) next.arrivingAt = at
+        if (stage === 'BOOKED') next.arrivingAt = null
+        if (stage !== s.stage) { setPulse(true); setTimeout(() => setPulse(false), 700) }
+        return next
+      }),
+      patch: (fields) => setStatus((s) => ({ ...s, ...fields })),
+    }
+    return () => { delete window.__turnupDemo }
+  }, [demo])
 
   const stage = stageOf(status.stage)
   const step = STAGE_ORDER.indexOf(stage.key)

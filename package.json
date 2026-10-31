@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
-    "check:current": "node scripts/check-current.mjs"
+    "check:current": "node scripts/check-current.mjs",
+    "record:social": "node scripts/record-social.mjs",
+    "check:demo": "node scripts/check-demo.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

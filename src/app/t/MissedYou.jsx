@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { TRADE_NAME } from '@/lib/trade'
+import { useTrade } from '@/components/TradeProvider'
 import { HouseIcon } from '@/components/icons'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * "Sorry we missed you." The facts of the visit — at the door at 10:04,
@@ -12,10 +13,13 @@ import { HouseIcon } from '@/components/icons'
  * was taken.
  */
 const hhmm = (d) => new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-const first = TRADE_NAME.split(' ')[0]
 const WORDS = { KNOCKED: 'knocked', CALLED: 'called', TEXTED: 'texted' }
 
 export default function MissedYou({ status, onReplied }) {
+  // The trade the page says is coming, which on /demo is an invented one
+  // and must never fall back to the environment's name.
+  const first = useTrade().name.split(' ')[0]
+  const statusFetch = useStatusFetch()
   const n = status.noAccess
   const [busy, setBusy] = useState(false)
   if (!n || status.stage !== 'PAUSED') return null
@@ -24,7 +28,7 @@ export default function MissedYou({ status, onReplied }) {
   const reply = async (choice) => {
     setBusy(true)
     try {
-      const r = await fetch(`/api/status/${status.code}/no-access`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ choice }) })
+      const r = await statusFetch(`/api/status/${status.code}/no-access`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ choice }) })
       const d = await r.json().catch(() => ({}))
       if (r.ok) onReplied?.({ noAccess: { ...n, reply: d.reply, replyAt: d.replyAt } })
     } finally { setBusy(false) }

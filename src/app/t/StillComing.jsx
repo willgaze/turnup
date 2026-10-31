@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { timeOnly } from '@/lib/when'
 import { useTrade } from '@/components/TradeProvider'
 import { BellIcon } from '@/components/icons'
+import { useStatusFetch } from './status-fetch'
 
 /**
  * "Are you still coming?"
@@ -17,6 +18,7 @@ import { BellIcon } from '@/components/icons'
  */
 
 export default function StillComing({ status, onAsked }) {
+  const statusFetch = useStatusFetch()
   const first = useTrade().name.split(' ')[0]
   const [now, setNow] = useState(() => Date.now())
   const [busy, setBusy] = useState(false)
@@ -46,7 +48,7 @@ export default function StillComing({ status, onAsked }) {
   const choose = async (choice) => {
     setChoosing(true)
     try {
-      const r = await fetch(`/api/status/${status.code}/missed`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ choice }) })
+      const r = await statusFetch(`/api/status/${status.code}/missed`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ choice }) })
       const d = await r.json().catch(() => ({}))
       if (r.ok) onAsked?.({ missedChoice: d.missedChoice, missedChoiceAt: d.missedChoiceAt })
     } finally { setChoosing(false) }
@@ -55,7 +57,7 @@ export default function StillComing({ status, onAsked }) {
   const askNow = async () => {
     setBusy(true)
     try {
-      const r = await fetch(`/api/status/${status.code}/ask`, { method: 'POST' })
+      const r = await statusFetch(`/api/status/${status.code}/ask`, { method: 'POST' })
       const d = await r.json().catch(() => ({}))
       if (r.ok) onAsked?.({ askedAt: d.askedAt, askAnsweredAt: null })
     } finally { setBusy(false) }

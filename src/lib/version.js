@@ -16,8 +16,8 @@
  *
  * Adding one is welcome. Inventing one at runtime is not.
  */
-export const VERSION = '1.77.0'
-export const BUILD_DATE = '2026-10-27'
+export const VERSION = '1.78.0'
+export const BUILD_DATE = '2026-10-31'
 
 export const THEMES = [
   { id: 'harbour',  name: 'Harbour',   bg: '#f4f7fb', bgDark: '#0b1119', accent: '#255a95', deep: '#122a46' },
@@ -39,7 +39,7 @@ export const THEMES = [
 // those are fixed in globals.css, because they mean something, and a meaning
 // that changes colour every night is not a meaning. See the stage tint block
 // in src/app/globals.css.
-export const THEME_INDEX = 61
+export const THEME_INDEX = 62
 
 export const theme = () => THEMES[THEME_INDEX % THEMES.length]
 
@@ -48,6 +48,11 @@ export const theme = () => THEMES[THEME_INDEX % THEMES.length]
  * by the person who asked for it, not by a release manager.
  */
 export const CHANGELOG = [
+  { version: '1.78.0', date: '2026-10-31', notes: [
+    'The homepage shows the job going round. Beside the headline, the phone now plays thirteen silent seconds of the customer\u2019s page moving Booked in, On my way, On site, Job done, so a stranger gets what this is before reading a word. It loads only when it scrolls into view, shows a still to anyone whose phone is set to less motion, and has no sound. The caption says what it is: what your customer sees, one link, no app.',
+    'The demo stays on the page. Every button on /demo used to send a real request to the server under the made-up job\u2019s code, where nothing was listening: the taps did nothing on the one page people are sent to try, and a worked example was sending traffic at the live database. A tap on the demo is now answered on the page, the way the real page would answer it, and nothing leaves the phone. Two rows at Job done also named the real business on a page that says everything on it is invented; they name the invented one now.',
+    'Changed the card? npm run record:social films it again. It only films a local server, blocks anything that is not a plain read, and stops if the demo ever starts posting again, so the film can never be of real requests.',
+  ] },
   { version: '1.77.0', date: '2026-10-27', notes: [
     'The pilot comes to you. Every Monday at eight, one notification to your phone with last week\'s four numbers beside the week before: jobs, links opened by a customer, will-someone-be-in answered, wasted trips, calls asking when you are coming, and the totals since the count started. A tap opens the panel. Numbers only, never a name. Send me this week\'s now, on the pilot panel, sends the same message today so you can see it before you trust it.',
   ] },

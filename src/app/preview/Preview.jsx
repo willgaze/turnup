@@ -2,6 +2,7 @@
 
 import StatusTracker from '../t/StatusTracker'
 import { TradeProvider } from '@/components/TradeProvider'
+import { DemoProvider } from '../t/status-fetch'
 
 /**
  * The customer's page, drawn from a fixture.
@@ -35,6 +36,10 @@ export default function Preview({ stage }) {
        demo and the diary, and both say nothing on them is real. No phone,
        so there is no Call button that rings a real business. */
     <TradeProvider name="Sam Hale Plumbing">
+    {/* Nothing on this page reaches a server: every tap is answered on the
+        page by src/lib/demo-answers.js. Until v1.78.0 the buttons posted to
+        the real API under the fixture's code and nothing was there. */}
+    <DemoProvider>
     <StatusTracker
       initialProfile={{
         engineerName: 'Sam Hale',
@@ -68,6 +73,7 @@ export default function Preview({ stage }) {
           ],
       }}
     />
+    </DemoProvider>
     </TradeProvider>
   )
 }

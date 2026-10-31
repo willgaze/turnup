@@ -3,6 +3,7 @@ import Mark from '@/components/Mark'
 import { STAGE_ORDER, stageOf } from '@/lib/trade-status'
 import { TickIcon, ChevronIcon } from '@/components/icons'
 import Device from '@/components/Device'
+import HomeVideo from '@/components/HomeVideo'
 import WalletHero from '@/components/WalletHero'
 import Shot, { ShotStrip } from '@/components/Shot'
 import { PHASES } from '@/lib/roadmap'
@@ -116,11 +117,17 @@ export default function Home() {
             Since 25 Oct 2026 the card is live and moves itself, and the
             caption says so. Whether it leads again is the owner's call. */}
         <section className="mt-12 grid items-start gap-8 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+          {/* The phone plays the job going round (v1.78.0): thirteen silent
+              seconds of the real customer page, Booked in to Job done, from
+              scripts/record-social.mjs. A stranger gets it from this before
+              reading a word; the still it replaced showed one stage. */}
           <figure className="mx-auto">
-            <Device screen="/home/customer-on-my-way.webp" width={220} tilt={12} priority className="mx-auto"
-                    alt="The page your customer opens from the text: Hello Sarah, On my way, set off at 08:00, between 09:00 and 11:00" />
+            <Device width={220} tilt={12} priority className="mx-auto"
+                    alt="The page your customer opens from the text, going round the job: Booked in, then On my way, then On site, then Job done"
+                    media={<HomeVideo alt="What your customer sees, as the job moves: Booked in with the agreed hours, On my way with who to expect and when they set off, On site, then Job done" />} />
             <figcaption className="mt-4 text-center text-[14px] leading-snug muted">
-              The job from a text. Live today.
+              What your customer sees. One link, no app.
+              <span className="block">The job from a text. Live today.</span>
             </figcaption>
           </figure>
           <figure className="mx-auto w-full max-w-[320px] sm:max-w-[400px]" style={{ '--tint': '#5856d6' }}>
