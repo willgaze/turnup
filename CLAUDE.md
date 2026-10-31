@@ -1284,6 +1284,32 @@ pulled forward and a job with no day is not today's. If nothing else is
 booked today the card says so once. `node scripts/check-next-job.mjs` (9
 cases, the clock change included). It never names a time.
 
+## Views: one cut of the jobs at a time (`src/lib/views.js`)
+
+Fourteen full job cards was a wall (owner's screenshot, 31 Oct 2026). The
+dashboard now shows **one view at a time**, the ServiceM8 "Action required"
+idea: **Needs you · Now · Today · Coming up · Loose ends · Done · All**, each
+chip with its count. Every job is a **one-line row** (who, when, stage, and the
+one reason it is here) until tapped; only **Now** shows full cards, because
+those are the jobs being worked. It opens on the first view with something in
+it, in that order, and remembers a pick in `?view=` and `localStorage`.
+
+Rules that must not drift:
+
+- **A reason is a fact already on the row** (`needsReasons()`): an unanswered
+  ask, a missed window and the customer's choice, a "move it" reply, hours that
+  started with the card still Booked in, the customer running late, a link not
+  sent or not opened for a job today or tomorrow, a note after the job. Never a
+  guess, never a predicted delay.
+- **Red is only for someone waiting on you now** (`alert`: the ask, the missed
+  window). Everything else that needs you is amber. Calm views take the accent.
+- **Views are lenses, not folders.** A job can be in Needs you and Today.
+- **London days through `isoDay()`**, never millisecond maths.
+- `buildViews(rows, defs)` is generic: the household card list and the
+  ServiceM8 week can take their own `defs`.
+
+`node scripts/check-views.mjs` (30 cases, midnight and BST included).
+
 ## A tap with no signal still counts (`src/app/dashboard/offline-queue.js`)
 
 Every write from the dashboard that is safe to replay — a stage tap, a note, a

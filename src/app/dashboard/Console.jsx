@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { STAGES, stageOf } from '@/lib/trade-status'
 import Passkeys from './Passkeys'
@@ -26,6 +26,8 @@ import NoAccess from './NoAccess'
 import TheyRang from './TheyRang'
 import Pilot from './Pilot'
 import Sm8Week from './Sm8Week'
+import { ViewBar, JobRow } from './JobViews'
+import { buildViews, defaultView } from '@/lib/views'
 import { AttendanceSheet } from './Pictures'
 import { nextJobAfterDone, leftToday } from '@/lib/next-job'
 import { queueFetch, startQueue, onQueue } from './offline-queue'
@@ -96,6 +98,28 @@ export default function Console({ assistant = false }) {
   const [setupOpen, setSetupOpen] = useState(false)
   const [focusPanel, setFocusPanel] = useState(null)
   const [setup, setSetup] = useState(null)
+  // Views (src/lib/views.js): Needs you, Now, Today, Coming up, Done, All.
+  // One cut of the jobs on screen at a time, each job a one-line row until
+  // tapped. null means "not picked": the first view with something in it.
+  const [view, setView] = useState(null)
+  const [expanded, setExpanded] = useState(() => new Set())
+  const built = useMemo(() => buildViews(trackers), [trackers])
+  const shownView = view && built.byKey[view] ? view : defaultView(built)
+  const pickView = (k) => {
+    setView(k)
+    try {
+      const u = new URL(window.location.href); u.searchParams.set('view', k)
+      window.history.replaceState(null, '', u)
+      localStorage.setItem('turnup-view', k)
+    } catch { /* a view is a convenience; never an error */ }
+  }
+  useEffect(() => {
+    try {
+      const want = new URLSearchParams(window.location.search).get('view') || localStorage.getItem('turnup-view')
+      if (want && /^[a-z]{2,10}$/.test(want)) setView(want)
+    } catch { /* no URL, no storage: the default view */ }
+  }, [])
+  const toggleRow = (id) => setExpanded((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n })
 
   const load = useCallback(async () => {
     try {
@@ -433,8 +457,17 @@ export default function Console({ assistant = false }) {
       {loading ? null
        : trackers.length === 0 ? <p className="mt-8 text-center text-[15px] muted">No jobs yet.</p>
        : (
-        <ul className="mt-6 space-y-4">
-          {trackers.map((t) => {
+        <>
+        <ViewBar built={built} view={shownView} onPick={pickView} />
+        {built.byKey[shownView].count === 0 && (
+          <p className="mt-6 text-center text-[15px] muted">{built.byKey[shownView].empty}</p>
+        )}
+        <ul className="mt-4 space-y-3">
+          {built.byKey[shownView].rows.map((t) => {
+            // A one-line row unless it is under way (Now) or has been tapped
+            // open. The full card is the same card as before, one tap away.
+            const full = shownView === 'now' || expanded.has(t.id)
+            if (!full) return <JobRow key={t.id} t={t} reason={built.reasons(t)[0]} onOpen={() => toggleRow(t.id)} />
             const open = openJob === t.id
             // What is useful at the door shows when you are heading there or
             // there; before that it is noise between this job and the next.
@@ -443,6 +476,12 @@ export default function Console({ assistant = false }) {
             return (
             <li key={t.id}
                 className={`glass r-outer tone-${stageOf(t.stage).tone} p-4 ${t.isActive ? '' : 'opacity-55'}`}>
+              {shownView !== 'now' && expanded.has(t.id) && (
+                <button type="button" onClick={() => toggleRow(t.id)}
+                        className="-mt-1 mb-2 inline-flex min-h-[40px] items-center gap-1.5 text-[14px] font-medium muted">
+                  <ChevronIcon size={15} className="-rotate-90" /> Fold back to one line
+                </button>
+              )}
               {presenceOf(t.presence) && presenceIsFresh(t.presenceAt) && (
                 <div className="r-inner mb-3 flex items-start gap-3 px-4 py-3"
                      style={{
@@ -847,6 +886,7 @@ export default function Console({ assistant = false }) {
             )
           })}
         </ul>
+        </>
       )}
 
       {/* Setup and settings, shut. Seven panels used once each, and they were
